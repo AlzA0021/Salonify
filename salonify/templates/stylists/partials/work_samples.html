@@ -1,0 +1,27 @@
+<form method="post" action="{% url 'stylists:update_work_samples' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ work_samples_form.as_p }}
+  <small>حجم تصویر نباید از ۲ مگابایت بیشتر باشد و فرمت‌های مجاز JPG و PNG هستند.</small>
+  <button type="submit" class="btn btn-primary mt-3">ثبت نمونه کار</button>
+</form>
+
+<br >
+<br >
+<hr >
+<br >
+
+{% for sample in work_samples %}
+<div class="work-sample">
+  
+    <h3>{{ sample.service }}</h3>
+    <img src="{{ media_url }}{{ sample.sample_image }}" alt="" style="width: 250px; height: 250px;" />
+    <p>
+      {{ sample.description }} <span class="fa fa-heart" style="color: black;">{{ sample.like_count }}</span>
+    </p>
+    {% if sample.is_active == True %}
+      <h4>فعال میباشد</h4>
+    {% else %}
+      <h4>فعال نیست</h4>
+    {% endif %}
+  {% endfor %}
+</div>

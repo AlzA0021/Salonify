@@ -1,0 +1,810 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/add_stylist.css' %}">
+
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fa.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-date/dist/persian-date.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+    /*
+        مهم: استایل‌های کامل صفحه شما باید در فایل 'add_stylist.css'
+        که به این قالب لینک شده است قرار داشته باشند.
+        این بخش <style> فقط برای نمونه‌های کوچک یا استایل‌های اضطراری است.
+        اطمینان حاصل کنید که فایل CSS اصلی شما به درستی بارگذاری و اعمال می‌شود.
+    */
+
+    /* --- نمونه استایل‌های ضروری برای عملکرد صحیح برخی عناصر --- */
+    .avatar input[type="file"] { display: none; }
+    .avatar {
+        width: 100px; height: 100px; border-radius: 50%; background-color: #e9ecef;
+        display: flex; justify-content: center; align-items: center; position: relative;
+        cursor: pointer; overflow: hidden; border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .avatar #preview_image { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .avatar .avatar-icon { display: flex; justify-content: center; align-items: center; }
+    .avatar .avatar-icon i { font-size: 40px; color: #6c757d; }
+    .edit-avatar {
+        position: absolute; bottom: 5px; right: 5px; background-color: #495057; color: white;
+        width: 30px; height: 30px; border-radius: 50%; display: flex;
+        justify-content: center; align-items: center; border: 2px solid white;
+    }
+    .edit-avatar i { font-size: 14px; }
+
+    /* استایل‌های مربوط به تب خدمات برای نمایش صحیح انتخاب‌ها */
+    .services-category-btn.active {
+        background-color: #2d3748; /* رنگ از CSS اصلی شما */
+        color: white;
+        border-color: #2d3748;
+    }
+    .mb-15.selected {
+        background-color: #e6e6ff; /* رنگ از CSS اصلی شما */
+    }
+    .group-checkbox.checked i,
+    .group-checkbox.checked i,
+    .group-checkbox.partial i {
+        display: inline-block; /* یا opacity: 1 بسته به CSS اصلی شما */
+    }
+     .group-checkbox i, .group-checkbox i {
+        display: none; /* یا opacity: 0 */
+     }
+
+    /* ... سایر استایل‌های ضروری یا نمونه از CSS اصلی شما ... */
+</style>
+{% endblock head %}
+
+{% block title %} افزودن عضو تیم {% endblock title %}
+
+{% block content %}
+<div class="container">
+    <form method="post" enctype="multipart/form-data" id="addStylistForm">
+        {% csrf_token %}
+        <div class="header">
+            <h1>افزودن عضو تیم</h1>
+            <a href="{% url 'dashboards:team_managment' %}" class="close-btn">&times;</a>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="profile">پروفایل</div>
+            <div class="tab" data-tab="emergency">اطلاعات اضطراری</div>
+            <div class="tab" data-tab="services">خدمات</div>
+            <div class="tab" data-tab="commission">کمیسیون‌ها</div>
+        </div>
+
+        <div class="hidden active" id="profile">
+            <div class="profile-picture">
+                <label for="{{ profile_form.profile_image.id_for_label }}" class="avatar">
+                    {{ profile_form.profile_image }}
+                    <img id="preview_image" src="#" alt="پیش‌نمایش تصویر">
+                    <div id="avatar_icon_placeholder" class="avatar-icon">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div class="edit-avatar">
+                        <i class="fa-solid fa-pen"></i>
+                    </div>
+                </label>
+            </div>
+
+            <div class="form-row">
+                <div class="mb-20">
+                    <label for="{{ user_form.name.id_for_label }}" class="required">نام</label>
+                    {{ user_form.name }}
+                </div>
+                <div class="mb-20">
+                    <label for="{{ user_form.family.id_for_label }}">نام خانوادگی</label>
+                    {{ user_form.family }}
+                </div>
+            </div>
+
+            <div class="mb-20">
+                <label for="{{ user_form.email.id_for_label }}" class="required">ایمیل</label>
+                {{ user_form.email }}
+            </div>
+            <div class="mb-20">
+                <label for="{{ profile_form.expert.id_for_label }}">تخصص</label>
+                {{ profile_form.expert }}
+                <div class="subtitle">قابل مشاهده برای مشتریان آنلاین</div>
+            </div>
+
+            <div class="mb-20">
+                <label style="margin-bottom: 0; font-weight: 600;">جزئیات کاری</label>
+                <div class="subtitle" style="margin-top: 4px;">مدیریت تاریخ شروع و جزئیات استخدام عضو تیم</div>
+            </div>
+
+            <div class="form-row">
+                <div class="mb-20">
+                    <label for="{{ job_form.start_date.id_for_label }}">تاریخ شروع</label>
+                    <div class="grid-item">
+                        {{ job_form.start_date }} <div class="date-icon" id="start_date_icon">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                    </div>
+                </div>
+                 <div class="mb-20">
+                    <label for="{{ job_form.end_date.id_for_label }}">تاریخ پایان</label>
+                    <div class="grid-item">
+                        {{ job_form.end_date }} <div class="date-icon" id="end_date_icon">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-20">
+                <label for="{{ job_form.employment_type.id_for_label }}">نوع استخدام</label>
+                {{ job_form.employment_type }}
+            </div>
+            <div class="mb-20">
+                <label for="{{ user_form.mobile_number.id_for_label }}">شماره تلفن</label>
+                {{ user_form.mobile_number }}
+            </div>
+
+            <div class="mb-20">
+                <label>رنگ تقویم</label>
+                 {{ profile_form.calendar_color }}
+                 <div class="color-selector">
+                    <div class="color-dot selected" data-color="#80DEEA" style="background-color: #80DEEA;"></div>
+                    <div class="color-dot" data-color="#64B5F6" style="background-color: #64B5F6;"></div>
+                    <div class="color-dot" data-color="#7986CB" style="background-color: #7986CB;"></div>
+                    <div class="color-dot" data-color="#9575CD" style="background-color: #9575CD;"></div>
+                    <div class="color-dot" data-color="#B39DDB" style="background-color: #B39DDB;"></div>
+                    <div class="color-dot" data-color="#CE93D8" style="background-color: #CE93D8;"></div>
+                    <div class="color-dot" data-color="#F48FB1" style="background-color: #F48FB1;"></div>
+                    <div class="color-dot" data-color="#FF8A80" style="background-color: #FF8A80;"></div>
+                    <div class="color-dot" data-color="#FFB74D" style="background-color: #FFB74D;"></div>
+                    <div class="color-dot" data-color="#FFD54F" style="background-color: #FFD54F;"></div>
+                    <div class="color-dot" data-color="#FFF176" style="background-color: #FFF176;"></div>
+                    <div class="color-dot" data-color="#AED581" style="background-color: #AED581;"></div>
+                    <div class="color-dot" data-color="#A1887F" style="background-color: #A1887F;"></div>
+                    <div class="color-dot" data-color="#90A4AE" style="background-color: #90A4AE;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden" id="emergency">
+            <h2>اطلاعات تماس اضطراری</h2>
+            <div class="form-row">
+                <div class="mb-20">
+                    <label for="{{ emergency_form.emergency_contact_name.id_for_label }}">نام</label>
+                    {{ emergency_form.emergency_contact_name }}
+                </div>
+                <div class="mb-20">
+                    <label for="{{ emergency_form.emergency_contact_family.id_for_label }}">نام خانوادگی</label>
+                    {{ emergency_form.emergency_contact_family }}
+                </div>
+            </div>
+            <div class="mb-20">
+                <label for="{{ emergency_form.relationship.id_for_label }}">نسبت</label>
+                {{ emergency_form.relationship }}
+            </div>
+            <div class="mb-20">
+                <label>شماره تلفن</label>
+                <div class="icons">
+                    <div class="phone-prefix">
+                        {{ emergency_form.emergency_phone_prefix }}
+                    </div>
+                    <div class="date-text">
+                        {{ emergency_form.emergency_phone }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden" id="services">
+            <div class="services-modern-container">
+                <div class="services-header">
+                     <h2>خدمات</h2>
+                    <p class="services-subtitle">خدماتی که این عضو تیم ارائه می‌دهد را انتخاب کنید</p>
+                </div>
+
+                <div class="services-search-section">
+                    <div class="services-search-container">
+                        <input type="text" class="services-search-input" placeholder="جستجوی خدمات..." id="servicesSearchInput">
+                        <i class="fas fa-search services-search-icon"></i>
+                    </div>
+                    <div class="services-category-filters" id="servicesCategoryFiltersContainer">
+                        <button type="button" class="services-category-btn active" data-category="all">همه</button>
+                        {% for group in salon_service_groups %}
+                        <button type="button" class="services-category-btn" data-category="{{ group.id }}">{{ group.group_title }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="services-list" id="servicesList">
+                    </div>
+
+                <div class="selected-count" id="selectedServicesCount" style="display: none;">
+                    0 خدمت انتخاب شده
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden" id="commission">
+            <h2>تنظیمات کمیسیون</h2>
+            <div class="commission-item">
+                <div class="commission-header">
+                    <span class="commission-title">کمیسیون خدمات</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="service_commission_active" checked> <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                 <div class="subtitle">فعال‌سازی و تنظیم نرخ کمیسیون برای خدمات ارائه شده.</div>
+                <div class="commission-settings">
+                    <select name="service_commission_type" class="form-control">
+                        <option value="">انتخاب نوع کمیسیون</option>
+                        <option value="fixed">نرخ ثابت</option>
+                        <option value="percentage">درصدی</option>
+                        <option value="none">بدون کمیسیون</option>
+                    </select>
+                    <input type="number" name="service_commission_rate" placeholder="درصد یا مبلغ" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" name="selected_services_input" id="selectedServicesInput">
+
+        <div class="form-submit-section">
+            <button type="submit" class="btn-primary">افزودن </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profileImageInput = document.getElementById('{{ profile_form.profile_image.id_for_label }}');
+    const initialPreview = document.getElementById('preview_image');
+    const initialIconPlaceholder = document.getElementById('avatar_icon_placeholder');
+    if (profileImageInput && profileImageInput.files && profileImageInput.files.length > 0) {
+        showPreview(profileImageInput);
+    } else if (initialPreview && initialPreview.getAttribute('src') && initialPreview.getAttribute('src') !== '#' && initialPreview.style.display !== 'none') {
+        if(initialIconPlaceholder) initialIconPlaceholder.style.display = 'none';
+        if(initialPreview) initialPreview.style.display = 'block';
+    } else {
+        if (initialPreview) initialPreview.style.display = 'none';
+        if (initialIconPlaceholder) initialIconPlaceholder.style.display = 'flex';
+    }
+
+    // --- Tab Switching ---
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.hidden');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() { 
+            console.log(`Tab clicked. Data-tab attribute: ${this.getAttribute('data-tab')}`); 
+
+            const targetId = this.getAttribute('data-tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            this.classList.add('active');
+            const targetContent = document.getElementById(targetId);
+            if(targetContent) {
+                targetContent.classList.add('active');
+            } else {
+                console.error(`Target content with ID '${targetId}' not found!`); 
+            }
+
+            if (targetId === 'services') {
+                console.log("Services tab is now active. Proceeding to check/fetch data."); 
+                const servicesListEl = document.getElementById('servicesList');
+
+                if (!servicesListEl) { 
+                    console.error("CRITICAL ERROR: Element with ID 'servicesList' was NOT FOUND in the DOM when services tab was clicked."); 
+                    const servicesTabContent = document.getElementById('services');
+                    if (servicesTabContent) {
+                        servicesTabContent.innerHTML = `<div class="text-danger" style="padding: 20px; text-align:center; color: #dc3545;">خطای داخلی: ساختار صفحه خدمات بارگذاری نشده است. لطفاً صفحه را رفرش کنید.</div>`;
+                    }
+                    return; 
+                }
+                
+                // اصلاح شرط needsFetching
+                const isEssentiallyEmpty = servicesListEl.innerHTML.trim() === '';
+                const hasError = servicesListEl.querySelector('.text-danger') !== null;
+                const isLoading = servicesListEl.querySelector('.text-danger') !== null;
+                
+                const needsFetching = isEssentiallyEmpty || hasError || isLoading;
+
+                console.log(`Checking conditions to fetch services: needsFetching = ${needsFetching}`); 
+                console.log(`  isEssentiallyEmpty (innerHTML.trim() === ''): ${isEssentiallyEmpty}`); 
+                console.log(`  hasError (querySelector('.text-danger') !== null): ${hasError}`); 
+                console.log(`  isLoading (querySelector('.text-danger') !== null): ${isLoading}`); 
+
+                if (needsFetching) {
+                    console.log("Conditions met. Calling fetchServicesData()."); 
+                    fetchServicesData();
+                } else {
+                    console.log("Conditions NOT met (already populated or not in error/loading state). Not calling fetchServicesData()."); 
+                }
+            }
+        });
+    });
+
+    // --- Flatpickr (Shamsi Calendar) ---
+    flatpickr.localize(flatpickr.l10ns.fa);
+    const dateConfig = {
+        dateFormat: "Y-m-d",
+        disableMobile: true,
+        locale: "fa",
+        altInput: true,
+        altFormat: "j F Y",
+        allowInput: false, 
+        onReady: function(selectedDates, dateStr, instance) {
+            if (instance.altInput) {
+                instance.altInput.placeholder = "تاریخ را انتخاب کنید";
+                instance.altInput.classList.add('flatpickr-alt-input');
+                instance.altInput.setAttribute('readonly', 'readonly'); 
+            }
+        },
+    };
+    document.querySelectorAll('input[name="start_date"], input[name="end_date"]').forEach(element => {
+        const picker = flatpickr(element, dateConfig);
+        const iconId = element.name + '_icon';
+        const dateIcon = document.getElementById(iconId);
+        if (dateIcon) {
+            dateIcon.addEventListener('click', (e) => { e.stopPropagation(); picker.open(); });
+        }
+        if (picker.altInput) {
+            picker.altInput.addEventListener('click', (e) => { e.stopPropagation(); picker.open(); });
+        }
+    });
+
+    // --- Color Selector ---
+    const colorDots = document.querySelectorAll('.color-dot');
+    const colorInput = document.querySelector('input[name="calendar_color"]');
+    if (colorDots.length > 0 && colorInput) {
+        let initialColorVal = colorInput.value;
+        if (!initialColorVal) {
+            const initialSelectedDot = document.querySelector('.color-dot.selected') || colorDots[0];
+            if (initialSelectedDot) {
+                initialColorVal = initialSelectedDot.getAttribute('data-color');
+                colorInput.value = initialColorVal;
+            }
+        }
+        colorDots.forEach(dot => {
+            dot.classList.toggle('selected', dot.getAttribute('data-color') === initialColorVal);
+        });
+        colorDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                colorDots.forEach(d => d.classList.remove('selected'));
+                dot.classList.add('selected');
+                colorInput.value = dot.getAttribute('data-color');
+            });
+        });
+    }
+
+    // --- Services Tab Functionality ---
+    const servicesState = {
+        selectedServices: new Set(),
+        activeCategory: 'all',
+        searchQuery: ''
+    };
+    const servicesListContainer = document.getElementById('servicesList'); 
+    const servicesSearchInput = document.getElementById('servicesSearchInput');
+    const servicesCategoryFiltersContainer = document.getElementById('servicesCategoryFiltersContainer');
+    const selectedServicesCountElement = document.getElementById('selectedServicesCount');
+    const selectedServicesHiddenInput = document.getElementById('selectedServicesInput');
+
+    function formatDuration(minutes) {
+        if (minutes === null || minutes === undefined || minutes === 0) return '';
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        let durationStr = '';
+        if (hours > 0) durationStr += `${new Intl.NumberFormat('fa-IR').format(hours)} ساعت`;
+        if (remainingMinutes > 0) {
+            if (hours > 0) durationStr += ' و ';
+            durationStr += `${new Intl.NumberFormat('fa-IR').format(remainingMinutes)} دقیقه`;
+        }
+        return durationStr;
+    }
+
+    function formatPrice(price) {
+        if (price === null || price === undefined) return 'رایگان';
+        if (price === 0) return 'رایگان';
+        return new Intl.NumberFormat('fa-IR').format(price) + ' ریال';
+    }
+
+    async function fetchServicesData() {
+        console.log("Attempting to fetch services data..."); 
+        if (!servicesListContainer) { 
+            console.error("CRITICAL ERROR: servicesListContainer is null or undefined in fetchServicesData function scope."); 
+            return;
+        }
+        servicesListContainer.innerHTML = '<div class="error-message" style="padding: 20px; text-align:center; color: #6c757d;">در حال بارگذاری خدمات...</div>';
+        try {
+            const servicesUrl = "{% url 'dashboards:services_list' %}";
+            console.log(`Fetching from URL: ${servicesUrl}`); 
+
+            const response = await fetch(servicesUrl);
+            console.log("Fetch response status:", response.status); 
+
+            if (!response.ok) {
+                let errorText = `Status: ${response.status}, StatusText: ${response.statusText}`;
+                try {
+                    const responseBody = await response.text();
+                    errorText += `, Body: ${responseBody.substring(0, 200)}...`; 
+                } catch (textError) {
+                    errorText += `, Could not read response body.`;
+                }
+                console.error("Network error details:", errorText); 
+                throw new Error(`خطای شبکه هنگام دریافت خدمات. ${errorText}`);
+            }
+
+            const data = await response.json();
+            console.log("Data received from API:", data); 
+
+            if (data && Array.isArray(data.services)) {
+                populateServicesList(data.services);
+                // attachFilterButtonListeners(); // دیگر نیازی به فراخوانی مجدد در اینجا نیست، چون در DOMContentLoaded یکبار فراخوانی می‌شود
+                updateSelectedVisuals();
+            } else {
+                console.error("Invalid data format received from API:", data); 
+                throw new Error('فرمت داده‌های دریافتی از سرور نامعتبر است.');
+            }
+        } catch (error) {
+            console.error('خطا در دریافت یا پردازش اطلاعات خدمات:', error); 
+            if (servicesListContainer) { 
+                servicesListContainer.innerHTML = `<div class="text-danger" style="padding: 20px; text-align:center; color: #dc3545;">خطا در بارگذاری خدمات. (${error.message}) لطفاً کنسول مرورگر را برای جزئیات بیشتر بررسی کنید.</div>`;
+            }
+        }
+    }
+
+    function attachFilterButtonListeners() {
+        console.log("Attaching filter button listeners..."); 
+        if (!servicesCategoryFiltersContainer) {
+            console.warn("servicesCategoryFiltersContainer not found for attaching listeners."); 
+            return;
+        }
+        const allCategoryButtons = servicesCategoryFiltersContainer.querySelectorAll('.services-category-btn');
+        console.log(`Found ${allCategoryButtons.length} category buttons.`); 
+
+        allCategoryButtons.forEach(button => {
+            // برای جلوگیری از افزودن چندباره شنونده، اگر قبلا اضافه شده، دوباره اضافه نمی‌کنیم.
+            // یک راه ساده‌تر این است که این تابع فقط یکبار در DOMContentLoaded فراخوانی شود.
+            button.removeEventListener('click', handleCategoryFilterClick); // ابتدا حذف کن (اگر وجود داشت)
+            button.addEventListener('click', handleCategoryFilterClick); // سپس اضافه کن
+        });
+
+        const isActiveButtonPresent = servicesCategoryFiltersContainer.querySelector('.services-category-btn.active');
+        if(!isActiveButtonPresent){
+            const allBtn = servicesCategoryFiltersContainer.querySelector('.services-category-btn[data-category="all"]');
+            if(allBtn) {
+                console.log("Activating 'all' category button by default."); 
+                allBtn.classList.add('active');
+                servicesState.activeCategory = 'all';
+            }
+        }
+    }
+
+    function handleCategoryFilterClick(event) {
+        const clickedButton = event.currentTarget;
+        console.log("Category filter clicked:", clickedButton.dataset.category); 
+        if (servicesCategoryFiltersContainer) {
+            servicesCategoryFiltersContainer.querySelectorAll('.services-category-btn').forEach(b => b.classList.remove('active'));
+        }
+        clickedButton.classList.add('active');
+        servicesState.activeCategory = clickedButton.dataset.category;
+        filterServices();
+    }
+
+    function createServiceItemHTML(service) {
+        const isSelected = servicesState.selectedServices.has(service.id.toString());
+        const durationText = formatDuration(service.duration);
+        return `
+            <div class="mb-15 ${isSelected ? 'selected' : ''}"
+                data-service-id="${service.id}"
+                data-group-id="${service.groupId !== null && service.groupId !== undefined ? service.groupId.toString() : 'other'}"
+                data-service-name="${service.name || ''}">
+                <div class="service-content">
+                    <div class="group-checkbox ${isSelected ? 'checked' : ''}" data-service-id="${service.id}">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="service-info">
+                        <div class="service-name">${service.name || 'سرویس بدون نام'}</div>
+                        ${durationText ? `<div class="service-price">${durationText}</div>` : ''}
+                    </div>
+                    <div class="service-price">${formatPrice(service.price)}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function populateServicesList(services) {
+        console.log("Populating services list with:", services.length, "services"); 
+        if (!servicesListContainer) {
+             console.error("CRITICAL ERROR: servicesListContainer not found in populateServicesList!"); 
+             return;
+        }
+        const groupedServices = {};
+        services.forEach(service => {
+            const groupId = service.groupId !== null && service.groupId !== undefined ? service.groupId.toString() : 'other';
+            const groupTitle = service.groupTitle || 'سایر خدمات';
+            if (!groupedServices[groupId]) {
+                groupedServices[groupId] = { id: groupId, title: groupTitle, services: [] };
+            }
+            groupedServices[groupId].services.push(service);
+        });
+
+        if (services.length === 0) {
+             console.log("No services to display. Showing empty message."); 
+             servicesListContainer.innerHTML = '<div style="padding: 20px; text-align:center; color: #6c757d;">هیچ خدمتی برای نمایش یافت نشد.</div>';
+             return;
+        }
+
+        servicesListContainer.innerHTML = Object.values(groupedServices).map(group => {
+            if (group.services.length === 0) return ''; 
+            return `
+                <div class="service-group" data-category="${group.id}">
+                    <div class="group-header">
+                        <div class="group-title">
+                            <div class="group-checkbox" data-group="${group.id}"><i class="fas fa-check"></i></div>
+                            <span>${group.title}</span>
+                            <span class="group-count">${new Intl.NumberFormat('fa-IR').format(group.services.length)}</span>
+                        </div>
+                    </div>
+                    <div class="service-items-container">
+                        ${group.services.map(service => createServiceItemHTML(service)).join('')}
+                    </div>
+                </div>`;
+        }).join('');
+
+        attachServiceEventListeners();
+        filterServices(); 
+        updateSelectedVisuals();
+    }
+
+    function attachServiceEventListeners() {
+        console.log("Attaching service item and group checkbox listeners..."); 
+        if (!servicesListContainer) return;
+        servicesListContainer.querySelectorAll('.mb-15').forEach(item => {
+            item.removeEventListener('click', serviceItemClickHandler);
+            item.addEventListener('click', serviceItemClickHandler);
+        });
+        servicesListContainer.querySelectorAll('.group-checkbox').forEach(checkbox => {
+            checkbox.removeEventListener('click', serviceCheckboxClickHandler);
+            checkbox.addEventListener('click', serviceCheckboxClickHandler);
+        });
+        servicesListContainer.querySelectorAll('.group-checkbox').forEach(checkbox => {
+            checkbox.removeEventListener('click', groupCheckboxClickHandler);
+            checkbox.addEventListener('click', groupCheckboxClickHandler);
+        });
+    }
+    function serviceItemClickHandler(event) { toggleServiceSelection(event.currentTarget.dataset.serviceId); }
+    function serviceCheckboxClickHandler(event) { event.stopPropagation(); toggleServiceSelection(event.currentTarget.dataset.serviceId); }
+    function groupCheckboxClickHandler(event) { event.stopPropagation(); toggleServiceGroupSelection(event.currentTarget.dataset.group); }
+
+
+    function toggleServiceSelection(serviceId) {
+        if (!serviceId) return;
+        const serviceIdStr = serviceId.toString();
+        console.log(`Toggling selection for service ID: ${serviceIdStr}`); 
+
+        const serviceItem = servicesListContainer?.querySelector(`.mb-15[data-service-id="${serviceIdStr}"]`);
+        const serviceCheckbox = serviceItem?.querySelector(`.group-checkbox`);
+
+        if (servicesState.selectedServices.has(serviceIdStr)) {
+            servicesState.selectedServices.delete(serviceIdStr);
+            serviceItem?.classList.remove('selected');
+            serviceCheckbox?.classList.remove('checked');
+        } else {
+            servicesState.selectedServices.add(serviceIdStr);
+            serviceItem?.classList.add('selected');
+            serviceCheckbox?.classList.add('checked');
+        }
+        updateSelectedVisuals();
+    }
+
+    function toggleServiceGroupSelection(groupId) {
+        if (!groupId || !servicesListContainer) return;
+        const groupIdStr = groupId.toString();
+        console.log(`Toggling selection for group ID: ${groupIdStr}`); 
+
+        const servicesInGroup = servicesListContainer.querySelectorAll(`.mb-15[data-group-id="${groupIdStr}"]`);
+
+        if (servicesInGroup.length === 0) {
+            updateSelectedVisuals();
+            return;
+        }
+
+        let allCurrentlySelectedInGroup = Array.from(servicesInGroup).every(item =>
+            servicesState.selectedServices.has(item.dataset.serviceId)
+        );
+
+        const shouldSelectGroup = !allCurrentlySelectedInGroup;
+        console.log(`  Group should be selected: ${shouldSelectGroup}`); 
+
+        servicesInGroup.forEach(item => {
+            const serviceId = item.dataset.serviceId;
+            const sCheckbox = item.querySelector(`.group-checkbox`);
+            if (shouldSelectGroup) {
+                if (!servicesState.selectedServices.has(serviceId)) {
+                    servicesState.selectedServices.add(serviceId);
+                    item.classList.add('selected');
+                    sCheckbox?.classList.add('checked');
+                }
+            } else {
+                if (servicesState.selectedServices.has(serviceId)) {
+                    servicesState.selectedServices.delete(serviceId);
+                    item.classList.remove('selected');
+                    sCheckbox?.classList.remove('checked');
+                }
+            }
+        });
+        updateSelectedVisuals();
+    }
+
+    function updateSelectedVisuals() {
+        if (!servicesListContainer) return;
+        console.log("Updating selected visuals. Total selected:", servicesState.selectedServices.size); 
+
+        document.querySelectorAll('.group-checkbox').forEach(groupCb => {
+            const groupId = groupCb.dataset.group;
+            const visibleServicesInThisGroup = servicesListContainer.querySelectorAll(`.mb-15[data-group-id="${groupId}"]:not([style*="display: none"])`);
+            const allServicesInThisGroupRaw = servicesListContainer.querySelectorAll(`.mb-15[data-group-id="${groupId}"]`);
+
+            let selectedCountInVisible = 0;
+            let totalVisibleServicesInGroup = visibleServicesInThisGroup.length;
+
+            if (allServicesInThisGroupRaw.length === 0) {
+                 groupCb.classList.remove('checked', 'partial');
+                 return;
+            }
+
+            visibleServicesInThisGroup.forEach(item => {
+                if (servicesState.selectedServices.has(item.dataset.serviceId)) {
+                    selectedCountInVisible++;
+                }
+            });
+
+            groupCb.classList.remove('checked', 'partial');
+
+            if (totalVisibleServicesInGroup === 0) {
+            } else if (selectedCountInVisible === 0) {
+            } else if (selectedCountInVisible === totalVisibleServicesInGroup) {
+                groupCb.classList.add('checked'); 
+            } else {
+                groupCb.classList.add('partial'); 
+            }
+        });
+
+        const count = servicesState.selectedServices.size;
+        if (selectedServicesCountElement) {
+            if (count > 0) {
+                selectedServicesCountElement.textContent = `${new Intl.NumberFormat('fa-IR').format(count)} خدمت انتخاب شده`;
+                selectedServicesCountElement.style.display = 'block';
+            } else {
+                selectedServicesCountElement.style.display = 'none';
+            }
+        }
+        if (selectedServicesHiddenInput) {
+            selectedServicesHiddenInput.value = JSON.stringify(Array.from(servicesState.selectedServices));
+        }
+    }
+
+    if(servicesSearchInput) {
+        servicesSearchInput.addEventListener('input', (e) => {
+            servicesState.searchQuery = e.target.value.toLowerCase().trim();
+            console.log(`Search query changed: "${servicesState.searchQuery}"`); 
+            filterServices();
+        });
+    }
+
+    function filterServices() {
+        console.log(`Filtering services. Query: "${servicesState.searchQuery}", Category: "${servicesState.activeCategory}"`); 
+        if (!servicesListContainer) return;
+        const allServiceGroupElements = servicesListContainer.querySelectorAll('.service-group');
+        const searchQuery = servicesState.searchQuery; 
+        const activeCategoryFilter = servicesState.activeCategory;
+        let anyItemVisibleOverall = false;
+
+        allServiceGroupElements.forEach(groupElement => {
+            const groupDataId = groupElement.dataset.category;
+            const serviceItemElements = groupElement.querySelectorAll('.mb-15');
+            let visibleServicesCountInThisGroup = 0;
+
+            const isGroupRelevantToCategory = activeCategoryFilter === 'all' || groupDataId === activeCategoryFilter;
+
+            if (isGroupRelevantToCategory) {
+                serviceItemElements.forEach(serviceItem => {
+                    const serviceName = serviceItem.dataset.serviceName ? serviceItem.dataset.serviceName.toLowerCase() : "";
+                    const matchesSearch = searchQuery === '' || serviceName.includes(searchQuery);
+
+                    if (matchesSearch) {
+                        serviceItem.style.display = 'flex';
+                        visibleServicesCountInThisGroup++;
+                    } else {
+                        serviceItem.style.display = 'none';
+                    }
+                });
+
+                if (visibleServicesCountInThisGroup > 0 || (activeCategoryFilter !== 'all' && searchQuery === '')) {
+                    groupElement.style.display = 'block';
+                    if (visibleServicesCountInThisGroup > 0) anyItemVisibleOverall = true;
+                } else if (activeCategoryFilter === 'all' && searchQuery !== '' && visibleServicesCountInThisGroup === 0) {
+                    groupElement.style.display = 'none';
+                } else if (activeCategoryFilter === 'all' && searchQuery === '') {
+                     groupElement.style.display = 'block';
+                }
+                 else {
+                    groupElement.style.display = 'none';
+                }
+
+                const groupCountElement = groupElement.querySelector('.group-header .group-count');
+                if (groupCountElement) {
+                    groupCountElement.textContent = new Intl.NumberFormat('fa-IR').format(visibleServicesCountInThisGroup);
+                }
+
+            } else {
+                groupElement.style.display = 'none';
+            }
+        });
+
+        const noResultsMessageElement = servicesListContainer.querySelector('.text-danger');
+        if (noResultsMessageElement) {
+            noResultsMessageElement.remove();
+        }
+
+        if (!anyItemVisibleOverall && (searchQuery !== '' || activeCategoryFilter !== 'all')) {
+            const hasServiceGroupsLoaded = servicesListContainer.querySelectorAll('.service-group').length > 0;
+            const isLoadingMessagePresent = servicesListContainer.querySelector('.text-danger') !== null;
+            const isErrorMessagePresent = servicesListContainer.querySelector('.text-danger') !== null;
+
+            if ((hasServiceGroupsLoaded || (!isLoadingMessagePresent && !isErrorMessagePresent)) && 
+                servicesListContainer.children.length > 0 && 
+                Array.from(servicesListContainer.children).every(child => child.style.display === 'none' || child.classList.contains('no-results-message'))) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'no-results-message';
+                msgDiv.textContent = 'هیچ خدمتی با این جستجو یا در این دسته یافت نشد.';
+                msgDiv.style.textAlign = 'center';
+                msgDiv.style.padding = '20px';
+                msgDiv.style.color = '#6c757d';
+                servicesListContainer.appendChild(msgDiv);
+                console.log("Displayed 'no results' message."); 
+            } else if (!hasServiceGroupsLoaded && !isLoadingMessagePresent && !isErrorMessagePresent && servicesListContainer.innerHTML.trim() === '') {
+                 const msgDiv = document.createElement('div');
+                msgDiv.className = 'no-results-message'; 
+                msgDiv.textContent = 'هیچ خدمتی برای نمایش وجود ندارد.'; 
+                msgDiv.style.textAlign = 'center';
+                msgDiv.style.padding = '20px';
+                msgDiv.style.color = '#6c757d';
+                servicesListContainer.appendChild(msgDiv);
+                console.log("Displayed 'no services available' message."); 
+            }
+        }
+        updateSelectedVisuals();
+    }
+
+    // --- Initial Setup ---
+    // فراخوانی attachFilterButtonListeners یکبار پس از بارگذاری کامل DOM
+    attachFilterButtonListeners();
+
+    const activeServicesTab = document.querySelector('.tab.active[data-tab="services"]');
+    if (activeServicesTab) {
+        console.log("Services tab is active on page load. Fetching data."); 
+        fetchServicesData();
+    } else {
+        console.log("Services tab is NOT active on page load."); 
+        // دیگر نیازی به فراخوانی attachFilterButtonListeners در اینجا نیست چون بالاتر فراخوانی شده
+    }
+
+    // --- Form Submission ---
+    const addStylistForm = document.getElementById('addStylistForm');
+    if (addStylistForm) {
+        addStylistForm.addEventListener('submit', function(e) {
+            // e.preventDefault(); 
+            console.log("Form submitted. Selected services (JSON string):", selectedServicesHiddenInput.value); 
+        });
+    }
+});
+</script>
+
+{% endblock content %}

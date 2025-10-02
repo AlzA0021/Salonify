@@ -1,0 +1,18 @@
+<!-- stylists/partials/update_stylist_services.html -->
+<form method="post" action="{% url 'stylists:update_stylist_services' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ service_form.as_p }}
+  <button type="submit" class="btn btn-primary">ذخیره</button>
+</form>
+
+<h3>خدمات فعلی</h3>
+<ul>
+  {% for service in services %}
+    <li>{{ service.service_name }} - 
+      {% for price in service.service_prices.all %}
+      {{ price.price }} تومان</li>
+      {% endfor %}
+  {% empty %}
+    <li>هیچ خدمتی اضافه نشده است.</li>
+  {% endfor %}
+</ul>

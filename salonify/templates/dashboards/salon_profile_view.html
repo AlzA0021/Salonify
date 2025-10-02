@@ -1,0 +1,59 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+
+{% block title %}پروفایل سالن{% endblock title %}
+
+{# برای لود خودکار ماژول pages/salon_profile_creator.js توسط app.js #}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="header">
+    {# back-btn بجای back-button برای اتصال به initCommonNav #}
+    <button type="button" class="back-btn btn" aria-label="بازگشت">
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </button>
+
+    <div class="title">پروفایل آنلاین</div>
+
+    {# اگر به منوی بیشتر نیاز نیست می‌توانید نگه دارید؛ در JS درگیر نیست #}
+    <button type="button" class="menu-button" aria-label="بیشتر">
+      <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="subtitle">
+    مشاهده و مدیریت پروفایل آنلاین شما در بازار سالنی‌فای.
+    <a href="#" class="learn-more">بیشتر بدانید</a>
+  </div>
+
+  {% if salon.banner_image %}
+    <img src="{{ salon.banner_image.url }}" alt="سالن زیبایی" class="salon-image">
+  {% endif %}
+
+  <div class="status-badge">{{ salon.avg_score|floatformat:1|default:"بدون امتیاز" }}</div>
+
+  <div class="salon-info">
+    <div class="salon-name">{{ salon.salon_name }}</div>
+    <div class="reviews">
+      میانگین امتیاز {{ salon.avg_score|floatformat:1|default:"-" }}
+      (از {{ salon.reviews_count }} نظر)
+    </div>
+    <div class="location">{{ salon.address }}</div>
+  </div>
+
+  <div class="action-buttons">
+    {# افزودن کلاس btn برای افکت فشردن #}
+    <button type="button" class="action-button btn">مشخصات</button>
+    <button type="button" class="action-button dropdown btn">
+      اقدامات <span class="dropdown-icon">›</span>
+    </button>
+  </div>
+
+  <div class="update-date">به‌روزرسانی شده در {{ salon.register_date }}</div>
+</div>
+{% endblock content %}

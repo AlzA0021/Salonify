@@ -1,0 +1,26 @@
+<div class="top-section-card">
+  <!-- تصویر پروفایل آرایشگر -->
+  <div class="top-section-image">
+    <img src="{{ stylist.profile_image.url }}" alt="{{ stylist.user.name }}" />
+  </div>
+
+  <!-- جزئیات آرایشگر -->
+  <div class="top-section-details">
+    <h3 class="top-section-title">
+      {{ stylist.user.name }} {{ stylist.user.family }}
+      <span class="top-section-discount">50%</span>
+    </h3>
+    <p class="top-section-description">{{ stylist.description|truncatechars:50 }}</p>
+    <div class="top-section-card-body">
+      <p>
+        <i class="fas fa-star"></i>&nbsp;&nbsp;{{ stylist.get_average_score }}
+      </p>
+
+      <div class="top-section-actions">
+        <button type="button" class="action-btn" onclick="get_stylist_worksample_card({{ stylist.user.id }},this)"><i class="fas fa-images"></i>نمونه کار&nbsp;&nbsp;{{ stylist.work_samples_of_stylist.count }}</button>
+        <button type="button" class="action-btn" onclick="get_stylist_priceList({{ stylist.user.id }},this)"><i class="fas fa-list-alt"></i>لیست قیمت&nbsp;&nbsp;{{ stylist.services_of_stylist.count }}</button>
+        <button type="button" class="action-btn" onclick="get_stylist_comments({{ stylist.user.id }},this)"><i class="fas fa-comments"></i> نظرات&nbsp;&nbsp;{{ stylist.comments_stylist.count }}</button>
+      </div>
+    </div>
+  </div>
+</div>

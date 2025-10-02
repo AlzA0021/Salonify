@@ -1,0 +1,330 @@
+/* ===== متغیرهای اصلی ===== */
+:root {
+  --primary-color: #b048f8;
+  --primary-hover: #9a3ad8;
+  --gradient-start: #6b5bff;
+  --gradient-end: #ff59c7;
+  --text-dark: #333;
+  --text-medium: #555;
+  --text-light: #777;
+  --error-color: #e74c3c;
+  --success-bg: #d4edda;
+  --success-color: #155724;
+  --danger-bg: #f8d7da;
+  --danger-color: #721c24;
+  --warning-bg: #fff3cd;
+  --warning-color: #856404;
+  --border-color: #ddd;
+  --border-radius-sm: 6px;
+  --border-radius-md: 10px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 25px;
+  --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== پایه ===== */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Tahoma', Arial, sans-serif;
+  direction: rtl;
+  height: 100vh;
+  background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== عناصر پس‌زمینه ===== */
+.login-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-page:before,
+.login-page:after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.login-page:before {
+  width: 300px;
+  height: 300px;
+  top: -150px;
+  right: -150px;
+}
+
+.login-page:after {
+  width: 400px;
+  height: 400px;
+  bottom: -200px;
+  left: -200px;
+}
+
+/* ===== کانتینر اصلی ===== */
+.login-container {
+  background: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--box-shadow);
+  width: 90%;
+  max-width: 400px;
+  padding: 30px 40px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.login-container h2 {
+  color: var(--text-dark);
+  margin-bottom: 30px;
+  font-weight: 600;
+  font-size: 28px;
+}
+
+/* ===== فرم‌ها ===== */
+.form-group {
+  margin-bottom: 25px;
+  text-align: right;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-medium);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.input-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: var(--border-radius-lg);
+  padding: 0 15px;
+  border: 1px solid var(--border-color);
+}
+
+.input-field i {
+  color: var(--text-light);
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.form-group input,
+.register-input-group {
+  width: 100%;
+  padding: 15px 10px;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 14px;
+}
+
+/* ===== دکمه‌ها ===== */
+.btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: var(--border-radius-xl);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.btn-primary {
+  background: var(--text-dark);
+  color: white;
+  border-radius: var(--border-radius-lg);
+}
+
+.btn-primary:hover {
+  background: #fff;
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+}
+
+/* ===== پیام‌های خطا و هشدار ===== */
+.error span {
+  color: var(--error-color);
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.alert {
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: var(--border-radius-sm);
+  text-align: center;
+  font-size: 14px;
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success-color);
+}
+
+.alert-danger {
+  background: var(--danger-bg);
+  color: var(--danger-color);
+}
+
+.alert-warning {
+  background: var(--warning-bg);
+  color: var(--warning-color);
+}
+
+/* ===== ورود با سرویس‌های دیگر ===== */
+.alt-login {
+  margin-top: 30px;
+  position: relative;
+}
+
+.alt-login p {
+  display: inline-block;
+  padding: 0 10px;
+  background: white;
+  position: relative;
+  z-index: 1;
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.alt-login:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e1e1e1;
+  z-index: 0;
+}
+
+.social-login {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  gap: 15px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--text-dark);
+  text-decoration: none;
+  background: none;
+  font-size: 30px;
+  transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow);
+}
+
+/* ===== لینک‌های کمکی ===== */
+.register-link,
+.login-link {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.login-link p {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.register-link a,
+.login-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.register-link a:hover,
+.login-link a:hover {
+  color: var(--primary-hover);
+}
+
+.forgot-password {
+  margin-top: 15px;
+}
+
+.forgot-password a {
+  color: var(--text-light);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.3s;
+}
+
+.forgot-password a:hover {
+  color: var(--text-dark);
+}
+
+/* ===== چک‌باکس ===== */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 15px 0;
+  text-align: right;
+}
+
+.checkbox-group input[type='checkbox'] {
+  width: auto;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.checkbox-group label {
+  display: inline;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+}
+
+/* ===== ریسپانسیو ===== */
+@media (max-width: 576px) {
+  .login-container {
+    padding: 20px;
+    width: 85%;
+  }
+
+  .login-container h2 {
+    font-size: 24px;
+  }
+
+  .form-group input,
+  .register-input-group {
+    padding: 12px 10px;
+  }
+
+  .btn {
+    padding: 12px;
+  }
+
+  .checkbox-group {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .checkbox-group label {
+    font-size: 12px;
+  }
+}

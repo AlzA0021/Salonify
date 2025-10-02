@@ -1,0 +1,272 @@
+/* page: membership */
+
+        @font-face {
+            font-family: 'Vazir';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Vazir-Regular.eot');
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Vazir-Regular.eot?#iefix') format('embedded-opentype'),
+                 url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Vazir-Regular.woff2') format('woff2'),
+                 url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Vazir-Regular.woff') format('woff'),
+                 url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Vazir-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazir', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #ffffff, #e0d5ff);
+            min-height: 100vh;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            /* اضافه کردن padding-bottom برای جلوگیری از همپوشانی با فوتر */
+            padding-bottom: 60px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        
+        .free-tag {
+            background-color: rgba(75, 181, 67, 0.15);
+            color: #4BB543;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: inline-block;
+            margin-right: 14rem;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .description {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        
+        .benefits {
+            margin-bottom: 30px;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .check-icon {
+            color: #333;
+            margin-left: 10px;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .benefit-text {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .banner {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            /* اضافه کردن z-index برای جلوگیری از همپوشانی با فوتر */
+            z-index: 1;
+        }
+        
+        .banner-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .banner-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            padding: 20px;
+            color: white;
+        }
+        
+        .banner-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .banner-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .services-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .services-list {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .service-item {
+            margin-bottom: 15px;
+        }
+        
+        .service-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .service-duration {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .service-tag {
+            color: #4BB543;
+            font-size: 14px;
+        }
+        
+        .membership-container {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .membership-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .membership-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .membership-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .membership-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+        
+        .green-bg {
+            background-color: rgba(75, 181, 67, 0.15);
+        }
+        
+        .blue-bg {
+            background-color: rgba(66, 135, 245, 0.15);
+        }
+        
+        .purple-bg {
+            background-color: rgba(156, 136, 255, 0.15);
+        }
+        
+        .membership-details {
+            flex: 1;
+        }
+        
+        .membership-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .membership-plan {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-outline {
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-solid {
+            background-color: #111;
+            color: white;
+        }
+        
+        @media (max-width: 600px) {
+            .services-container {
+                flex-direction: column;
+            }
+            
+            .membership-container {
+                margin-top: 20px;
+            }
+        }
+
+        /* اضافه کردن استایل برای مطمئن شدن از عدم همپوشانی محتوا با فوتر */
+        main {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 20px;
+        }
+
+        /* در صورتی که فوتر fixed باشد، این استایل ها کمک می کند */
+        .dashboard-footer {
+            position: relative;
+            z-index: 2;
+        }

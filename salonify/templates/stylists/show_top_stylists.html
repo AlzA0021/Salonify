@@ -1,0 +1,26 @@
+<div class="top-section-body">
+  <div class="top-section-container">
+    <!-- بخش عنوان و دکمه "همه" -->
+    <div class="top-section-header">
+      <h2 class="top-section-title">آرایشگران منتخب</h2>
+      <button class="top-section-btn-all">همه</button>
+    </div>
+
+    <!-- اسلایدر آرایشگران -->
+    <div class="swiper topStylist-swiper-container">
+      <div class="swiper-wrapper">
+        {% for stylist in stylists %}
+          <div class="swiper-slide">
+            {% include 'stylists/partials/stylist_card.html' %}
+          </div>
+        {% empty %}
+          <p class="top-section-no-section">هیچ آرایشگری برای نمایش وجود ندارد.</p>
+        {% endfor %}
+      </div>
+
+      {% comment %} <!-- دکمه‌های ناوبری -->
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div> {% endcomment %}
+    </div>
+  </div>
+</div>

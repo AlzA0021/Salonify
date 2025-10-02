@@ -1,0 +1,86 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+    {{ customer.user.name }} {{ customer.user.family }}
+{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/customer_panel.css' %}">
+{% endblock head %}
+
+{% block content %}
+    <div class="account-page">
+
+        <!-- Header Section -->
+        <header class="header">
+            <h1>{{ customer.user.name }} {{ customer.user.family }}</h1>
+            <p>مشتری</p>
+            <div class="account-logo">
+                {% if customer.profile_image %}
+                    <img src="{{ customer.profile_image.url }}" alt="{{ customer.user.name }} {{ customer.user.family }} Logo">
+                {% else %}
+                    <div class="default-logo">
+                        <span>{{ customer.user.name }} {{ customer.user.family }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Wallet Section -->
+        <section class="wallet-card">
+            <div class="wallet-balance">
+                <p>اعتبار کیف پول</p>
+                <h2>{{ wallet.balance|default:0|intcomma }} تومان</h2>
+                <a href="{% url "payments:detail" %}" class="btn-wallet">دیدن کیف پول</a>
+            </div>
+        </section>
+
+        <!-- Menu Section 1 -->
+        <section class="menu-section">
+            <a href="{% url 'accounts:customerProfile' %}" class="menu-item">
+                <div class="menu-icon"><i class="fa-solid fa-user"></i></div>
+                <div class="menu-text">پروفایل</div>
+                <div class="menu-arrow">&#10095;</div>
+            </a>
+            <a href="{% url "csf:favorite_salons" %}" class="menu-item">
+                <div class="menu-icon"><i class="fa-solid fa-heart"></i></div>
+                <div class="menu-text">علاقه مندی ها</div>
+                <div class="menu-arrow">&#10095;</div>
+            </a>
+            <a href="{% url "orders:appointments" %}" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="menu-text">سفارشات</div>
+                <div class="menu-arrow">&#10095;</div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-credit-card"></i></div>
+                <div class="menu-text">روش پرداخت</div>
+                <div class="menu-arrow">&#10095;</div>
+            </a>
+        </section>
+
+        <!-- Menu Section 2 -->
+        <section class="menu-section">
+            <a href="{% url "main:contact" %}" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-headset"></i></div>
+                <div class="menu-text">پشتیبانی</div>
+                <div class="menu-arrow">&#10095;</div>
+            </a>
+            <a href="{% url "accounts:customer_settings" %}" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-cog"></i></div>
+                <div class="menu-text">تنظیمات</div>
+                <div class="menu-arrow">&#10095;</div>
+            </a>
+            {% if customer %}
+                <a href="{% url 'accounts:logout' %}" class="menu-item">
+                    <div class="menu-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+                    <div class="menu-text">خروج</div>
+                    <div class="menu-arrow">&#10095;</div>
+                </a>
+            {% endif %}
+        </section>
+
+    </div>
+{% endblock content %}

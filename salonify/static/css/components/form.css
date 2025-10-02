@@ -1,0 +1,18 @@
+/*! salonify: components/form.css */
+label{ display:block; margin-bottom: .35rem; color: var(--gray-700); }
+.input, input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea, select{
+  width: 100%;
+  padding: .6rem .8rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: #fff; color: var(--color-fg);
+  outline: none;
+}
+.input:focus, input:focus, textarea:focus, select:focus{
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-400) 20%, transparent);
+}
+.form-row{ display:flex; gap: var(--space-4); }
+.form-row > *{ flex:1; min-width: 0; }
+.help-text{ color: var(--gray-500); font-size: var(--font-size-200); margin-top: .25rem; }
+.error-text{ color: var(--danger-500); font-size: var(--font-size-200); margin-top: .25rem; }

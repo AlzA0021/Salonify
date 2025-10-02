@@ -1,0 +1,284 @@
+{% extends "main_template.html" %} {% load static %} {% load render_partial %}
+{% block head %}
+<!-- حذف استایل‌های داخلی -->
+
+<link rel="stylesheet" href="{% static 'css/search_page.css' %}">
+<link rel="stylesheet" href="{% static 'css/salons.css' %}">
+
+
+{% endblock %} 
+
+{% block title %}جستجو{% endblock %} 
+
+{% block body_attrs %}data-page="search_page"{% endblock %}
+
+
+
+{% block content %}
+<!-- نوار جستجو -->
+<div class="search-container">
+  <button id="searchMenu-button">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <input type="text" placeholder="همه خدمات" id="search-input" />
+  <button id="search-button">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+</div>
+
+<!-- نقشه -->
+<div id="map"></div>
+
+<!-- پنل کشویی (فیلترها و نتایج) -->
+<div class="filters-container" id="filters-container">
+  <!-- دسته برای کشیدن پنل -->
+  <div class="handle" id="handle"></div>
+  <!-- دکمه‌های فیلتر -->
+  <div class="closed-filters-buttons">
+    <!-- منوی مرتب‌سازی -->
+    <div class="dropdown" id="dropdown-sort">
+      <button id="sort-button">مرتب‌سازی</button>
+      <div class="dropdown-content">
+        <a href="#" class="dropdown-item">جدیدترین</a>
+        <a href="#" class="dropdown-item">پربازدیدترین</a>
+        <a href="#" class="dropdown-item">پیشنهادی</a>
+        <a href="#" class="dropdown-item">نزدیکترین</a>
+      </div>
+    </div>
+    <!-- منوی قیمت -->
+    <div class="dropdown" id="dropdown-price">
+      <button id="price-button">قیمت</button>
+      <div class="dropdown-content">
+        <a href="#" class="dropdown-item">کم به زیاد</a>
+        <a href="#" class="dropdown-item">زیاد به کم</a>
+      </div>
+    </div>
+    <!-- منوی محله -->
+    <div class="dropdown" id="dropdown-type">
+      <button id="type-button">محله</button>
+      <div class="dropdown-content">
+        <a href="#" class="dropdown-item">شمال</a>
+        <a href="#" class="dropdown-item">جنوب</a>
+        <a href="#" class="dropdown-item">شرق</a>
+        <a href="#" class="dropdown-item">غرب</a>
+        <a href="#" class="dropdown-item">همه</a>
+      </div>
+    </div>
+    <!-- دکمه فیلتر (آیکون) -->
+    <button id="filter-button" class="filter-icon">
+      <i class="fa-solid fa-sliders"></i>
+    </button>
+  </div>
+  <!-- بخش نتایج -->
+  <div class="results-content" id="results-content">
+    <!-- کارت‌های سالن در اینجا نمایش داده می‌شوند -->
+  </div>
+</div>
+
+<!-- مدال فیلترها -->
+<div class="search-modal" id="searchModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="close-modal">&times;</button>
+    </div>
+
+    <div class="modal-section">
+      <div class="filter-options">
+        <div class="filter-item selected" id="openLocationModal">
+          <i class="fa-solid fa-location-dot"></i>&nbsp&nbsp موقعیت فعلی
+        </div>
+        <!-- دکمه هر تاریخی با id -->
+        <div class="filter-item" id="openDateModal">
+          <i class="fa-solid fa-calendar"></i>&nbsp&nbsp هر تاریخی
+        </div>
+        <!-- دکمه هر زمانی با id (برای باز کردن مدال زمان) -->
+        <div class="filter-item" id="openTimeModal">
+          <i class="fa-solid fa-clock"></i>&nbsp&nbsp هر زمانی
+        </div>
+      </div>
+    </div>
+
+    <!-- مودال جستجوی موقعیت -->
+    <div class="location-modal" id="locationModal">
+      <div class="modal-content location-content">
+        <!-- سرآیند با دکمه بازگشت -->
+        <div class="modal-header">
+          <button class="back-button" id="backToSearchModal">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <h3>موقعیت</h3>
+        </div>
+        <!-- محتوای مودال -->
+        <div class="modal-body" style="position: relative">
+          <!-- فیلد جستجو برای موقعیت -->
+          <input
+            type="text"
+            placeholder="موقعیت خود را جستجو کنید"
+            id="locationSearchInput"
+            autocomplete="off"
+          />
+          <!-- کانتینر نمایش پیشنهادات -->
+          <div id="locationSuggestions" class="suggestions"></div>
+
+          <!-- دکمه دریافت موقعیت فعلی -->
+          <div class="current-location">
+            <button id="useCurrentLocation">
+              <i class="fa-solid fa-location-arrow"></i>&nbsp&nbsp موقعیت فعلی
+            </button>
+          </div>
+
+          <!-- بخش آخرین آدرس‌های جستجو شده -->
+          <div class="latest-addresses">
+            <h4>آخرین</h4>
+            <ul id="latestAddressesList">
+              <!-- آخرین آدرس‌ها به صورت دینامیک درج خواهند شد -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% render_partial 'services:categories' %}
+
+    <div class="modal-actions">
+      <button class="btn clear-btn">پاک کردن</button>
+      <button class="btn primary-btn" id="freshaSearchButton">
+        جستجو در SaloniFy
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- مدال انتخاب تاریخ -->
+<div class="date-modal" id="dateModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="back-button" id="backToSearchModalFromDate">
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+      <h3>تاریخ</h3>
+    </div>
+    <div class="modal-body">
+      <!-- دکمه‌های انتخاب سریع تاریخ -->
+      <div
+        class="date-quick-options"
+        style="
+          display: flex;
+          justify-content: space-around;
+          margin-bottom: 20px;
+        "
+      >
+        <button class="btn quick-date" data-value="all">هر تاریخی</button>
+        <button class="btn quick-date" data-value="today">امروز</button>
+        <button class="btn quick-date" data-value="tomorrow">فردا</button>
+      </div>
+      <!-- تقویم انتخاب تاریخ -->
+      <div class="date-picker" style="text-align: center; margin-bottom: 20px">
+        <input
+          type="date"
+          id="dateInput"
+          style="font-size: 1.2rem; padding: 10px; color: #333"
+        />
+      </div>
+      <!-- دکمه تایید -->
+      <div class="modal-actions">
+        <button class="btn primary-btn" id="confirmDate">تایید</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- مدال انتخاب زمان -->
+<div class="time-modal" id="timeModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="back-button" id="backToSearchModalFromTime">
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+      <h3>زمان</h3>
+    </div>
+    <div class="modal-body">
+      <!-- دکمه‌های انتخاب سریع زمان -->
+      <div class="time-quick-options">
+        <button class="btn quick-time" data-value="morning">صبح</button>
+        <button class="btn quick-time" data-value="afternoon">بعدازظهر</button>
+        <button class="btn quick-time" data-value="night">شب</button>
+        <button class="btn quick-time" data-value="all">هر زمانی</button>
+      </div>
+      <!-- منوی کشویی برای انتخاب بازه زمانی -->
+      <div
+        class="time-range-selection"
+        style="
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          margin-bottom: 20px;
+        "
+      >
+        <select id="timeFrom">
+          <option value="" disabled selected>از</option>
+          <option value="06:00">06:00</option>
+          <option value="07:00">07:00</option>
+          <option value="08:00">08:00</option>
+          <option value="09:00">09:00</option>
+          <option value="10:00">10:00</option>
+          <option value="11:00">11:00</option>
+          <option value="12:00">12:00</option>
+          <option value="13:00">13:00</option>
+          <option value="14:00">14:00</option>
+          <option value="15:00">15:00</option>
+          <option value="16:00">16:00</option>
+          <option value="17:00">17:00</option>
+          <option value="18:00">18:00</option>
+          <option value="19:00">19:00</option>
+          <option value="20:00">20:00</option>
+          <option value="21:00">21:00</option>
+          <option value="22:00">22:00</option>
+          <option value="23:00">23:00</option>
+          <option value="24:00">24:00</option>
+        </select>
+        <select id="timeTo">
+          <option value="" disabled selected>تا</option>
+          <option value="06:00">06:00</option>
+          <option value="07:00">07:00</option>
+          <option value="08:00">08:00</option>
+          <option value="09:00">09:00</option>
+          <option value="10:00">10:00</option>
+          <option value="11:00">11:00</option>
+          <option value="12:00">12:00</option>
+          <option value="13:00">13:00</option>
+          <option value="14:00">14:00</option>
+          <option value="15:00">15:00</option>
+          <option value="16:00">16:00</option>
+          <option value="17:00">17:00</option>
+          <option value="18:00">18:00</option>
+          <option value="19:00">19:00</option>
+          <option value="20:00">20:00</option>
+          <option value="21:00">21:00</option>
+          <option value="22:00">22:00</option>
+          <option value="23:00">23:00</option>
+          <option value="24:00">24:00</option>
+        </select>
+      </div>
+      <!-- دکمه تایید -->
+      <div class="modal-actions">
+        <button class="btn primary-btn" id="confirmTime">تایید</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- مدال درخواست موقعیت -->
+<div id="initialLocationModal" class="modal">
+  <div class="modal-content">
+    <h3>دسترسی به موقعیت مکانی</h3>
+    <p>برای نمایش سالن‌های نزدیک، اجازه دسترسی به موقعیت مکانی را فعال کنید</p>
+    <div class="modal-actions">
+      <button id="allowLocation">اجازه دسترسی</button>
+      <button id="denyLocation">انصراف</button>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

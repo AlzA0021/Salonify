@@ -1,0 +1,33 @@
+<form method="post" action="{% url 'stylists:stylist_schedule' %}">
+  {% csrf_token %}
+  {{ schedule_form.as_p }}
+  <button type="submit" class="btn btn-primary mt-3">ثبت برنامه</button>
+</form>
+<form method="post" action="{% url 'stylists:stylist_schedule' %}">
+  {% csrf_token %}
+  {{ time_off_form.as_p }}
+  <button type="submit" class="btn btn-primary mt-3">ثبت تعطیلی</button>
+</form>
+<br />
+<hr />
+<div class="container">
+  <h2>برنامه کاری</h2>
+  {% for schedule in stylist_schedules %}
+    <p>سالن : {{ schedule.salon }}</p>
+    <p>خدمت : {{ schedule.service }}</p>
+    <p>تاریخ : {{ schedule.date }}</p>
+    <p>ساعت شروع : {{ schedule.start_time }}</p>
+    <p>ساعت اتمام : {{ schedule.end_time }}</p>
+  {% endfor %}
+</div>
+<div class="container">
+  <h2>برنامه تعطیلی</h2>
+  {% for off_time in Stylist_times_off %}
+    <p>تاریخ : {{ off_time.date }}</p>
+    <p>ساعت شروع : {{ off_time.start_time }}</p>
+    <p>ساعت اتمام : {{ off_time.end_time }}</p>
+    <p>علت : {{ off_time.reason }}</p>
+  {% endfor %}
+</div>
+
+

@@ -1,0 +1,90 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block title %}عضویت{% endblock title %}
+
+{# برای اجرای ماژول صفحه #}
+{% block body_attrs %}data-page="dashboard_membership"{% endblock %}
+
+{% block head %}
+{# اگر فایل CSS اختصاصی داری، باز کن: #}
+{# <link rel="stylesheet" href="{% static 'css/dashboard/membership.css' %}"> #}
+{% endblock head %}
+
+{% block content %}
+<div class="container membership-page">
+  <div class="header">
+    <button class="back-button"
+            type="button"
+            aria-label="بازگشت"
+            data-action="go-back"
+            data-fallback-url="{% url 'dashboards:salon_manager_dashboard' %}">
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+    <div class="free-tag">به زودی</div>
+  </div>
+
+  <h1>مدیریت عضویت چند جلسه‌ای</h1>
+
+  <p class="description">
+    با ترکیب چندین خدمت در قالب یک عضویت، درآمد خود را افزایش دهید و مشتریان خود را به مشتریان ثابت تبدیل کنید.
+  </p>
+
+  <div class="benefits">
+    <div class="benefit-item">
+      <span class="check-icon">✓</span>
+      <p class="benefit-text">با عضویت‌های مکرر، درآمد پایداری را تضمین کنید</p>
+    </div>
+    <div class="benefit-item">
+      <span class="check-icon">✓</span>
+      <p class="benefit-text">مشتریان را تشویق کنید تا یک دوره خدمات را به صورت یکجا خریداری کنند</p>
+    </div>
+    <div class="benefit-item">
+      <span class="check-icon">✓</span>
+      <p class="benefit-text">مشتریان به راحتی می‌توانند جلسات خود را رزرو کرده و جلسات باقیمانده را پیگیری کنند</p>
+    </div>
+  </div>
+
+  <div class="banner">
+    <img src="{% static 'images/banners/banner3.jpg' %}" alt="بنر عضویت" class="banner-image">
+    <div class="banner-overlay">
+      <h3 class="banner-title">عضویت‌های ویژه</h3>
+      <p class="banner-subtitle">با صرفه‌جویی تا ۳۰٪ برای خدمات زیبایی</p>
+    </div>
+  </div>
+
+  {# 
+  --- اگر بعداً این بخش را فعال کردید، JS همین ماژول رویداد کلیک را مدیریت می‌کند ---
+  <div class="services-container">
+    <div class="services-list">
+      <h4 class="membership-title">خدمات ما</h4>
+      <div class="service-item">
+        <p class="service-name">کوتاه کردن موی کوتاه</p>
+        <p class="service-duration">1 ساعت</p>
+        <p class="service-tag">شامل در عضویت</p>
+      </div>
+      ...
+    </div>
+
+    <div class="membership-container">
+      <h4 class="membership-title">عضویت‌ها</h4>
+      <div class="membership-options">
+        <div class="membership-option">
+          <div class="membership-icon green-bg">...</div>
+          <div class="membership-details">
+            <p class="membership-name">خدمات موی کوتاه</p>
+            <p class="membership-plan">طرح ماهانه</p>
+          </div>
+        </div>
+        ...
+      </div>
+    </div>
+  </div>
+  #}
+
+  <div class="buttons">
+    <button class="btn btn-outline" type="button" data-action="learn">آموزش بیشتر</button>
+    <button class="btn btn-solid" type="button" data-action="start">شروع کنید</button>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,252 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+
+    {% block title %}ویرایش شیفت {{ stylist.get_fullName }}{% endblock title %}
+    {% block head %} 
+ 
+    {% endblock head %}
+   
+
+{% block content %}
+    <div class="page-container">
+        <div class="header-bar">
+            <a href="{% url 'dashboards:scheduled_shifts' %}" class="action-button close-button" title="بستن">&times;</a>
+            <h1>  {{ stylist.get_fullName }} <br> {{ page_title_date }}</h1>
+            <div class="placeholder"></div>
+        </div>
+        
+        {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'dashboards:edit_day_schedule' stylist_pk=stylist.pk salon_pk=salon.pk date_iso=date_iso %}" id="editShiftsForm">
+            {% csrf_token %}
+            <input type="hidden" name="stylist_id_form" value="{{ stylist.pk }}">
+            <input type="hidden" name="date_form" value="{{ date_iso }}">
+            <input type="hidden" name="salon_id_form" value="{{ salon.pk }}">
+            
+            <div class="content-area">
+                <div id="shifts-container">
+                    {% for schedule in existing_schedules %}
+                        <div class="shift-entry" data-schedule-id="{{ schedule.pk }}">
+                            <div class="time-input-group">
+                                <label for="start_time_{{ forloop.counter0 }}">زمان شروع</label>
+                                <select name="shifts[{{ forloop.counter0 }}][start_time]" id="start_time_{{ forloop.counter0 }}" class="time-input">
+                                    {% for time_opt in time_options %}
+                                    <option value="{{ time_opt }}" {% if schedule.start_time|time:"H:i" == time_opt %}selected{% endif %}>{{ time_opt }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="time-input-group">
+                                <label for="end_time_{{ forloop.counter0 }}">زمان پایان</label>
+                                <select name="shifts[{{ forloop.counter0 }}][end_time]" id="end_time_{{ forloop.counter0 }}" class="time-input">
+                                    {% for time_opt in time_options %}
+                                    <option value="{{ time_opt }}" {% if schedule.end_time|time:"H:i" == time_opt %}selected{% endif %}>{{ time_opt }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="service-input-group">
+                                <label for="service_{{ forloop.counter0 }}">خدمت</label>
+                                <option value="">انتخاب کنید</option>
+                                <select name="shifts[{{ forloop.counter0 }}][service_id]" id="service_{{ forloop.counter0 }}">
+                                    {% for service_opt in available_services %}
+                                    <option value="{{ service_opt.pk }}" {% if schedule.service.pk == service_opt.pk %}selected{% endif %}>{{ service_opt.service_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="delete-shift-btn" title="حذف این شیفت"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="add-shift-section">
+                    <button type="button" class="add-shift-button" id="addShiftBtn">
+                        <div class="icon"><i class="fa-solid fa-plus"></i></div>
+                        <span>افزودن یک شیفت</span>
+                    </button>
+                    <div class="total-hours" id="totalHoursDisplay">۰ ساعت</div>
+                </div>
+                
+                <p class="info-text">
+                    شما فقط در حال ویرایش شیفت‌های این روز هستید. برای تنظیم شیفت‌های منظم، به بخش <a href="{% url 'dashboards:set_regular_shifts' stylist_id=stylist.user.id salon_id=salon.id %}">شیفت‌های برنامه‌ریزی شده</a> بروید.
+                </p>
+            </div>
+
+            <div class="footer-actions">
+                <button type="button" class="delete-all-btn" id="deleteAllShiftsBtn">حذف</button>
+                <button type="submit" class="save-btn">ذخیره</button>
+            </div>
+        </form>
+    </div>
+
+    <template id="{{ new_shift_template_id }}">
+        <div class="shift-entry" data-schedule-id="">
+            <div class="time-input-group">
+                <label for="start_time___INDEX__">زمان شروع</label>
+                <select name="shifts[__INDEX__][start_time]" id="start_time___INDEX__" class="time-input">
+                    {% for time_opt in time_options %}
+                    <option value="{{ time_opt }}">{{ time_opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="time-input-group">
+                <label for="end_time___INDEX__">زمان پایان</label>
+                <select name="shifts[__INDEX__][end_time]" id="end_time___INDEX__" class="time-input">
+                    {% for time_opt in time_options %}
+                    <option value="{{ time_opt }}">{{ time_opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="service-input-group">
+                <label for="service___INDEX__">خدمت</label>
+                    <select name="shifts[__INDEX__][service_id]" id="service___INDEX__">
+                        <option value="">انتخاب کنید</option>  {# این خط اضافه شده #}
+                        {% for service_opt in available_services %}
+                        <option value="{{ service_opt.pk }}">{{ service_opt.service_name }}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+            <button type="button" class="delete-shift-btn" title="حذف این شیفت"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+    </template>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const shiftsContainer = document.getElementById('shifts-container');
+        const addShiftBtn = document.getElementById('addShiftBtn');
+        const totalHoursDisplay = document.getElementById('totalHoursDisplay');
+        const shiftTemplate = document.getElementById('{{ new_shift_template_id }}'); // فقط خود المنت را میگیریم
+        let shiftCounter = shiftsContainer.querySelectorAll('.shift-entry').length;
+
+        function calculateTotalHours() {
+            let totalMinutes = 0;
+            shiftsContainer.querySelectorAll('.shift-entry').forEach(entry => {
+                const startTimeStr = entry.querySelector('select[name*="[start_time]"]').value;
+                const endTimeStr = entry.querySelector('select[name*="[end_time]"]').value;
+
+                if (startTimeStr && endTimeStr) {
+                    const [startH, startM] = startTimeStr.split(':').map(Number);
+                    const [endH, endM] = endTimeStr.split(':').map(Number);
+                    
+                    if (endH > startH || (endH === startH && endM > startM)) {
+                        const startDate = new Date(2000, 0, 1, startH, startM);
+                        const endDate = new Date(2000, 0, 1, endH, endM);
+                        totalMinutes += (endDate - startDate) / (1000 * 60);
+                    }
+                }
+            });
+            const hours = totalMinutes / 60;
+            totalHoursDisplay.textContent = `${hours.toFixed(1)} ساعت`;
+        }
+
+        function attachEventListenersToRow(rowElement) {
+            rowElement.querySelector('.delete-shift-btn').addEventListener('click', function() {
+                rowElement.remove();
+                reindexShiftInputs();
+                calculateTotalHours();
+            });
+            rowElement.querySelectorAll('select.time-input, select[name*="[service_id]"]').forEach(select => {
+                select.addEventListener('change', calculateTotalHours);
+            });
+        }
+
+        function reindexShiftInputs() {
+            shiftsContainer.querySelectorAll('.shift-entry').forEach((row, index) => {
+                row.querySelectorAll('input[name*="[shifts]"], select[name*="[shifts]"]').forEach(input => {
+                    const oldName = input.name;
+                    const newName = oldName.replace(/shifts\[.+?\]/, `shifts[${index}]`);
+                    input.name = newName;
+                    
+                    if (input.id) {
+                        const oldId = input.id;
+                        // با استفاده از regex، فقط عدد انتهای آیدی را جایگزین میکنیم
+                        const newId = oldId.replace(/_\d+$/, `_${index}`).replace(/___INDEX__/, `_${index}`);
+                        input.id = newId;
+                        
+                        const label = document.querySelector(`label[for="${oldId}"]`);
+                        if(label) label.htmlFor = newId;
+                    }
+                });
+            });
+            shiftCounter = shiftsContainer.querySelectorAll('.shift-entry').length;
+        }
+
+        // --- تابع بازنویسی شده ---
+        function addShiftRow() {
+            // ۱. محتوای template را با روش استاندارد کپی می‌کنیم
+            const newFragment = shiftTemplate.content.cloneNode(true);
+            const newRow = newFragment.querySelector('.shift-entry');
+            const index = shiftCounter;
+
+            // ۲. مقادیر name و id و for را در نودهای کپی شده آپدیت می‌کنیم
+            const startSelect = newRow.querySelector('#start_time___INDEX__');
+            startSelect.name = `shifts[${index}][start_time]`;
+            startSelect.id = `start_time_${index}`;
+            newRow.querySelector('label[for="start_time___INDEX__"]').htmlFor = startSelect.id;
+
+            const endSelect = newRow.querySelector('#end_time___INDEX__');
+            endSelect.name = `shifts[${index}][end_time]`;
+            endSelect.id = `end_time_${index}`;
+            newRow.querySelector('label[for="end_time___INDEX__"]').htmlFor = endSelect.id;
+
+            const serviceSelect = newRow.querySelector('#service___INDEX__');
+            serviceSelect.name = `shifts[${index}][service_id]`;
+            serviceSelect.id = `service_${index}`;
+            newRow.querySelector('label[for="service___INDEX__"]').htmlFor = serviceSelect.id;
+
+            // ۳. مقادیر پیش‌فرض را تنظیم می‌کنیم
+            startSelect.value = "08:00";
+            endSelect.value = "20:00";
+            if (serviceSelect.options.length > 0) {
+                serviceSelect.selectedIndex = 0; // اولین گزینه (اگه "انتخاب کنید" باشه) انتخاب می‌شه
+            }
+
+            // ۴. ردیف جدید را اضافه و رویدادها را متصل می‌کنیم
+            shiftsContainer.appendChild(newRow);
+            shiftCounter++;
+            attachEventListenersToRow(shiftsContainer.lastElementChild);
+            calculateTotalHours();
+        }
+
+        // --- اجرای اولیه ---
+        shiftsContainer.querySelectorAll('.shift-entry').forEach(row => {
+            attachEventListenersToRow(row);
+        });
+
+        if (addShiftBtn) {
+            addShiftBtn.addEventListener('click', addShiftRow);
+        }
+        
+        if (shiftsContainer.children.length === 0) {
+            addShiftRow();
+        }
+
+        calculateTotalHours();
+
+        const deleteAllShiftsBtn = document.getElementById('deleteAllShiftsBtn');
+        if (deleteAllShiftsBtn) {
+            deleteAllShiftsBtn.addEventListener('click', function() {
+                if (confirm("آیا از حذف تمام شیفت‌های این روز مطمئن هستید؟ با کلیک روی 'ذخیره'، این عمل نهایی خواهد شد.")) {
+                    shiftsContainer.innerHTML = ''; 
+                    shiftCounter = 0;
+                    calculateTotalHours();
+                }
+            });
+        }
+        
+        const editShiftsForm = document.getElementById('editShiftsForm');
+        if (editShiftsForm) {
+            editShiftsForm.addEventListener('submit', function(e) {
+                reindexShiftInputs(); 
+            });
+        }
+    });
+</script>
+{% endblock content %}

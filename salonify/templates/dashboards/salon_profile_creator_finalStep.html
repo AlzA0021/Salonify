@@ -1,0 +1,18 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="success-circle"><span class="checkmark"></span></div>
+  <h1>شما اکنون در سالنی‌فای فعال هستید!</h1>
+  <p>مشتریان اکنون می‌توانند شما را به صورت آنلاین رزرو کنند.</p>
+  <div class="buttons">
+    <button class="btn btn-outline" onclick="window.location.href='{% url 'salons:detail_salon' salon.id %}'">پیش‌نمایش</button>
+    <button class="btn btn-dark" onclick="window.location.href='{% url 'dashboards:salon_profile' %}'">انجام شد</button>
+  </div>
+</div>
+{% endblock content %}

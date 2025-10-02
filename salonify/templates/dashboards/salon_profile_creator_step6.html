@@ -1,0 +1,93 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+
+{% block title %}به‌روزرسانی تصاویر مکان{% endblock title %}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="navigation-header">
+    <a href="{% url 'dashboards:salon_profile_creator_step5' %}" class="back-btn" aria-label="بازگشت">
+      <i class="fa fa-arrow-right"></i>
+    </a>
+    <button class="close-btn" type="button" aria-label="بستن">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="content-section">
+    <h1 class="page-title">به‌روزرسانی تصاویر مکان</h1>
+    <p class="page-description">حداقل ۳ تصویر اضافه کنید. می‌توانید ترتیب را تغییر دهید.</p>
+
+    <form method="post" enctype="multipart/form-data" id="upload-form">
+      {% csrf_token %}
+      {{ form.salon.as_hidden }}
+
+      <div class="upload-area" id="upload-area" role="button" tabindex="0" aria-label="افزودن تصویر">
+        <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
+        <div class="upload-text">تصاویر خود را اضافه کنید</div>
+        <button type="button" class="file-button" aria-label="انتخاب فایل">انتخاب فایل</button>
+        {{ form.salon_image }}
+        {% if form.salon_image.errors %}
+          <div class="form-errors">
+            {% for error in form.salon_image.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="file-info">jpg یا png • حداقل ۹۱۶×۵۰۰ • حداکثر ۱۰MB</div>
+    </form>
+
+    <div class="uploaded-images-container">
+      {% if gallery_images %}
+        {% for image in gallery_images %}
+          <div class="uploaded-image {% if image.is_cover %}cover-image{% endif %}"
+               data-set-cover-url="{% url 'dashboards:salon_profile_creator_step6' %}?set_cover={{ image.id }}"
+               data-delete-url="{% url 'dashboards:delete_salon_image' image.id %}">
+            <img src="{{ image.salon_image.url }}" alt="تصویر سالن" class="example-image">
+            <div class="image-overlay">
+              {% if image.is_cover %}
+                <span class="cover-tag">تصویر کاور</span>
+              {% endif %}
+              <button type="button"
+                      class="image-option-btn"
+                      aria-label="گزینه‌های بیشتر"
+                      data-id="{{ image.id }}"
+                      data-set-cover-url="{% url 'dashboards:salon_profile_creator_step6' %}?set_cover={{ image.id }}"
+                      data-delete-url="{% url 'dashboards:delete_salon_image' image.id %}">
+                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <div class="add-image-button" id="add-more-btn" role="button" tabindex="0" aria-label="افزودن تصویر جدید">
+        <i class="fa fa-plus"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-button">
+    <button class="continue-btn" id="continue-btn" type="button">ادامه</button>
+  </div>
+</div>
+
+{# Config for JS – برای فراخوانی مرحله بعد و CSRF #}
+<div id="js-config"
+     data-csrf-token="{{ csrf_token }}"
+     data-step7-url="{% url 'dashboards:salon_profile_creator_step7' %}"></div>
+{% endblock content %}

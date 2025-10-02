@@ -1,0 +1,145 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% load stylists_extra %}
+
+{% block title %}آرایشگران{% endblock %}
+
+{% block head %}
+  {# استایل‌های خودت #}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/stylists_list.css' %}">
+
+  {# FullCalendar (ضروری برای نمایش برنامه کاری) #}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+{% endblock %}
+
+{# مهم: کلید فراخوانی ماژول صفحه #}
+{% block body_attrs %}data-page="stylists_list"{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row">
+
+      {% for stylist in stylists %}
+        <div class="col-md-4 col-sm-6">
+          <div class="stylist_card-stylist-card">
+
+            <a href="{% url 'stylists:stylist_detail' stylist.slug %}" style="text-decoration:none;color:inherit;">
+              {% if stylist.profile_image %}
+                <img src="{{ stylist.profile_image.url }}" alt="{{ stylist.user.name }}" class="stylist_card-profile-image">
+              {% else %}
+                <img src="{% static 'css/images/default-avatar.png' %}" alt="{{ stylist.user.name }}" class="stylist_card-profile-image">
+              {% endif %}
+              <div class="stylist_card-card-body">
+                <h5 class="stylist_card-stylist-name">{{ stylist.user.name }} {{ stylist.user.family }}</h5>
+
+                <div class="stylist_card-rating">
+                  <span>امتیاز:</span>
+                  {# فرض: make_range سفارشی شما؛ 1..5 #}
+                  {% for i in 1|make_range:6 %}
+                    {% if i <= stylist.get_average_score %}
+                      <i class="fas fa-star"></i>
+                    {% else %}
+                      <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            </a>
+
+            <div class="mt-2 d-flex gap-2">
+              <button
+                class="btn btn-outline-primary stylist_card-comments-btn"
+                data-action="toggle-comments"
+                data-stylist-pk="{{ stylist.pk }}">
+                نظرات ({{ stylist.active_comments_count }})
+              </button>
+
+              {% if stylist.user.id %}
+                <button
+                  class="btn btn-secondary"
+                  data-action="load-calendar"
+                  data-stylist-id="{{ stylist.user.id }}"
+                  data-api-url="{% url 'stylists:stylist_schedule_view' stylist.user.id %}">
+                  مشاهده برنامه کاری
+                </button>
+              {% endif %}
+
+              <button
+                class="btn btn-light"
+                data-action="toggle-calendar"
+                data-stylist-id="{{ stylist.user.id }}">
+                نمایش/پنهان تقویم
+              </button>
+            </div>
+
+            <div id="calendar-{{ stylist.user.id }}" class="calendar-container mt-3" style="display:none;"></div>
+
+            <div id="comments-{{ stylist.pk }}" class="stylist_card-comments-section" style="display:none;">
+              {% for comment in stylist.comments_stylist|filter_active_comments %}
+                <p>{{ comment.comment_user }}: {{ comment.comment_text }}</p>
+              {% empty %}
+                <p class="text-muted">نظری ثبت نشده است.</p>
+              {% endfor %}
+            </div>
+
+            {# اگر سالن از قبل مشخص نیست، لیست انتخاب سالن نشان بده (یونیک‌سازی IDها) #}
+            {% if not salon %}
+              <div class="mt-3">
+                <label for="salonSelect-{{ stylist.user.id }}">انتخاب سالن:</label>
+                <select
+                  id="salonSelect-{{ stylist.user.id }}"
+                  name="salon"
+                  class="form-control"
+                  data-role="salon-select"
+                  data-stylist-id="{{ stylist.user.id }}">
+                  <option value="">لطفاً سالن را انتخاب کنید</option>
+                  {% for salon in stylist.stylists_of_salon.all %}
+                    <option value="{{ salon.id }}">{{ salon.salon_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            {% endif %}
+
+            {# اگر خدمت از قبل مشخص نیست، لیست انتخاب خدمت نشان بده (یونیک‌سازی IDها) #}
+            {% if not service %}
+              <div class="mt-3">
+                <label for="serviceSelect-{{ stylist.user.id }}">انتخاب خدمت:</label>
+                <select
+                  id="serviceSelect-{{ stylist.user.id }}"
+                  name="service"
+                  class="form-control"
+                  data-role="service-select"
+                  data-stylist-id="{{ stylist.user.id }}">
+                  <option value="">لطفاً خدمت را انتخاب کنید</option>
+                  {% for service in stylist.services_of_stylist.all %}
+                    <option value="{{ service.id }}">{{ service.service_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            {% endif %}
+
+            <div class="mt-3">
+              <button
+                class="btn btn-primary reserve-btn"
+                data-action="reserve"
+                data-stylist-id="{{ stylist.user.id }}"
+                data-reserve-url="{% url 'orders:add_to_order_cart' %}"
+                {% if service %}data-service="{{ service.id }}"{% endif %}
+                {% if salon %}data-salon="{{ salon.id }}"{% endif %}>
+                رزرو
+              </button>
+            </div>
+
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <p class="text-center text-muted">آرایشگری یافت نشد.</p>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+{% endblock %}

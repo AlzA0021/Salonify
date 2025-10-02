@@ -1,0 +1,38 @@
+:root {
+  --color-fff-1: #fff;
+  --color-333-2: #333;
+  --color-white-3: white;
+  --color-666-4: #666;
+  --color-555-5: #555;
+  --color-000-6: #000;
+  --color-f5f5f5-7: #f5f5f5;
+  --color-6c757d-8: #6c757d;
+  --color-6c5ce7-9: #6c5ce7;
+  --color-888-10: #888;
+  --color-f8f9fa-11: #f8f9fa;
+  --color-777-12: #777;
+  --font-size-16px-1: 16px;
+  --font-size-14px-2: 14px;
+  --font-size-20px-3: 20px;
+  --font-size-0-9rem-4: 0.9rem;
+  --font-size-24px-5: 24px;
+  --font-size-18px-6: 18px;
+  --font-size-12px-7: 12px;
+  --font-size-1rem-8: 1rem;
+  --radius-8px-1: 8px;
+  --radius-50-2: 50%;
+  --radius-12px-3: 12px;
+  --radius-10px-4: 10px;
+  --radius-4px-5: 4px;
+  --radius-5px-6: 5px;
+  --space-0-1: 0;
+  --space-20px-2: 20px;
+  --space-15px-3: 15px;
+  --space-0-auto-4: 0 auto;
+  --space-10px-5: 10px;
+  --space-1rem-6: 1rem;
+  --space-12px-7: 12px;
+  --space-15px-0-8: 15px 0;
+  --space-10px-0-9: 10px 0;
+  --space-15px-20px-10: 15px 20px;
+}

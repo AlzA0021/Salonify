@@ -1,0 +1,49 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+{% block content %}
+<div class="page-container">
+  <div class="navigation-header">
+    <a href="#" class="back-btn"><i class="fa-solid fa-arrow-right"></i></a>
+    <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div class="content-section">
+    <h1 class="guide-title">راهنمای تصاویر مجموعه</h1>
+    <p class="guide-description">تصاویر باکیفیت بهترین راه برای جلب توجه مشتریان هستند.</p>
+
+    <div class="image-type-section">
+      <h2 class="image-type-title">قابل قبول</h2>
+      <div class="image-container">
+        <img src="{% static 'images/banners/sample.png' %}" alt="نمونه مناسب" class="example-image">
+        <div class="status-indicator check-indicator">✓</div>
+      </div>
+      <ul class="checklist">
+        <li class="checklist-item"><span class="check-icon">✓</span><span>تصاویر داخلی واضح</span></li>
+        <li class="checklist-item"><span class="check-icon">✓</span><span>حداقل ۳ تصویر</span></li>
+        <li class="checklist-item"><span class="check-icon">✓</span><span>کیفیت بالا</span></li>
+      </ul>
+    </div>
+
+    <div class="image-type-section">
+      <h2 class="image-type-title">نامناسب</h2>
+      <div class="image-container">
+        <img src="{% static 'images/banners/badSample.png' %}" alt="نمونه نامناسب" class="example-image">
+        <div class="status-indicator x-indicator">✕</div>
+      </div>
+      <ul class="checklist">
+        <li class="checklist-item"><span class="x-icon">✕</span><span>تصاویر استوک</span></li>
+        <li class="checklist-item"><span class="x-icon">✕</span><span>لوگوها</span></li>
+        <li class="checklist-item"><span class="x-icon">✕</span><span>نمای بیش‌ازحد نزدیک</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="action-button">
+    <button class="continue-btn" onclick="window.location.href='{% url 'dashboards:salon_profile_creator_step6' %}'">ادامه</button>
+  </div>
+</div>
+{% endblock content %}

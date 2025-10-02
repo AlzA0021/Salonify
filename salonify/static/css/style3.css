@@ -1,0 +1,267 @@
+/* Gandom Font */
+@font-face {
+    font-family: 'Gandom';
+    src: url(../fonts/Gandom/Gandom.eot),
+        url(../fonts/Gandom/Gandom.ttf),
+        url(../fonts/Gandom/Gandom.woff);
+}
+
+/* Common Styles */
+body,
+html {
+    font-family: 'Gandom', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    direction: rtl;
+    background-color: #ffffff;
+    color: #333;
+}
+
+/* Common Container Styles */
+.container-common {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+/* Common Header Styles */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    margin: 0;
+    color: #222;
+}
+
+.btn-all {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    color: #555;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-all:hover {
+    background-color: #f2b3a6;
+    color: #fff;
+}
+
+/* Common Card Styles */
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 10px;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-image img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card-details {
+    padding: 15px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.discount-badge {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.card-description {
+    font-size: 14px;
+    color: #666;
+    margin: 8px 0;
+}
+
+/* Actions Styles */
+.actions {
+    position: relative;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 14px;
+    text-decoration: none;
+    color: #333;
+}
+
+.action-btn i {
+    font-size: 24px;
+    color: #f2b3a6;
+    margin-bottom: 8px;
+}
+
+/* Navbar Styles */
+.nav-wrapper {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(45deg, #e3eefe 0%, #E6A391 100%);
+    z-index: 9999;
+    transition: all 0.6s ease-in-out;
+}
+
+.nav-menu-btn {
+    position: fixed;
+    z-index: 10000;
+    right: 20px;
+    top: 20px;
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    color: #000000;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Search Form Styles */
+.search-form {
+    display: flex;
+    align-items: center;
+    background-color: #f8e7e3;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 500px;
+    width: 85%;
+    position: relative;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: transparent;
+    text-align: right;
+}
+
+/* Service Group Index Styles */
+.index-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #f2b3a6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .nav-wrapper {
+        width: 100%;
+    }
+
+    .section-title {
+        font-size: 1.6rem;
+    }
+
+    .btn-all {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .actions {
+        gap: 15px;
+    }
+
+    .action-btn {
+        font-size: 0.8rem;
+    }
+
+    .action-btn i {
+        font-size: 32px;
+    }
+
+    .index-circle {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-title {
+        font-size: 1.3rem;
+    }
+
+    .btn-all {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+    }
+
+    .card-title {
+        font-size: 16px;
+    }
+
+    .card-description {
+        font-size: 12px;
+    }
+
+    .actions {
+        gap: 13px;
+        flex-direction: row;
+    }
+
+    .action-btn {
+        font-size: 0.6rem;
+    }
+
+    .action-btn i {
+        font-size: 24px;
+    }
+
+    .index-circle {
+        width: 60px;
+        height: 60px;
+    }
+}

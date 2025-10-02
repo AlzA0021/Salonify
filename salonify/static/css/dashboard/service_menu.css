@@ -1,0 +1,580 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  min-height: 100vh;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  font-size: 24px;
+  color: #212529;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.back-btn:hover {
+  transform: translateX(-3px);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+  background-color: #f8f9fa;
+}
+
+.add-btn {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-decoration: none;
+}
+
+.add-btn:hover {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.description {
+  padding: 0 20px;
+  margin-top: 10px;
+  color: #6c757d;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.learn-more {
+  color: #4361ee;
+  text-decoration: none;
+  position: relative;
+}
+
+.learn-more::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: #4361ee;
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+
+.learn-more:hover::after {
+  transform: scaleX(1);
+}
+
+.search-container {
+  padding: 15px 20px;
+  display: flex;
+  gap: 10px;
+  position: sticky;
+  top: 72px;
+  background-color: #fff;
+  z-index: 99;
+}
+
+.search-box {
+  flex: 1;
+  position: relative;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px 10px 12px 40px;
+  display: flex;
+  align-items: center;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-box:focus-within {
+  border-color: #4361ee;
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  color: #6c757d;
+}
+
+.search-input {
+  border: none;
+  flex: 1;
+  outline: none;
+  font-size: 16px;
+  background-color: transparent;
+  width: 100%;
+  padding-right: 30px;
+}
+
+.sort-btn {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sort-btn:hover {
+  background-color: #f8f9fa;
+}
+
+.sort-btn.active {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.category-tabs-container {
+  position: sticky;
+  top: 68px;
+  background-color: #fff;
+  z-index: 101;
+  padding: 5px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 10px;
+  padding: 0 20px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+}
+
+.category-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.category-tab {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.category-tab.active {
+  background-color: #333;
+  color: #fff;
+}
+
+.count-badge {
+  display: inline-block;
+  margin-right: 5px;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.category-tab.active .count-badge {
+  background-color: #fff;
+  color: #333;
+  border-radius: 25px;
+}
+
+.service-category {
+  margin-top: 20px;
+  padding: 0 20px;
+  scroll-margin-top: 200px;
+  transition: opacity 0.3s;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.category-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #212529;
+  position: relative;
+  padding-right: 120px;
+}
+
+/* .category-title::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 16px;
+  background-color: #4361ee;
+  border-radius: 2px;
+} */
+
+.more-options {
+  font-size: 20px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.more-options:hover {
+  background-color: #f8f9fa;
+}
+
+.service-item {
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-right: 4px solid #4361ee;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.service-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.service-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #212529;
+}
+
+.service-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.service-duration {
+  color: #6c757d;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.duration-icon {
+  margin-left: 5px;
+  color: #adb5bd;
+}
+
+.service-price {
+  font-weight: bold;
+  color: #212529;
+  font-size: 15px;
+  background-color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.no-results {
+  padding: 40px 20px;
+  text-align: center;
+  color: #6c757d;
+  display: none;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Animation for category switching */
+.service-category.active {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 15px;
+  }
+
+  .search-container {
+    padding: 10px 15px;
+  }
+
+  .service-item {
+    padding: 12px;
+  }
+}
+/* استایل‌های مربوط به مودال */
+.service-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s;
+}
+
+.modal-header {
+  padding: 15px;
+  display: flex;
+  justify-content: flex-end;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.close-modal {
+  color: #aaa;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-modal:hover {
+  background-color: #f8f9fa;
+  color: #555;
+}
+
+.modal-body {
+  padding: 15px 0;
+}
+
+.modal-option {
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-option:hover {
+  background-color: #f8f9fa;
+}
+
+.modal-option i {
+  margin-left: 12px;
+  width: 24px;
+  color: #555;
+}
+
+.delete-option {
+  color: #e53935;
+}
+
+.delete-option i {
+  color: #e53935;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    top: 60%;
+    opacity: 0;
+  }
+  to {
+    top: 50%;
+    opacity: 1;
+  }
+}
+
+/* سایه برای کارت‌های خدمت در حالت هاور */
+.service-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+/* این بخش را به انتهای فایل service_menu.css اضافه کنید */
+
+/* رنگ‌های مختلف برای گروه‌های خدمات */
+.service-category[data-color="1"] .service-item {
+  border-right-color: #4361ee; /* آبی - رنگ پیش‌فرض */
+}
+
+.service-category[data-color="2"] .service-item {
+  border-right-color: #2ecc71; /* سبز */
+}
+
+.service-category[data-color="3"] .service-item {
+  border-right-color: #e74c3c; /* قرمز */
+}
+
+.service-category[data-color="4"] .service-item {
+  border-right-color: #f39c12; /* نارنجی */
+}
+
+.service-category[data-color="5"] .service-item {
+  border-right-color: #9b59b6; /* بنفش */
+}
+
+.service-category[data-color="6"] .service-item {
+  border-right-color: #1abc9c; /* فیروزه‌ای */
+}
+
+.service-category[data-color="7"] .service-item {
+  border-right-color: #d35400; /* نارنجی تیره */
+}
+
+.service-category[data-color="8"] .service-item {
+  border-right-color: #3498db; /* آبی روشن */
+}
+
+/* سایر رنگ‌ها را متناسب با نیاز خود اضافه کنید */
+
+/* همچنین می‌توانید رنگ عنوان گروه را نیز با رنگ خدمات هماهنگ کنید */
+.service-category[data-color="1"] .category-title {
+  color: #4361ee;
+}
+
+.service-category[data-color="2"] .category-title {
+  color: #2ecc71;
+}
+
+.service-category[data-color="3"] .category-title {
+  color: #e74c3c;
+}
+
+.service-category[data-color="4"] .category-title {
+  color: #f39c12;
+}
+
+.service-category[data-color="5"] .category-title {
+  color: #9b59b6;
+}
+
+.service-category[data-color="6"] .category-title {
+  color: #1abc9c;
+}
+
+.service-category[data-color="7"] .category-title {
+  color: #d35400;
+}
+
+.service-category[data-color="8"] .category-title {
+  color: #3498db;
+}

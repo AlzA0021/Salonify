@@ -1,0 +1,101 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block title %}تنظیم شیفت‌های منظم {{ stylist.user.name }} {{ stylist.user.family }}{% endblock %}
+
+{# مهم: برای لودر مرکزی #}
+{% block body_attrs %}data-page="set_regular_shifts"{% endblock %}
+
+{% block head %}
+
+<link rel="stylesheet"
+      href={% static "css/pages/set_regular_shifts.css" %} />
+<link rel="stylesheet"
+      href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css" />
+
+{# کتابخانه‌های لازم برای تقویم شمسی #}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
+<script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+{# انتقال امنِ داده‌ی ساعات کاری سالن برای استفاده در ماژول JS #}
+<script type="application/json" id="salon-hours-json">
+  {{ salon_hours_json|safe|default:"{}" }}
+</script>
+{% endblock head %}
+
+{% block content %}
+<div class="container">
+  <a href="javascript:history.back()" class="back-button" title="بازگشت">
+    <i class="fa-solid fa-arrow-right"></i>
+  </a>
+
+  <h2 style="margin-top: 10px">
+    تنظیم شیفت‌های منظم <br />
+    {{ stylist.get_fullName }}
+  </h2>
+
+  {% if error %}
+    <p class="error-message">{{ error }}</p>
+  {% endif %}
+
+  <form method="post" id="regularShiftsForm">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="start_date_input">تاریخ شروع</label>
+      <input type="text" id="start_date_input" placeholder="تاریخ شروع را انتخاب کنید" readonly />
+      <input type="hidden" id="start_date" name="start_date" />
+    </div>
+
+    <div class="form-group">
+      <label for="end_date_input">تاریخ پایان</label>
+      <input type="text" id="end_date_input" placeholder="تاریخ پایان را انتخاب کنید" readonly />
+      <input type="hidden" id="end_date" name="end_date" />
+    </div>
+
+    <div class="info-box">
+      <p>شیفت اعضای تیم در روزهایی که کسب و کار تعطیل است، ثبت نخواهد شد.</p>
+    </div>
+
+    <div class="week-schedule">
+      {% for day_name in weekdays %}
+        <div class="day-row" data-day-index="{{ forloop.counter0 }}" data-day-name="{{ day_name }}">
+          <span class="day-name">{{ day_name }}</span>
+          <div class="shift-summary" id="summary-{{ forloop.counter0 }}">بدون شیفت</div>
+          <span class="arrow"><i class="fa-solid fa-chevron-left"></i></span>
+          <input type="hidden" name="day-{{ forloop.counter0 }}-shifts" id="shifts-{{ forloop.counter0 }}" />
+        </div>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="save-button">ذخیره کل برنامه</button>
+  </form>
+</div>
+
+<div id="shiftModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <span class="close-btn" id="modalCloseBtn">&times;</span>
+    </div>
+    <div id="modalBody"></div>
+    <a class="add-shift-btn" id="addShiftBtn"><i class="fa-solid fa-plus"></i> افزودن شیفت</a>
+    <div class="modal-footer">
+      <button id="modal-delete-day-btn">حذف همه</button>
+      <button id="modal-save-btn">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<div id="shiftRowTemplate" style="display: none">
+  <div class="shift-editor-row">
+    <select class="time-select start-time"></select>
+    <span>-</span>
+    <select class="time-select end-time"></select>
+    <span class="delete-shift-btn"><i class="fa-regular fa-trash-can"></i></span>
+  </div>
+</div>
+{% endblock content %}
+
+{# ❌ بلوک js اینلاین حذف شد. لود ماژول از app.js انجام می‌شود. #}

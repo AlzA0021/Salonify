@@ -1,0 +1,37 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+
+{% endblock head %}
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="header">
+    <a href="{% url 'dashboards:online_booking' %}" class="back-btn"><i class="fa-solid fa-arrow-right"></i></a>
+    <a href="{% url 'dashboards:online_booking' %}" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+  </div>
+  <div class="content">
+    <div class="shop-icon"><div class="shop-roof"></div><div class="shop-body"><div class="shop-door"><div class="shop-sign"></div></div></div></div>
+    <div class="step">مرحله ۱</div>
+    <h1>درباره کسب و کار خود به ما بگویید</h1>
+    <p>جزئیات اصلی مجموعه خود مانند نام و شماره تماس را وارد کنید.</p>
+    <form method="post" action="{% url 'dashboards:salon_profile_creator_step1' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.salon_name.id_for_label }}">{{ form.salon_name.label }}</label>
+        {{ form.salon_name }}
+        {% if form.salon_name.errors %}<div class="form-errors">{{ form.salon_name.errors }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
+        {{ form.phone_number }}
+        {% if form.phone_number.errors %}<div class="form-errors">{{ form.phone_number.errors }}</div>{% endif %}
+        <div class="form-help-text">شماره تماس برای ارتباط مشتریان نمایش داده می‌شود</div>
+      </div>
+      <button type="submit" class="continue-btn">ادامه</button>
+    </form>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,80 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+
+
+
+{% endblock head %}
+
+{% block title %} آرایشگران{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+        <header>
+            <button class="back-button">
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <h1>تیم</h1>
+        </header>
+        
+        <div class="card">
+            <div class="menu-item">
+                <a href="{% url "dashboards:team_member" %}" class="menu-item-content">
+                    <div class="icon">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+                    <span class="menu-item-text">اعضای تیم</span>
+                    <span class="arrow">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </span>
+                </a>
+            </div>
+            
+            <div class="menu-item">
+                <div class="menu-item-content">  <div class="icon">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <span class="menu-item-text">شیفت‌های برنامه‌ریزی شده</span>
+                    <span class="arrow">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.back-button').addEventListener('click', function() {
+            // عملکرد دکمه بازگشت
+            console.log('بازگشت به صفحه قبل');
+            // در اینجا می‌توانید کد مناسب برای بازگشت به صفحه قبل را اضافه کنید
+            window.history.back(); // مثال: بازگشت به صفحه قبلی در تاریخچه مرورگر
+        });
+
+        document.querySelectorAll('.menu-item').forEach(function(item) {
+            // بررسی اینکه آیا آیتم منو حاوی لینک است یا خیر
+            const linkElement = item.querySelector('a.menu-item-content');
+            if (linkElement) {
+                // اگر لینک وجود دارد، نیاز به event listener جداگانه برای کلیک روی .menu-item نیست
+                // چون خود لینک قابلیت کلیک و ناوبری را دارد.
+                // فقط برای لاگ کردن می‌توان نگه داشت:
+                linkElement.addEventListener('click', function(event) {
+                    const menuText = this.querySelector('.menu-item-text').textContent;
+                    console.log(`کلیک روی لینک: ${menuText}`);
+                    // ناوبری توسط خود لینک انجام می‌شود.
+                });
+            } else {
+                // اگر آیتم منو لینک مستقیم نیست (مثل آیتم دوم شما که یک div با کلاس menu-item-content است)
+                item.addEventListener('click', function() {
+                    const menuText = this.querySelector('.menu-item-text').textContent;
+                    console.log(`کلیک روی آیتم (نه لینک): ${menuText}`);
+                    // در اینجا می‌توانید کد مناسب برای هدایت به صفحات مربوطه را اضافه کنید
+                    { window.location.href = '/dashboards/scheduled_shifts/'; }
+                });
+            }
+        });
+    </script>
+
+{% endblock content %}

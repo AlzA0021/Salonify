@@ -1,0 +1,110 @@
+<!-- recently_sales.html -->
+<!-- Recent Sales Section -->
+<div class="card">
+    <div class="section-title">
+        <span>فروش های اخیر</span>
+    </div>
+    <div class="section-subtitle">۷ روز گذشته</div>
+    <div class="big-number">{{ total_sales|floatformat:0 }} تومان</div>
+    
+    <div class="summary-stats">
+        <div class="stat-item">نوبت‌ها <span class="stat-value">{{ appointment_count }}</span></div>
+        <div class="stat-item">ارزش نوبت‌ها <span class="stat-value">{{ appointments_value|floatformat:0 }} تومان</span></div>
+    </div>
+    
+    <div class="chart-container">
+        <canvas id="salesChart" width="400" height="200"></canvas>
+    </div>
+    
+    <div class="chart-legend">
+        <div class="legend-item">
+            <div class="legend-color legend-purple"></div>
+            <span>فروش</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-green"></div>
+            <span>نوبت‌ها</span>
+        </div>
+    </div>
+</div>
+
+<script>
+console.log("=== Sales Chart Debug ===");
+
+// دریافت داده‌ها
+const salesChartData = {{ chart_data|safe }};
+console.log("Chart data received:", salesChartData);
+console.log("Chart data type:", typeof salesChartData);
+console.log("Chart data length:", salesChartData ? salesChartData.length : 'undefined');
+
+// بررسی وجود canvas
+const canvas = document.getElementById('salesChart');
+console.log("Canvas element:", canvas);
+
+if (!canvas) {
+    console.error("Canvas element 'salesChart' not found!");
+} else if (!salesChartData || salesChartData.length === 0) {
+    console.error("No chart data available!");
+    // نمایش پیام عدم وجود داده
+    canvas.parentNode.innerHTML = '<p style="text-align: center; color: #666;">داده‌ای برای نمایش موجود نیست</p>';
+} else {
+    console.log("Attempting to create chart...");
+    
+    // بررسی وجود تابع createDynamicSalesChart
+    if (typeof createDynamicSalesChart === 'function') {
+        try {
+            createDynamicSalesChart(salesChartData);
+            console.log("Chart created successfully");
+        } catch (error) {
+            console.error("Error creating chart:", error);
+        }
+    } else {
+        console.error("Function 'createDynamicSalesChart' not found!");
+        
+        // پیاده‌سازی ساده Chart.js در صورت عدم وجود تابع سفارشی
+        if (typeof Chart !== 'undefined') {
+            const ctx = canvas.getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: salesChartData.map(item => item.date_display || item.date),
+                    datasets: [
+                        {
+                            label: 'فروش',
+                            data: salesChartData.map(item => item.sales),
+                            borderColor: '#8B5CF6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'نوبت‌ها',
+                            data: salesChartData.map(item => item.appointments),
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error("Chart.js library not found!");
+        }
+    }
+}
+
+console.log("=== End Sales Chart Debug ===");
+</script>

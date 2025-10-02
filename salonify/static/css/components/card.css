@@ -1,0 +1,11 @@
+/*! salonify: components/card.css */
+.card{
+  background:#fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4);
+}
+.card + .card{ margin-top: var(--space-4); }
+.card__title{ font-weight: 700; margin-bottom: var(--space-2); }
+.card__meta{ color: var(--gray-500); font-size: var(--font-size-200); }

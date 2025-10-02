@@ -1,0 +1,298 @@
+/* ====================================== */
+/* Base Variables & Global Resets */
+/* ====================================== */
+:root {
+  /* Color Palette */
+  --color-primary: #4a4a4a;
+  --color-secondary: #757575;
+  --color-accent: #3498db;
+  --color-background: #fff;
+  --color-text: #333;
+  --color-border: #ddd;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Typography */
+  --font-primary: 'Vazirmatn', Arial, sans-serif;
+
+  /* Spacing */
+  --space-xs: 10px;
+  --space-sm: 15px;
+  --space-md: 20px;
+  --space-lg: 30px;
+}
+
+/* ====================================== */
+/* Global & Base Styles */
+/* ====================================== */
+body {
+  font-family: var(--font-primary);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  direction: rtl;
+  line-height: 1.6;
+}
+
+/* Link Reset */
+.no-decoration,
+.no-decoration:link,
+.no-decoration:visited {
+  text-decoration: none;
+  color: inherit;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-md);
+}
+
+/* ====================================== */
+/* Typography & Headings */
+/* ====================================== */
+.page-title {
+  text-align: center;
+  color: var(--color-primary);
+  margin-bottom: var(--space-lg);
+  font-size: 1.8rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--space-lg) 0 var(--space-md);
+  padding: var(--space-xs);
+  background-color: var(--color-background);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.section-count {
+  background-color: var(--color-text);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+/* ====================================== */
+/* Button Styles */
+/* ====================================== */
+.btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: normal;
+}
+
+.btn-directions {
+  background-color: var(--color-text);
+  color: white;
+  border-radius: 12px;
+}
+
+.btn-directions:hover {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-calendar {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.btn-rebook {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-rebook:hover {
+  background-color: var(--color-text);
+  color: var(--color-background);
+  border: none;
+}
+
+.btn-search-salons {
+  display: inline-block;
+  background-color: var(--color-text);
+  color: var(--color-background);
+  padding: 10px 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.btn-search-salons:hover {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+/* ====================================== */
+/* Upcoming Appointments Grid */
+/* ====================================== */
+.appointments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-md);
+}
+
+.appointment-card {
+  background-color: var(--color-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.appointment-card:hover {
+  transform: scale(1.02);
+}
+
+.appointment-card-image {
+  position: relative;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--color-overlay);
+  color: white;
+  padding: var(--space-xs);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.salon-name {
+  font-weight: bold;
+}
+
+.remaining-days {
+  color: #ffd700;
+}
+
+.appointment-card-body {
+  padding: var(--space-sm);
+}
+
+.appointment-datetime {
+  color: var(--color-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.appointment-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.appointment-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ====================================== */
+/* Past Appointments Styles */
+/* ====================================== */
+.past-appointments {
+  background-color: var(--color-background);
+}
+
+.past-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.past-item:last-child {
+  border-bottom: none;
+}
+
+.past-item-image {
+  width: 80px;
+  height: 80px;
+  margin-left: var(--space-sm);
+}
+
+.past-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.past-item-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.past-item-details .salon-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.past-item-details .appointment-date {
+  color: var(--color-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.past-item-details .service-details {
+  color: var(--color-secondary);
+  font-size: 0.9rem;
+}
+
+/* ====================================== */
+/* Empty States */
+/* ====================================== */
+.no-appointments,
+.no-upcoming-appointments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--space-lg) var(--space-md);
+  margin: var(--space-lg) 0;
+  text-align: center;
+}
+
+.no-upcoming-icon {
+  font-size: 50px;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+
+.no-upcoming-appointments h2 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: var(--color-text);
+}
+
+.no-upcoming-appointments p {
+  font-size: 0.95rem;
+  color: var(--color-secondary);
+  margin-bottom: var(--space-md);
+}

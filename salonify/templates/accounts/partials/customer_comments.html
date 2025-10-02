@@ -1,0 +1,193 @@
+{% load jalali_extras %}
+
+<!-- مودال نظرات -->
+<div class="modal-overlay" id="reviews-modal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">نظرات {{ customer.get_fullName }}</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-content">
+            <div class="customer-comments">
+                <div class="customer-review-header">
+                    <h4 class="customer-review-title">دیدگاه‌ها</h4>
+                    <div class="customer-review-stats">
+                        <div class="customer-review-count">
+                            <i class="fa-solid fa-comment"></i>
+                            <span>{{ comments_count }} دیدگاه</span>
+                        </div>
+                        <div class="customer-rating">
+                            <i class="fa-solid fa-star"></i>
+                            <span>امتیاز: {{ rating }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- لیست دیدگاه‌ها -->
+                <div class="customer-reviews-list">
+                    {% for comment in customer_ratings %}
+                    <div class="customer-review-item {% if comment.is_active %}approved{% else %}pending{% endif %}" id="comment-{{ comment.id }}">
+                        <div class="status-indicator comment-status"></div>
+                        <div class="review-content-wrapper">
+                            <div class="customer-review-meta">
+                                <div class="customer-review-date">{{ comment.register_date|jalali_date:'%Y/%m/%d' }}</div>
+                                
+                                <!-- نمایش ستاره‌ها -->
+                                <div class="customer-review-stars">
+                                    {% if comment.scoring and comment.scoring.score %}
+                                    <div class="stars-container" data-rating="{{ comment.scoring.score }}">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    {% else %}
+                                    <span>بدون امتیاز</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="customer-review-content">
+                                <div class="customer-review-text">{{ comment.comment_text }}</div>
+                                
+                                <div class="customer-review-details">
+                                    {% if comment.stylist %}
+                                    <div class="review-detail-item">
+                                        <i class="fa-solid fa-cut"></i>
+                                        <span>آرایشگر: {{ comment.stylist.get_fullName }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if comment.service %}
+                                    <div class="review-detail-item">
+                                        <i class="fa-solid fa-list-alt"></i>
+                                        <span>خدمت: {{ comment.service.service_name }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="action-buttons">
+                                    {% if not comment.is_active %}
+                                    <button type="button" class="approve-comment-btn" data-comment-id="{{ comment.id }}" data-customer-id="{{ customer.user_id }}">
+                                        <i class="fa-solid fa-check"></i> تایید نظر
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="no-reviews-message">
+                        <i class="fa-solid fa-comments"></i>
+                        <p>این مشتری تاکنون دیدگاهی ثبت نکرده است.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- کدهای جاوااسکریپت مربوط به این مودال -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // فعال کردن ستاره‌ها براساس امتیاز
+    const starContainers = document.querySelectorAll('#reviews-modal .stars-container');
+    starContainers.forEach(container => {
+        const rating = parseInt(container.getAttribute('data-rating'));
+        const stars = container.querySelectorAll('i');
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('active');
+            }
+        });
+    });
+    
+    // بستن مودال با کلیک روی دکمه بستن
+    const closeButton = document.querySelector('#reviews-modal .modal-close');
+    if (closeButton) {
+        closeButton.addEventListener('click', function() {
+            document.getElementById('reviews-modal').style.display = 'none';
+        });
+    }
+    
+    // بستن مودال با کلیک خارج از محتوا
+    const modalOverlay = document.getElementById('reviews-modal');
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    }
+    
+    // اضافه کردن گوش‌دهنده برای دکمه‌های تایید نظر
+    document.querySelectorAll('.approve-comment-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            const customerId = this.getAttribute('data-customer-id');
+            approveComment(commentId, customerId, this);
+        });
+    });
+    
+    // تابع نمایش پیام موفقیت (Toast)
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+    
+    // تابع ارسال درخواست AJAX برای تایید نظر
+    function approveComment(commentId, customerId, buttonElement) {
+        const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+        
+        fetch(`/csf/approve-comment/${commentId}/${customerId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('خطا در ارتباط با سرور');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const commentItem = document.getElementById(`comment-${commentId}`);
+                
+                commentItem.classList.remove('pending');
+                commentItem.classList.add('approved');
+                
+                const actionButtons = buttonElement.closest('.action-buttons');
+                if (actionButtons) {
+                    actionButtons.innerHTML = ''; // حذف دکمه
+                }
+                
+                showToast('نظر با موفقیت تایید شد');
+            } else {
+                throw new Error(data.error || 'خطا در پردازش درخواست');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('خطا در تایید نظر');
+        });
+    }
+});
+</script>

@@ -1,0 +1,86 @@
+{% extends "main_template.html" %}
+{% load static %}
+
+{% block title %}انتخاب آرایشگر{% endblock title %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/select_stylists.css' %}">
+{% endblock head %}
+
+{# برای اتصال به ماژول صفحه #}
+{% block body_attrs %}data-page="select_stylists"{% endblock %}
+
+{% block content %}
+  <!-- هدر ثابت -->
+  <header class="fixed-header">
+    <button class="back-button" onclick="window.history.back();">
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+    <div class="header-title">انتخاب آرایشگر</div>
+    <div style="width:40px"></div>
+  </header>
+
+  <!-- آکاردئون خدمات -->
+  <div class="accordion">
+    {% for service in selected_services %}
+      <div class="accordion-item" data-service-id="{{ service.id }}">
+        <div class="accordion-header" data-accordion-toggle>
+          <span class="toggle-icon"><i class="fa-solid fa-chevron-down"></i></span>
+          <span class="service-title">{{ service.service_name }}</span>
+        </div>
+
+        <div class="accordion-content">
+          <div class="detailSalon-scroll-container">
+            <div class="detailSalon-team-members detailSalon-modal-team-members">
+              {% for stylist in service.stylists.all %}
+                <div class="detailSalon-team-member-box"
+                     data-service-id="{{ service.id }}"
+                     data-stylist-id="{{ stylist.user.id }}">
+                  <div class="detailSalon-team-member">
+                    <div class="detailSalon-profile-image-container">
+                      {% if stylist.profile_image %}
+                        <img src="{{ stylist.profile_image.url }}" alt="{{ stylist.get_fullName }}">
+                      {% else %}
+                        <img src="{% static 'css/images/default-avatar.png' %}" alt="{{ stylist.get_fullName }}">
+                      {% endif %}
+                      <div class="detailSalon-rating-badge">
+                        <span class="detailSalon-rating-value">{{ stylist.avg_score|floatformat:1|default_if_none:"—" }}</span>
+                        <span class="detailSalon-rating-star"><i class="fa-solid fa-star"></i></span>
+                      </div>
+                    </div>
+                    <div class="detailSalon-name">{{ stylist.get_fullName }}</div>
+                    <div class="detailSalon-role">{{ stylist.expert }}</div>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="no-stylists">برای این خدمت، آرایشگری ثبت نشده است.</div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="no-services">هیچ خدمتی برای انتخاب آرایشگر وجود ندارد.</div>
+    {% endfor %}
+  </div>
+
+  <!-- نوار پایین ثابت -->
+  <div class="fixed-bottom-bar">
+    <div class="selected-stylists-info" id="selectedStylistsInfo"></div>
+    <button id="proceedBtn" class="proceed-btn">انتخاب تاریخ و زمان</button>
+  </div>
+
+  <!-- داده‌های داینامیک برای JS -->
+  <script>
+    window.dynamicData = {
+      salonId: "{{ salon.id }}",
+      nextUrl: "{% url 'orders:select_dateTime' %}",
+      services: [
+        {% for service in selected_services %}
+          { id: "{{ service.id }}", serviceName: "{{ service.service_name|escapejs }}" }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ]
+    };
+  </script>
+{% endblock content %}

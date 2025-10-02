@@ -1,0 +1,164 @@
+{% extends 'main_template.html' %} {% load humanize %} {% block title %}جزئیات رزرو{% endblock title
+%} {% block head %}
+
+
+{% endblock head %} {% block content %}
+<!-- هدر ثابت -->
+<header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+  <div class="container mx-auto px-4 py-3 flex items-center">
+    <button class="p-2 rounded-full hover:bg-gray-100" onclick="window.history.back();">
+      <i class="fa-solid fa-arrow-right text-gray-500"></i>
+    </button>
+    <h1 class="text-lg font-bold mx-auto">جزئیات رزرو</h1>
+    <div class="w-8"></div>
+    <!-- این المان برای متوازن کردن هدر است -->
+  </div>
+</header>
+
+<div class="container mx-auto px-4 pt-16 pb-20">
+  <div class="reservation-card bg-white mb-6 overflow-hidden max-w-2xl mx-auto">
+    <!-- هدر کارت با گرادیان -->
+    <div class="header-gradient p-6 text-white">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">رزرو #{{ order.id }}</h2>
+          <p class="opacity-80 mt-1">{{ order.register_date|date:"Y/m/d" }}</p>
+        </div>
+        <div class="text-left">
+          {% if order.stylist_approved and order.is_finally %}
+          <span class="status-badge status-confirmed">تایید شده</span>
+          {% else %}
+          <span class="status-badge status-pending">در انتظار تایید</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- بخش اطلاعات مشتری -->
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-gray-700">اطلاعات مشتری</h3>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-xl space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">نام مشتری</span>
+          <span class="font-medium"
+            >{{ order.customer.user.name }} {{ order.customer.user.family }}</span
+          >
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">تاریخ ثبت</span>
+          <span class="font-medium">{{ order.register_date|date:"Y/m/d" }}</span>
+        </div>
+        {% if order.payment_type %}
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">روش پرداخت</span>
+          <span class="font-medium">{{ order.payment_type.payment_title }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- بخش خدمات -->
+    <div class="px-6 pb-2">
+      <h3 class="text-lg font-bold text-gray-700 mb-4">خدمات رزرو شده</h3>
+
+      <div class="space-y-3">
+        {% for detail in order_details %}
+        <div class="service-item bg-gray-50 p-4 rounded-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4 space-x-reverse">
+              {% if detail.stylist.profile_image %}
+              <img
+                src="{{ detail.stylist.profile_image.url }}"
+                alt="{{ detail.stylist.get_fullName }}"
+                class="stylist-avatar"
+              />
+              {% else %}
+              <div
+                class="stylist-avatar bg-indigo-100 flex items-center justify-center text-indigo-500"
+              >
+                <i class="fa-solid fa-user-tie text-2xl"></i>
+              </div>
+              {% endif %}
+              <div>
+                <h4 class="font-bold text-gray-800">{{ detail.service.service_name }}</h4>
+                <p class="text-gray-500 text-sm">{{ detail.stylist.get_fullName }}</p>
+                <div class="flex items-center mt-1 text-sm text-gray-500">
+                  <i class="fa-solid fa-calendar-days ml-1"></i>
+                  <span>{{ detail.date|date:"Y/m/d" }}</span>
+                  <span class="mx-2">|</span>
+                  <i class="fa-regular fa-clock ml-1"></i>
+                  <span>{{ detail.time }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-left">
+              <span class="price-tag bg-blue-50 text-blue-700 font-bold"
+                >{{ detail.price|intcomma }} تومان</span
+              >
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- بخش قیمت‌ها -->
+    <div class="p-6">
+      <div class="bg-gray-50 p-4 rounded-xl space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">قیمت کل</span>
+          <span class="font-medium">{{ total_price|intcomma }} تومان</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">مالیات (۹٪)</span>
+          <span class="font-medium text-red-600">{{ tax|intcomma }} تومان</span>
+        </div>
+        {% if order.discount %}
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">تخفیف</span>
+          <span class="font-medium text-green-600">{{ order.discount }}٪</span>
+        </div>
+        {% endif %}
+        <div class="divider"></div>
+        <div class="flex justify-between items-center">
+          <span class="font-bold">قیمت نهایی</span>
+          <span class="font-bold text-lg text-green-600">{{ final_price|intcomma }} تومان</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- بخش آدرس سالن -->
+    {% for detail in order_details|slice:":1" %}
+    <div class="p-6 pt-0">
+      <h3 class="text-lg font-bold text-gray-700 mb-4">آدرس سالن</h3>
+      <div class="bg-gray-50 p-4 rounded-xl">
+        <div class="flex items-start">
+          <i class="fa-solid fa-location-dot text-red-500 mt-1 ml-3"></i>
+          <div>
+            <p class="font-medium text-gray-800">{{ detail.salon.salon_name }}</p>
+            <p class="text-gray-500 mt-1">{{ detail.salon.address }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- دکمه‌های عملیات -->
+    <div class="p-6 space-y-3">
+      <a
+        href="tel:+989123456789"
+        class="block text-center py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition"
+      >
+        تماس با پشتیبانی
+      </a>
+      <button
+        class="block w-full py-3 border border-red-500 text-red-500 rounded-xl font-bold hover:bg-red-50 transition"
+      >
+        لغو رزرو
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock content %}

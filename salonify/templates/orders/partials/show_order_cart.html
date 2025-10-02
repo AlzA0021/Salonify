@@ -1,0 +1,170 @@
+{% load humanize %}
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 14px; /* سایز فونت کوچک‌تر */
+  }
+  th,
+  td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  .empty-cart {
+    color: #888;
+    text-align: center;
+  }
+  .btn-delete,
+  .btn-edit {
+    padding: 6px 12px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .btn-delete {
+    background-color: #e74c3c;
+  }
+  .btn-edit {
+    background-color: #3498db;
+  }
+  .btn-save {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  /* مدیا کوئری برای نمایش موبایل */
+  @media (max-width: 768px) {
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+      display: block;
+      width: 100%;
+    }
+    tr {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px 0;
+    }
+    td {
+      text-align: right;
+      padding: 8px 0;
+      border: none;
+      width: 100%;
+    }
+    th {
+      display: none;
+    }
+    td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      display: inline-block;
+      width: 40%;
+      color: #555;
+    }
+    .btn-save {
+      width: 100%;
+    }
+  }
+</style>
+
+<h1>سبد سفارش</h1>
+
+{% if order_cart %}
+  <table>
+    <thead>
+      <tr>
+        <th>ردیف</th>
+        <th>خدمت</th>
+        <th>آرایشگر</th>
+        <th>سالن</th>
+        <th>تاریخ</th>
+        <th>زمان</th>
+        <th>تخفیف</th>
+        <th>قیمت</th>
+        <th>قیمت بعد از تخفیف</th>
+        <th>عملیات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order_cart %}
+        <tr>
+          <td data-label="ردیف">{{ forloop.counter }}</td>
+          <td data-label="خدمت">{{ item.service.service_name|default:'نامشخص' }}</td>
+          <td data-label="آرایشگر">{{ item.stylist.user.name|default:'نامشخص' }} {{ item.stylist.user.family|default:'' }}</td>
+          <td data-label="سالن">{{ item.salon.salon_name|default:'نامشخص' }}</td>
+          <td data-label="تاریخ">{{ item.date|default:'انتخاب نشده' }}</td>
+          <td data-label="زمان">{{ item.time|default:'انتخاب نشده' }}</td>
+          <td data-label="تخفیف">{{ item.discount|default:'0' }}</td>
+          <td data-label="قیمت">{{ item.price|default:'انتخاب نشده '|intcomma }}</td>
+          <td data-label="قیمت با تخفیف">{{ item.final_price|default:'تخفیف اعمال نشده ' }}</td>
+          <td data-label="عملیات">
+            <a onclick="delete_from_order_cart({{ item.service.id }})"><i class="fa fa-trash" style="cursor: pointer;"></i></a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <hr />
+  <p style="justify-content: left;">مجموع پرداختی : {{ order_cart.calc_total_price|intcomma }} تومان</p>
+  <hr />
+  <div class="checkout">
+    <form action="{% url 'orders:create_order' %}" method="get">
+      <button type="submit" class="btn-save">ادامه به پرداخت</button>
+    </form>
+  </div>
+  <a class="btn btn-edit" onclick="show_update_salon_stylist_order()">ویرایش سالن و آرایشگر</a>
+{% else %}
+  <p class="empty-cart">سبد سفارش شما خالی است.</p>
+{% endif %}
+
+<script>
+  function delete_from_order_cart(service) {
+    $.ajax({
+      type: 'GET',
+      url: '/orders/delete_from_order_cart/',
+      data: {
+        service: service
+      },
+      success: function (res) {
+        alert('خدمت مورد نظر از سبد سفارش حذف شد ')
+        $('#order_cart_list').html(res)
+      }
+    })
+  }
+  
+  function show_update_salon_stylist_order() {
+    $.ajax({
+      type: 'GET',
+      url: '/orders/show_update_salon_stylist_order/',
+  
+      success: function (res) {
+        $('#order_cart_list').html(res)
+      }
+    })
+  }
+</script>

@@ -1,0 +1,23 @@
+<div class="serviceGroup-container">
+    <h2>گروه های خدمات </h2>
+    <div class="serviceGroup-grid">
+        {% for group in service_groups %}
+        <div class="serviceGroup-card">
+            <img src="{{ media_url }}{{ group.group_image }}" alt="{{ group.group_title }}">
+            <span>{{ group.group_title }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+

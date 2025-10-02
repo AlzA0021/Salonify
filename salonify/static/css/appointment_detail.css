@@ -1,0 +1,232 @@
+/* Appointment Detail Stylesheet */
+
+/* Global Reset and Base Styles */
+:root {
+  /* Color Palette */
+  --primary-text-color: #333;
+  --secondary-text-color: #666;
+  --light-text-color: #999;
+  --border-color: #eee;
+  --confirmed-color: #6e44ff;
+  --pending-color: #ff9800;
+  --background-color: #fff;
+  --hover-background: #f5f5f5;
+}
+
+/* RTL Layout and Typography */
+body,
+.appointment-detail-container {
+  direction: rtl;
+  font-family: 'Iran Sans', 'Vazir', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: var(--primary-text-color);
+  line-height: 1.6;
+}
+
+/* Main Container */
+.appointment-detail-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: var(--background-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* Navigation */
+.back-arrow {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  padding: 8px;
+  transition: background 0.2s ease;
+}
+
+.back-arrow:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Salon Banner */
+.detail-header {
+  position: relative;
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.detail-header .overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.detail-header .bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px 20px;
+}
+
+.detail-header .salon-name {
+  margin: 0;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+/* Appointment Status Section */
+.detail-status-section {
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: right;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.status-badge.confirmed {
+  background-color: var(--confirmed-color);
+}
+
+.status-badge.pending {
+  background-color: var(--pending-color);
+}
+
+.appointment-time {
+  font-size: 1.2rem;
+  margin-top: 5px;
+  color: var(--primary-text-color);
+}
+
+.appointment-duration {
+  margin-top: 3px;
+  font-size: 0.9rem;
+  color: var(--secondary-text-color);
+}
+
+/* Action Buttons */
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.action-button:hover {
+  background-color: var(--hover-background);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-button i {
+  color: var(--primary-text-color);
+  font-size: 1rem;
+}
+
+/* Venue Address */
+.venue-address {
+  padding: 15px;
+  font-size: 0.95rem;
+  color: var(--secondary-text-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Overview Section */
+.overview-section {
+  padding: 15px;
+  margin-bottom: 3rem;
+}
+
+.overview-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: var(--primary-text-color);
+}
+
+.services-list {
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 15px;
+}
+
+.service-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.service-item:last-child {
+  border-bottom: none;
+}
+
+.service-name {
+  font-weight: bold;
+  color: var(--primary-text-color);
+  margin-bottom: 5px;
+}
+
+.service-duration,
+.service-price {
+  font-size: 0.9rem;
+  color: var(--secondary-text-color);
+}
+
+/* Total Price */
+.total-price {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--primary-text-color);
+}
+
+/* Booking Reference */
+.booking-ref {
+  color: var(--light-text-color);
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 480px) {
+  .appointment-detail-container {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .detail-header {
+    height: 180px;
+  }
+}

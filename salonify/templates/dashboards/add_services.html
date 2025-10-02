@@ -1,0 +1,182 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% load jalali_extras %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static "css/dashboard/add_services.css" %}">
+  {# Vendor CSS: Select2 #}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+{% endblock head %}
+
+{% block title %}افزودن خدمت{% endblock title %}
+
+{# مهم برای app.js تا ماژول را لود کند #}
+{% block body_attrs %}data-page="dashboard_add_service"{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="header">
+    <h1>خدمت جدید</h1>
+    <a href="{% url "dashboards:service_menu" %}" class="close-btn" title="بازگشت">×</a>
+  </div>
+
+  <div class="form-container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form id="serviceForm" method="post" enctype="multipart/form-data" action="{% url 'dashboards:add_service' %}">
+      {% csrf_token %}
+
+      <!-- اطلاعات پایه -->
+      <div class="form-section">
+        <h2>اطلاعات پایه</h2>
+
+        <div class="form-group">
+          <label for="id_service_name">نام خدمت</label>
+          {{ form.service_name }}
+          {% if form.service_name.errors %}
+            <div class="error-message">{{ form.service_name.errors }}</div>
+          {% endif %}
+          <div class="character-count">۰/۵۰۰</div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_service_group">گروه خدمت</label>
+          <div class="select-wrapper">
+            {{ form.service_group }}
+          </div>
+          {% if form.service_group.errors %}
+            <div class="error-message">{{ form.service_group.errors }}</div>
+          {% endif %}
+          <span class="helper-text">گروه خدمت به مشتریان کمک می‌کند تا خدمت شما را در فروشگاه پیدا کنند</span>
+        </div>
+
+        <div class="form-group">
+          <label for="id_summery_description">توضیحات کوتاه</label>
+          {{ form.summery_description }}
+          {% if form.summery_description.errors %}
+            <div class="error-message">{{ form.summery_description.errors }}</div>
+          {% endif %}
+          <div class="character-count">۰/۲۰۰</div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_description">توضیحات کامل</label>
+          {{ form.description }}
+          {% if form.description.errors %}
+            <div class="error-message">{{ form.description.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- قیمت و مدت -->
+      <div class="form-section">
+        <h2>قیمت و مدت زمان</h2>
+
+        <div class="form-group">
+          <label for="id_service_prices">قیمت پایه خدمت</label>
+          <div class="price-input-wrapper">
+            {{ form.service_prices }}
+            <span class="currency-symbol">تومان</span>
+          </div>
+          {% if form.service_prices.errors %}
+            <div class="error-message">{{ form.service_prices.errors }}</div>
+          {% endif %}
+          <span class="helper-text">قیمت پایه به عنوان مقدار پیش‌فرض برای همه آرایشگرها استفاده می‌شود</span>
+        </div>
+
+        <div class="form-group">
+          <label for="id_duration_minutes">مدت زمان (دقیقه)</label>
+          {{ form.duration_minutes }}
+          {% if form.duration_minutes.errors %}
+            <div class="error-message">{{ form.duration_minutes.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- آرایشگران -->
+      <div class="form-section stylist-section">
+        <h2>آرایشگرهای ارائه کننده خدمت</h2>
+
+        <div class="form-group">
+          <label>آرایشگرهایی که این خدمت را ارائه می‌دهند</label>
+          <div class="checkbox-group">
+            {% for stylist in stylists %}
+              <div class="checkbox-item">
+                <label class="checkbox-label">
+                  <input type="checkbox"
+                         name="selected_stylists"
+                         value="{{ stylist.user.id }}"
+                         id="stylist_{{ stylist.user.id }}"
+                         {% if stylist.user.id in form.selected_stylists.value %}checked{% endif %}>
+                  {% if stylist.user.get_fullName %}
+                    {{ stylist.user.get_fullName }}
+                  {% else %}
+                    {{ stylist.user.name }}
+                  {% endif %}
+                </label>
+              </div>
+            {% endfor %}
+          </div>
+          {% if form.selected_stylists.errors %}
+            <div class="error-message">{{ form.selected_stylists.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- فیلدهای قیمت هر آرایشگر (از سمت سرور یا JS) -->
+        <div id="stylist-prices-container">
+          {% for field_name, field in form.fields.items %}
+            {% if field_name|startswith:'stylist_price_' %}
+              <div class="form-group stylist-price">
+                <div class="stylist-price-header">{{ field.label }}</div>
+                <div class="price-input-wrapper">
+                  <input type="number"
+                         name="{{ field_name }}"
+                         id="id{{ "_" }}{{ field_name }}"
+                         class="form-control {% if field.errors %}is-invalid{% endif %}"
+                         value="{{ field.value|default:form.service_prices.value }}"
+                         min="0" required>
+                  <span class="currency-symbol">تومان</span>
+                </div>
+                {% if field.errors %}
+                  <div class="error-message">{{ field.errors }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- تصویر -->
+      <div class="form-group">
+        <label for="id_service_image">تصویر خدمت</label>
+        <div class="file-input-wrapper">
+          <label class="file-input-btn" for="id_service_image">انتخاب تصویر</label>
+          {{ form.service_image }}
+          <div class="file-name"></div>
+        </div>
+        {% if form.service_image.errors %}
+          <div class="error-message">{{ form.service_image.errors }}</div>
+        {% endif %}
+        <span class="helper-text">فرمت‌های قابل قبول: JPG، PNG (حداکثر ۵MB)</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary">ذخیره</button>
+    </form>
+  </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+  {# Vendor JS: jQuery و Select2 قبل از app.js تا ماژول بتواند از آنها استفاده کند #}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  {# اگر CKEditor یا رسانه‌های فرم نیاز به اسکریپت دارند #}
+  {{ form.media }}
+{% endblock js %}

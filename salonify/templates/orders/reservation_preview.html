@@ -1,0 +1,175 @@
+{% extends "main_template.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}پیش نمایش رزرو{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+<link rel="stylesheet" href="{% static 'css/reservation_preview.css' %}" />
+{% endblock %}
+
+{% block content %}
+<!-- هدر صفحه -->
+<div class="header">
+    <button class="back-button" onclick="history.back()">
+        <i class="fas fa-arrow-right"></i>
+    </button>
+    <div class="page-title">پیش‌نمایش رزرو</div>
+    <div class="header-spacer"></div>
+</div>
+
+<div class="content-wrapper">
+    <!-- نمایش پیغام‌های خطا -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- اطلاعات سالن -->
+    <div class="salon-card">
+        {% if salon %}
+        <div class="salon-header">
+            {% if salon.banner_image %}
+            <img src="{{ salon.banner_image.url }}" alt="{{ salon.salon_name }}" class="salon-image" />
+            {% else %}
+            <img src="{% static 'images/default-salon.png' %}" alt="{{ salon.salon_name }}" class="salon-image" />
+            {% endif %}
+            
+            <div class="salon-details">
+                <h2 class="salon-name">{{ salon.salon_name }}</h2>
+                <div class="salon-rating">
+                    <span class="salon-score">{{ salon.avg_score|floatformat:1|default:"-" }}</span>
+                    <span class="salon-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></span>
+                    <span class="salon-reviews">({{ salon.reviews_count|default:0 }} نظر)</span>
+                </div>
+                <p class="salon-address">{{ salon.address }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- بخش آرایشگران -->
+    <div class="stylists-section">
+        {% for stylist_info in stylists_info %}
+        <div class="stylist-datetime">
+            <div class="date-section"><i class="far fa-calendar"></i><span>{{ stylist_info.selected_date }}</span></div>
+            <div class="time-section"><i class="far fa-clock"></i><span>{{ stylist_info.selected_time }}</span></div>
+        </div>
+        <div class="stylist-card">
+            <div class="stylist-header">
+                {% if stylist_info.stylist.profile_image %}
+                <img src="{{ stylist_info.stylist.profile_image.url }}" alt="{{ stylist_info.stylist.user.get_fullName }}" class="stylist-image" />
+                {% else %}
+                <div class="stylist-image default-stylist-image"><i class="fas fa-user default-stylist-icon"></i></div>
+                {% endif %}
+                <div class="stylist-name">{{ stylist_info.stylist.get_fullName }}</div>
+            </div>
+            <div id="services-list-{{ stylist_info.stylist.id }}">
+                {% for service_item in services_info %}
+                    {% if service_item.stylist.pk == stylist_info.stylist.pk %}
+                    <div class="stylist-service-item">
+                        <div>
+                            <div class="stylist-service-name">{{ service_item.service.service_name }}</div>
+                            <div class="stylist-service-duration"><i class="fa-regular fa-clock"></i><span>{{ service_item.service.duration_minutes }} دقیقه</span></div>
+                        </div>
+                        <div class="stylist-service-price">{{ service_item.price|intcomma }} تومان</div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- بخش کد تخفیف -->
+    <div class="discount-section">
+        <div class="discount-title">کد تخفیف</div>
+        <form class="discount-form" method="post" action="#">
+            {% csrf_token %}
+            <input type="hidden" name="apply_discount" value="true" />
+            <input type="text" name="discount_code" class="discount-input" placeholder="کد تخفیف خود را وارد کنید" />
+            <button type="submit" class="discount-button">اعمال</button>
+        </form>
+    </div>
+
+    <!-- خلاصه قیمت و محاسبات -->
+    <div class="price-summary">
+        <div class="price-row">
+            <div class="price-label">جمع خدمات</div>
+            <div class="price-value">{{ total_price|intcomma }} تومان</div>
+        </div>
+        <div class="price-row">
+            <div class="price-label">مالیات</div>
+            <div class="price-value">{{ tax|intcomma }} تومان</div>
+        </div>
+        {% if discount_amount %}
+        <div class="price-row">
+            <div class="price-label">تخفیف</div>
+            <div class="price-value discount-value">{{ discount_amount|intcomma }} تومان</div>
+        </div>
+        {% endif %}
+        <div class="price-row">
+            <div class="price-label">قیمت نهایی</div>
+            <div class="price-value">{{ final_price|intcomma }} تومان</div>
+        </div>
+    </div>
+
+    <!-- بخش انتخاب روش پرداخت -->
+    <div class="payment-section">
+        <div class="payment-title">روش پرداخت</div>
+        <div class="payment-options">
+            <div class="payment-option active" data-method="onsite">
+                <div class="payment-option-radio"></div>
+                <div class="payment-option-info">
+                    <div class="payment-option-title">پرداخت در محل</div>
+                    <div class="payment-option-description">پرداخت هنگام حضور در سالن</div>
+                </div>
+            </div>
+            <div class="payment-option" data-method="online">
+                <div class="payment-option-radio"></div>
+                <div class="payment-option-info">
+                    <div class="payment-option-title">پرداخت آنلاین</div>
+                    <div class="payment-option-description">پرداخت امن از طریق درگاه بانکی</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بخش نهایی و تایید سفارش -->
+    <div class="final-section">
+        <div class="final-price">{{ final_price|intcomma }} تومان</div>
+        <form method="post" action="{% url 'orders:reservation_preview' %}">
+            {% csrf_token %}
+            <input type="hidden" name="confirm_reservation" value="true" />
+            <input type="hidden" name="payment_method" id="payment_method" value="onsite" />
+            <button type="submit" class="confirm-button">تأیید و ثبت نهایی</button>
+        </form>
+    </div>
+</div>
+
+<!-- اسکریپت‌های جاوااسکریپت -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // انتخاب روش پرداخت
+        document.querySelectorAll('.payment-option').forEach((option) => {
+            option.addEventListener('click', function () {
+                // حذف کلاس active از همه گزینه‌ها
+                document.querySelectorAll('.payment-option').forEach((opt) => {
+                    opt.classList.remove('active');
+                });
+
+                // اضافه کردن کلاس active به گزینه انتخاب شده
+                this.classList.add('active');
+
+                // تنظیم مقدار فیلد مخفی
+                document.getElementById('payment_method').value = this.dataset.method;
+            });
+        });
+    });
+</script>
+{% endblock %}

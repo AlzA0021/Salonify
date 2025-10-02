@@ -1,0 +1,30 @@
+{% extends "main_template.html" %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/favorites_salons.css' %}">
+{% endblock head %}
+
+{% block title %}علاقه‌مندی‌ها{% endblock title %}
+
+{% block content %}
+  <div class="favorites-header">
+    <button class="back-button" onclick="window.history.back()">
+      <i class="fas fa-arrow-right"></i>
+    </button>
+    <h1>علاقه‌مندی‌ها</h1>
+  </div>
+
+  {% if salons %}
+    {% for salon in salons %}
+      {% include "csf/partials/favorits_salon_card.html " %}
+    {% endfor %}
+  {% else %}
+    <div class="no-favorites">
+      <img src="{% static 'images/icons/no_favorites.jpg' %}" alt="No favourites">
+      <h2>هیچ علاقه‌مندی‌ای ندارید</h2>
+      <p>لیست علاقه‌مندی‌های شما خالی است. بیایید پرش کنیم!</p>
+      <a href="{% url 'search:search_page' %}" class="start-searching-button">شروع جستجو</a>
+    </div>
+  {% endif %}
+{% endblock content %}

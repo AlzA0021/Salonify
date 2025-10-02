@@ -1,0 +1,33 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% load render_partial %}
+
+{% block title %}
+  SaloniFy
+{% endblock %}
+
+{% block content %}
+  {% comment %} {% include 'services/partials/service_group_index.html' %} {% endcomment %}
+
+  <hr class="divider" />
+
+  {% comment %} {% include 'partials/top_section.html' %} {% endcomment %}
+
+  
+
+  <hr class="divider" />
+
+  
+
+  <hr class="divider" />
+
+  {% comment %} {% render_partial 'services:popular_service' %} {% endcomment %}
+
+  <hr class="divider" />
+
+  {% comment %} {% render_partial 'blogs:latest_blogs' %} {% endcomment %}
+
+  {% comment %} {% include 'partials/ads_section.html' %} {% endcomment %}
+
+  {% comment %} {% render_partial 'blogs:latest_blogs' %} {% endcomment %}
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "main_template.html" %}
+{% block content %}
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body text-center py-5">
+                        <h1 class="text-success mb-4"><i class="fas fa-check-circle"></i></h1>
+                        <h2 class="card-title">درخواست شما با موفقیت ثبت شد</h2>
+                        <p class="card-text mt-4">با تشکر از تماس شما. کارشناسان ما در اسرع وقت با شما تماس خواهند گرفت.</p>
+                        <a href="{% url "accounts:customer_panel" %}" class="btn btn-primary mt-4">بازگشت به صفحه اصلی</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,82 @@
+{% extends 'main_template.html' %}
+{% load static %}
+
+{% block title %}
+  خدمات
+{% endblock %}
+
+{% block content %}
+  <section class="all-services-page">
+    <!-- عنوان اصلی صفحه -->
+    <h1 class="all-services-page-title">گروه خدمات</h1>
+
+    <!-- بخش آیکن‌های گروه خدمات -->
+    <div class="all-services-group-services">
+      {% for group in groups %}
+        <div class="all-services-group-item">
+          <!-- تصویر گروه -->
+          <button type="all-services-button" class="all-services-group-icon" onclick="get_subgroups({{ group.id }})"><img src="{{ group.group_image.url }}" alt="{{ group.group_title }}" /></button>
+          <!-- عنوان گروه -->
+          <span class="all-services-group-text">{{ group.group_title }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    <hr class="divider" />
+
+    <!-- عنوان گروه انتخاب شده -->
+    {% if selected_group %}
+      <div id="all-services-selected-group-title" class="all-services-selected-group-title">{{ selected_group.group_title }}</div>
+    {% else %}
+      <div id="all-services-selected-group-title" class="all-services-selected-group-title">تمام خدمات</div>
+    {% endif %}
+
+    <!-- فیلترها یا دسته‌بندی‌های زیرمجموعه خدمات (با دکمه‌های چپ و راست) -->
+    <div class="all-services-scroll-container">
+      <button class="all-services-scroll-button left" id="all-services-scrollLeftBtn" style="display: none;"><i class="fas fa-chevron-left"></i></button>
+
+      <div id="all-services-filters-container" class="all-services-filters-container">
+        {% for group in subgroups %}
+          <button onclick="get_service_of_subgroups({{ group.id }})">{{ group.group_title }}</button>
+        {% endfor %}
+      </div>
+
+      <button class="all-services-scroll-button right" id="all-services-scrollRightBtn" style="display: none;"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <!-- عنوان زیرگروه + منوی کشویی مرتب‌سازی -->
+    <div class="all-services-subgroup-header">
+      <!-- جایی برای نمایش عنوان مرتب‌سازی فعلی -->
+      <span class="all-services-subgroup-title" id="all-services-sortTitleSpan">محبوب‌ترین‌ها</span>
+
+      <!-- منوی کشویی برای مرتب‌سازی -->
+      <div class="all-services-sort-dropdown">
+        <button type="button" class="all-services-sort-button" id="all-services-sortDropdownButton"><i class="fa-solid fa-arrow-down-wide-short"></i></button>
+
+        <!-- لیست گزینه‌های مرتب‌سازی -->
+        <ul class="all-services-sort-options" id="all-services-sortOptions">
+          <li>
+            <button href="#" onclick="selectSortOption(0, 'محبوب‌ترین‌ها ')">محبوب‌ ترین‌ها</button>
+          </li>
+          <li>
+            <button href="#" onclick="selectSortOption(1, 'جدیدترین‌ها')">جدیدترین‌ها</button>
+          </li>
+          <li>
+            <button href="#" onclick="selectSortOption(2, 'مرتب‌سازی الفبایی')">مرتب‌سازی الفبایی</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div id="all-services-services-container">
+      {% if services %}
+        {% for service in services %}
+          {% include 'services/partials/service_card.html' %}
+        {% endfor %}
+      {% else %}
+        <p class="no-content">محتوای مورد نظر پیدا نشد</p>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,59 @@
+{# salon_profile_creator_step10.html (final) #}
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+
+{% block content %}
+<div class="container">
+  <div class="navigation-header">
+    <a href="{% url 'dashboards:salon_profile_creator_step9' %}" class="back-btn" aria-label="بازگشت">
+      <i class="fas fa-arrow-right" aria-hidden="true"></i>
+    </a>
+    <div style="flex-grow:1;"></div>
+    <div style="width:20px;"></div>
+    <button class="close-btn" type="button" aria-label="بستن">
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="content">
+    <h1>فعال‌سازی رزرو آنلاین در سالنی‌فای</h1>
+    <div class="banner">
+      {% if salon.banner_image %}
+        <img src="{{ salon.banner_image.url }}" alt="بنر سالن {{ salon.salon_name }}">
+      {% else %}
+        <img src="{% static 'images/banners/banner2.jpg' %}" alt="بنر پیش‌فرض">
+      {% endif %}
+    </div>
+    <p class="description">با فعال‌سازی، سالن شما در سالنی‌فای قابل کشف و رزرو خواهد بود.</p>
+
+    {% if salon.is_active %}
+      <div class="alert alert-success">سالن شما فعال است.</div>
+    {% else %}
+      <form method="post" action="{% url 'dashboards:salon_profile_creator_step10' %}">
+        {% csrf_token %}
+        <button type="submit" class="enable-button">
+          فعال‌سازی
+          <svg class="check-icon" width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}

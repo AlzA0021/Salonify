@@ -1,0 +1,51 @@
+/* page: stylist_detail */
+
+  body {
+      direction: rtl;
+      text-align: right;
+      font-family: 'Vazir', sans-serif;
+      background-color: #f9f9f9;
+  }
+  .stylist-detail-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-top: 30px;
+      padding: 20px;
+  }
+  .profile-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 10px;
+  }
+  .stylist-name {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-top: 15px;
+  }
+  .description {
+      margin-top: 15px;
+  }
+  .social-links {
+      margin-top: 15px;
+  }
+  .social-links a {
+      color: #555;
+      margin-left: 10px;
+      transition: color 0.3s;
+  }
+  .social-links a:hover {
+      color: #ff6f61;
+  }
+  .work-samples-section {
+      margin-top: 40px;
+  }
+  .sample-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+  }

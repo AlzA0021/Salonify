@@ -1,0 +1,18 @@
+<!-- partials/stylists_list.html -->
+{% load stylists_extra %}
+{% for stylist in stylists %}
+<div class="card">
+    <div class="card-body">
+        <img src="{{ stylist.profile_image.url }}" class="profile-img" alt="{{ stylist.user.name }}">
+        <div>
+            <p>{{ stylist.user.name }} {{ stylist.user.family }}</p>
+            <p>امتیاز: {{ stylist.get_average_score }}</p>
+            <p>قیمت: {{ stylist|get_price_for_service:service }} تومان</p>
+            <a href="#" class="btn btn-reserve">رزرو</a>
+            <button class="btn btn-info btn-sm" data-toggle="collapse" data-target="#commentsCollapse{{ stylist.id }}">
+                نظرات ({{ stylist.comments_stylist.count }})
+            </button>
+        </div>
+    </div>
+</div>
+{% endfor %}

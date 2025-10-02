@@ -1,0 +1,159 @@
+/* Header Favorites */
+.favorites-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  position: relative;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.favorites-header h1 {
+  margin: 0 6rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  margin-left: 0.5rem;
+}
+
+/* Salon Card */
+.salons-card {
+  position: relative;
+  margin: 1rem;
+  margin-bottom: 3.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.salons-card-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.like-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: #ffffffcc;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.like-button i {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+.like-button i.liked {
+  color: red;
+}
+
+.salons-card-details {
+  padding: 1rem;
+}
+
+.salons-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.salons-card-discount {
+  background-color: #ff5252;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.salons-card-address {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.salons-card-body {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.salons-card-body i {
+  color: #ffb400; /* رنگ ستاره */
+}
+
+/* Tags در صورت نیاز */
+.salons-card-tags {
+  margin-top: 0.5rem;
+}
+
+.salons-card-tag {
+  display: inline-block;
+  background-color: #eee;
+  color: #333;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+/* وضعیت عدم وجود علاقه‌مندی‌ها */
+.no-favorites,
+.no-favorites-message {
+  text-align: center;
+  margin: 2rem 0;
+  color: #888;
+}
+
+.no-favorites {
+  margin-top: 50px;
+}
+
+.no-favorites img {
+  width: 150px; /* تنظیم اندازه آیکون */
+  margin-bottom: 20px;
+}
+
+.no-favorites h2 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.no-favorites p {
+  font-size: 14px;
+  color: #666;
+}
+
+.start-searching-button {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #000;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.start-searching-button:hover {
+  background-color: #444;
+}

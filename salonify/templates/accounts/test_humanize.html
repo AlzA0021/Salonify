@@ -1,0 +1,22 @@
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تست Humanize</title>
+</head>
+<body>
+
+    <h1>تست فیلتر intcomma</h1>
+
+    <p>عدد اصلی: {{ number }}</p>
+    <p>عدد با کاما: <strong>{{ number|intcomma }}</strong></p>
+
+    <hr>
+
+    <p>عدد اعشاری اصلی: {{ decimal_number }}</p>
+    <p>عدد اعشاری با کاما: <strong>{{ decimal_number|intcomma }}</strong></p>
+
+</body>
+</html>

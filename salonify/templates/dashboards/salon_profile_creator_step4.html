@@ -1,0 +1,27 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+{% block content %}
+<div class="page-container">
+  <div class="navigation-header">
+    <a href="#" class="back-btn"><i class="fa-solid fa-arrow-right"></i></a>
+    <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div class="rocket-container">
+    <img src="{% static 'images/banners/rocket.jpg' %}" alt="تصویر موشک" class="rocket-image">
+  </div>
+
+  <div class="content-section">
+    <h1 class="page-title">نمایش ویژگی‌های منحصر به فرد مجموعه شما</h1>
+    <p class="page-description">با تصاویر و توضیحات جذاب، پروفایل خود را متمایز کنید.</p>
+  </div>
+
+  <div class="action-button">
+    <button class="continue-btn" onclick="window.location.href='{% url 'dashboards:salon_profile_creator_step5' %}'">ادامه</button>
+  </div>
+</div>
+{% endblock content %}

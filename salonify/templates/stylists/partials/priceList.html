@@ -1,0 +1,63 @@
+{% load stylists_extra %}
+
+<div class="TopSection-price-list">
+  <h3>لیست قیمت</h3>
+  {% if service_price_list %}
+    {% for service in service_price_list %}
+      <div class="TopSection-list-item">
+        <!-- ستون چپ: آیکون قیمت و آیکون زمان -->
+        <div class="TopSection-list-left">
+          <!-- ردیفِ شروع قیمت -->
+          <div class="TopSection-row-info">
+            <span>:قیمت از</span>
+            {% if service.price %}
+              <span class="TopSection-price-value">{{ service.price|intcomma_custom }}</span>
+              <span>تومان</span>
+            {% else %}
+              <span style="color: #f22323;">تعیین نشده</span>
+            {% endif %}
+          </div>
+
+          <!-- ردیف مدت زمان -->
+          <div class="TopSection-row-info">
+            <span>: مدت زمان</span>
+            <span class="TopSection-price-value">{{ service.duration_minutes }}</span>
+            <span>دقیقه</span>
+          </div>
+        </div>
+
+        <!-- ستون راست: نام خدمت، ستاره‌ها، و عکس -->
+        <div class="TopSection-list-right">
+          <div class="TopSection-service-details">
+            <h5>{{ service.service_name }}</h5>
+            <div class="topSection-stars">
+              {% if service.score %}
+                {% for i in 5|make_range %}
+                  {% if service.score >= i %}
+                    <i class="fa-solid fa-star topSection-filled-star"></i>
+                  {% elif service.score >= i|subtract:0.5 %}
+                    <i class="fa-solid fa-star-half-stroke topSection-half-star"></i>
+                  {% else %}
+                    <i class="fa-regular fa-star topSection-empty-star"></i>
+                  {% endif %}
+                {% endfor %}
+                <span class="individual-score">({{ service.score }})</span>
+              {% else %}
+                <span class="no-rating">امتیازی ثبت نشده</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- تصویر خدمت -->
+          {% if service.service_image %}
+            <img class="TopSection-service-image" src="{{ service.service_image.url }}" alt="{{ service.service_name }}" />
+          {% else %}
+            <img class="TopSection-service-image" src="#" alt="No Image" />
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="text-align: center; justify-content: center;">خدمتی به لیست خدمات اضافه نگردیده است .</p>
+  {% endif %}
+</div>

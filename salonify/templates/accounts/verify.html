@@ -1,0 +1,116 @@
+{% extends "main_template.html" %}
+{% load static %}
+{% block title %}تایید کد{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock head %}
+{% block content %}
+<div class="login-page">
+  <div class="login-container">
+    <h2>تایید ثبت نام</h2>
+   
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+   
+    <form method="post" novalidate>
+      {% csrf_token %}
+     
+      <div class="form-group">
+        {{ form.active_code.label_tag }}
+        <div class="input-field">
+          <i class="fas fa-key"></i>
+          {{ form.active_code }}
+        </div>
+        {% if form.active_code.errors %}
+          <div class="error">
+            {% for error in form.active_code.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <p style="text-align: center; font-size: 14px; color: #666;">
+          کد فعالسازی به شماره موبایل {{ request.session.user_session.mobile_number }} ارسال شده است.
+        </p>
+      </div>
+     
+      <button type="submit" class="btn btn-primary">تایید کد</button>
+    </form>
+   
+    <div class="forgot-password">
+      <a href="#" id="resend-code">ارسال مجدد کد</a>
+      <span id="timer" style="display: block; text-align: center; font-size: 13px; color: #777; margin-top: 10px;">
+        زمان باقی‌مانده: <span id="countdown">02:00</span>
+      </span>
+    </div>
+
+    <div class="register-link">
+      <a href="{% url 'accounts:login' %}">بازگشت به صفحه ورود</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // کد جاوااسکریپت برای شمارنده معکوس
+  document.addEventListener('DOMContentLoaded', function() {
+    let resendLink = document.getElementById('resend-code');
+    let countdownElement = document.getElementById('countdown');
+    let totalSeconds = 120; // 2 دقیقه
+    
+    resendLink.style.color = '#aaa';
+    resendLink.style.cursor = 'default';
+    resendLink.addEventListener('click', function(e) {
+      if (totalSeconds > 0) {
+        e.preventDefault();
+      } else {
+        // اینجا می‌توانید کد AJAX برای ارسال مجدد کد فعالسازی را اضافه کنید
+        // به عنوان مثال:
+        // fetch('/accounts/resend-code/', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     'X-CSRFToken': '{{ csrf_token }}'
+        //   },
+        // })
+        // .then(response => response.json())
+        // .then(data => {
+        //   if (data.success) {
+        //     // شروع مجدد تایمر
+        //     totalSeconds = 120;
+        //     countdownInterval = setInterval(updateCountdown, 1000);
+        //     resendLink.style.color = '#aaa';
+        //     resendLink.style.cursor = 'default';
+        //   }
+        // });
+      }
+    });
+    
+    function updateCountdown() {
+      let minutes = Math.floor(totalSeconds / 60);
+      let seconds = totalSeconds % 60;
+      
+      // نمایش با فرمت دو رقمی
+      countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      if (totalSeconds === 0) {
+        clearInterval(countdownInterval);
+        resendLink.style.color = '#b048f8';
+        resendLink.style.cursor = 'pointer';
+      } else {
+        totalSeconds--;
+      }
+    }
+    
+    updateCountdown();
+    let countdownInterval = setInterval(updateCountdown, 1000);
+  });
+</script>
+{% endblock %}

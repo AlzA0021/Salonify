@@ -1,0 +1,18 @@
+<div class="header-slider-container">
+  <div class="swiper header-swiper">
+    <div class="swiper-wrapper">
+      {% for slide in sliders %}
+        <div class="swiper-slide">
+          <img src="{{ slide.image.url }}" alt="{{ slide.title }}" />
+        </div>
+      {% endfor %}
+    </div>
+
+    {% comment %} <!-- Navigation buttons -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+
+    <!-- Pagination -->
+    <div class="swiper-pagination"></div> {% endcomment %}
+  </div>
+</div>

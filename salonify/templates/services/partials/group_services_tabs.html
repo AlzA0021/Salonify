@@ -1,0 +1,5 @@
+<ul class="group-services-tabs">
+  {% for group in groupservices %}
+      <li class="group-service-tab" data-target="#group-services-{{ group.slug }}">{{ group.group_title }}</li>
+  {% endfor %}
+</ul>

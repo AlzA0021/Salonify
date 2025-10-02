@@ -1,0 +1,55 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="header">
+    <a href="{% url 'dashboards:salon_profile_creator_step2' %}" class="back-btn"><i class="fa-solid fa-arrow-right"></i></a>
+    <a href="{% url 'dashboards:online_booking' %}" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+  </div>
+
+  <div class="content">
+    <div class="step">مرحله ۳</div>
+    <h1>ساعات کاری خود را اضافه کنید</h1>
+    <p>این ساعات در پروفایل شما نمایش داده می‌شوند (مستقل از شیفت‌ها).</p>
+
+    <form method="post" class="opening-hours-form">
+      {% csrf_token %}
+
+      {# شنبه تا جمعه - همگی از toggleDay(window) استفاده می‌کنند #}
+      {% for d in "1234567"|make_list %}
+      <div class="day-schedule">
+        <div class="day-status">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="checkbox-{{ d }}" onchange="toggleDay({{ d }})" {% if d != '7' %}checked{% endif %}>
+          </div>
+          <div>
+            <div class="day-name">
+              {% if d == '1' %}شنبه{% elif d == '2' %}یکشنبه{% elif d == '3' %}دوشنبه{% elif d == '4' %}سه‌شنبه{% elif d == '5' %}چهارشنبه{% elif d == '6' %}پنج‌شنبه{% else %}جمعه{% endif %}
+            </div>
+            <div class="status-text {% if d != '7' %}open-text{% else %}closed-text{% endif %}" id="status-{{ d }}">
+              {% if d != '7' %}باز{% else %}تعطیل{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="hours" id="time-range-{{ d }}" {% if d == '7' %}style="opacity:.5"{% endif %}>
+          <input type="time" name="day_{{ d }}_open_time" class="time-picker {% if d == '7' %}disabled{% endif %}" value="{% if d == '7' %}10:00{% else %}10:00{% endif %}" {% if d == '7' %}disabled{% endif %}>
+          <span class="hours-dash">-</span>
+          <input type="time" name="day_{{ d }}_close_time" class="time-picker {% if d == '7' %}disabled{% endif %}" value="{% if d == '7' %}17:00{% else %}19:00{% endif %}" {% if d == '7' %}disabled{% endif %}>
+        </div>
+
+        <input type="hidden" name="day_{{ d }}_active" id="day-{{ d }}-active" value="{% if d == '7' %}false{% else %}true{% endif %}">
+      </div>
+      {% endfor %}
+
+      <button type="submit" class="continue-btn">ادامه</button>
+    </form>
+  </div>
+</div>
+{% endblock content %}

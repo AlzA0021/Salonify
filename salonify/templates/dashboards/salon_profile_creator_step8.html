@@ -1,0 +1,58 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="navigation-header">
+    <a href="#" class="back-btn" aria-label="بازگشت">
+      <i class="fas fa-arrow-right"></i>
+    </a>
+    <div style="flex-grow:1;"></div>
+    <div style="width:20px;"></div>
+    <button class="close-btn" type="button" aria-label="بستن">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="content-section">
+    <h1 class="page-title">کمی درباره این سالن به ما بگویید</h1>
+    <p class="page-description">حداقل ۲۰۰ کاراکتر برای توضیحات لازم است.</p>
+
+    <form id="description-form" method="post" action="">
+      {% csrf_token %}
+
+      {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        {% for field in form %}
+          {% for error in field.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <label for="{{ form.description.id_for_label }}" class="form-label">توضیحات سالن</label>
+
+      <div class="counter">
+        <span id="char-count">0</span>/600
+      </div>
+
+      {# اطمینان از وجود id="id_description" (فرم جنگو به طور پیش‌فرض همین id را می‌دهد) #}
+      {{ form.description }}
+
+      <p class="min-chars">حداقل ۲۰۰ کاراکتر مورد نیاز است</p>
+
+      <div class="button-container">
+        <button type="submit" id="continue-btn" class="continue-btn" disabled>ادامه</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}

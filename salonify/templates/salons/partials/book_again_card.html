@@ -1,0 +1,139 @@
+<div class="book-again-card" data-salon-id="{{ order.salon.id }}">
+    <div class="book-again-image">
+        {% if order.salon.banner_image %}
+            <img src="{{ order.salon.banner_image.url }}" alt="{{ order.salon.salon_name }}" loading="lazy">
+        {% else %}
+            <div class="book-again-placeholder">
+                <i class="icon-salon"></i>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="book-again-content">
+        <h3 class="salon-name">{{ order.salon.salon_name }}</h3>
+        
+        <div class="booking-details">
+            <span class="visit-date">
+                {{ order.date|date:"j F Y" }} ساعت {{ order.time|time:"H:i" }}
+            </span>
+            <span class="service-details">
+                {{ order.price|floatformat:0 }} تومان • {{ order.service.service_name }}
+            </span>
+            <span class="salon-stylist">{{ order.stylist.user.get_fullName }}</span>
+        </div>
+        
+        <div class="book-again-actions">
+            <button class="btn-book-again" 
+                    data-order-id="{{ order.order.id }}">
+                رزرو مجدد
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Reset and Font settings can be placed in a global stylesheet */
+.book-again-card * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.book-again-card {
+    direction: rtl; /* Right-to-left direction for Persian */
+    display: flex;
+    background: #fff;
+    border-radius: 16px; /* Increased border radius */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Adjusted shadow */
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    max-width: 420px; 
+    border: 1px solid #f0f0f0;
+    margin-top: 1rem;
+}
+
+.book-again-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.book-again-image {
+    flex-shrink: 0;
+    width: 110px; /* Adjusted width */
+    height: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-again-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-again-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #666;
+}
+
+.book-again-content {
+    flex-grow: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px; /* Added gap for spacing */
+}
+
+.salon-name {
+    font-size: 18px; /* Increased font size */
+    font-weight: 700; /* Bolder */
+    color: #1a1a1a;
+    line-height: 1.4;
+}
+
+.booking-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Space between date and price */
+}
+
+.visit-date {
+    font-size: 14px; /* Adjusted font size */
+    color: #555; /* Adjusted color */
+}
+
+.service-details {
+    font-size: 14px;
+    color: #555;
+}
+
+.book-again-actions {
+    margin-top: auto; /* Pushes the button to the bottom */
+}
+
+.btn-book-again {
+    /* --- Style changed to match the image --- */
+    background: transparent;
+    color: #5856D6; /* Purple color from the image */
+    border: none;
+    padding: 0; /* Removed padding */
+    font-size: 16px; /* Increased font size */
+    font-weight: 600;
+    text-align: right; /* Align text to the right for RTL */
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-book-again:hover {
+    color: #3e3ca8; /* Darker shade on hover */
+}
+</style>

@@ -1,0 +1,499 @@
+@font-face {
+  font-family: 'Vazir';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Farsi-Digits/Vazir-FD.eot');
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Farsi-Digits/Vazir-FD.eot?#iefix')
+      format('embedded-opentype'),
+    url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Farsi-Digits/Vazir-FD.woff2')
+      format('woff2'),
+    url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Farsi-Digits/Vazir-FD.woff')
+      format('woff'),
+    url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1.0/Farsi-Digits/Vazir-FD.ttf')
+      format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Vazir', Arial, sans-serif;
+}
+
+body {
+  background-color: #fff; /* کمی تغییر رنگ پس‌زمینه برای تطابق بیشتر با تصویر */
+  direction: rtl;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 15px; /* کمی کاهش پدینگ برای ظاهر موبایلی‌تر */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 0; /* اضافه کردن پدینگ عمودی به هدر */
+  /* position: sticky; /* اگر می‌خواهید هدر چسبان باشد */
+  /* top: 0; */
+  /* background-color: #fff; */
+  /* z-index: 100; */
+}
+
+.header-left {
+  /* برای گروه کردن دکمه بازگشت و عنوان */
+  display: flex;
+  align-items: center;
+}
+
+.header h1 {
+  font-size: 20px; /* کاهش اندازه فونت عنوان برای تطابق با تصویر */
+  font-weight: bold;
+  margin-right: 10px; /* فاصله بین دکمه بازگشت و عنوان */
+}
+
+.header-right {
+  /* برای گروه کردن دکمه بیشتر و افزودن */
+  display: flex;
+  align-items: center;
+}
+
+.btn-back,
+.btn-more-header {
+  background: none;
+  border: none;
+  font-size: 22px; /* تنظیم اندازه آیکون */
+  cursor: pointer;
+  color: #333;
+  padding: 5px;
+}
+.btn-more-header {
+  margin-left: 10px; /* فاصله بین دکمه بیشتر و افزودن */
+}
+
+.btn-add {
+  color: #fff; 
+  background-color: #333;
+  border-radius: 15px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: normal; 
+  padding: 10px;
+}
+.btn-add:hover {
+  color: #333; 
+  background-color: #fff;
+  border: 1px solid #ddd;
+  
+}
+.btn-add i {
+  margin-right: 4px; /* فاصله بین متن افزودن و آیکون + */
+  font-size: 0.85em; /* کوچک‌تر کردن آیکون + */
+}
+
+.search-actions-container {
+  /* کانتینر برای نوار جستجو و دکمه فیلتر */
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-box-wrapper {
+  /* برای نگهداری اینپوت و آیکون جستجو */
+  flex-grow: 1;
+  position: relative;
+  margin-left: 10px; /* فاصله از دکمه فیلتر */
+}
+
+.search-box {
+  /* خود اینپوت جستجو */
+  width: 100%;
+  border: 1px solid #e0e0e0; /* بوردر روشن‌تر */
+  border-radius: 25px; /* گردی گوشه‌ها مطابق تصویر */
+  padding: 10px 40px 10px 15px; /* راست: برای آیکون، چپ: برای شروع متن */
+  font-size: 14px;
+  background-color: #fff;
+}
+.search-box::placeholder {
+  color: #aaa;
+}
+
+.search-icon {
+  /* آیکون جستجو در داخل باکس */
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 16px;
+}
+
+.filter-button {
+  /* دکمه فیلتر/مرتب‌سازی */
+  width: 42px; /* تنظیم اندازه مطابق تصویر */
+  height: 42px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0; /* بوردر روشن‌تر */
+  border-radius: 10px; /* گردی گوشه‌ها */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: #555;
+  font-size: 18px;
+}
+.filter-button:hover {
+  background-color: #f5f5f5;
+}
+.filter-button i {
+  text-decoration: none;
+}
+
+.team-member {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5px; /* کمی پدینگ افقی برای جلوگیری از چسبیدن به لبه‌ها */
+  border-bottom: 1px solid #eee;
+  text-decoration: none;
+  color: #333;
+}
+.team-member:last-child {
+  border-bottom: none;
+}
+
+.team-member-info {
+  display: flex;
+  align-items: center;
+}
+
+.team-member-avatar {
+  width: 50px; /* کاهش اندازه آواتار برای تطابق با تصویر */
+  height: 50px;
+  border-radius: 50%;
+  margin-left: 12px; /* تنظیم فاصله */
+  overflow: hidden;
+  position: relative; /* برای بوردر رنگی */
+  /* border: 2px solid transparent; /* بوردر پیش‌فرض */
+  box-sizing: border-box;
+}
+
+.team-member-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block; /* برای جلوگیری از فضای اضافی احتمالی زیر تصویر */
+}
+
+.team-member-name {
+  font-size: 15px; /* تنظیم اندازه فونت نام */
+  font-weight: 500; /* کمی نازک‌تر از بولد کامل */
+}
+
+.team-member-expert {
+  font-size: 13px; /* تنظیم اندازه فونت تخصص */
+  color: #777; /* رنگ تیره‌تر برای خوانایی بهتر */
+  margin-top: 3px;
+}
+
+.team-member-more {
+  background: none;
+  border: none;
+  font-size: 20px; /* آیکون سه نقطه */
+  color: #888;
+  cursor: pointer;
+  padding: 5px 10px; /* افزایش ناحیه قابل کلیک */
+}
+/* === Modal Styles Start === */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* تیرگی پس‌زمینه */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* برای نمایش مودال از پایین */
+    z-index: 1050; /* بالاتر از سایر عناصر */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease-in-out, visibility 0s linear 0.25s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.25s ease-in-out;
+}
+
+.modal-content {
+    background-color: #fff;
+    width: 100%;
+    max-width: 600px; /* می‌توانید با max-width کلاس container هماهنگ کنید */
+    padding: 10px 20px 20px 20px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    box-shadow: 0px -4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(100%);
+    transition: transform 0.25s ease-in-out;
+    direction: rtl; /* اطمینان از راست‌چین بودن محتوای مودال */
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: flex-end; /* دکمه بستن در سمت چپ (در RTL) قرار می‌گیرد */
+    align-items: center;
+    padding-bottom: 8px; /* فاصله دکمه بستن از گزینه‌ها */
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 18px; /* اندازه آیکون ضربدر */
+    color: #777;
+    cursor: pointer;
+    padding: 8px; /* افزایش محدوده کلیک */
+    line-height: 1;
+}
+.modal-close-btn:hover {
+    color: #333;
+}
+
+.modal-body {
+    padding-top: 5px;
+}
+
+.modal-actions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.modal-actions-list li {
+    /* برای افزودن خط جداکننده بین آیتم‌ها، اگر مایلید: */
+    border-bottom: 1px solid #f0f0f0; 
+}
+.modal-actions-list li:last-child {
+    border-bottom: none;
+} 
+
+.modal-actions-list li a {
+    display: block;
+    padding: 13px 5px; /* پدینگ عمودی و کمی افقی برای هر گزینه */
+    text-decoration: none;
+    color: #222; /* رنگ متن گزینه‌ها */
+    font-size: 15px; /* اندازه فونت گزینه‌ها */
+    transition: background-color 0.15s ease;
+    text-align: right; /* متن گزینه‌ها راست‌چین */
+}
+
+.modal-actions-list li a:hover {
+    color: #007bff; /* تغییر رنگ متن هنگام هاور */
+    /* background-color: #f8f9fa; */ /* رنگ پس‌زمینه ملایم هنگام هاور */
+}
+/* === Modal Styles End === */
+/* === Filter Modal Styles Start === */
+.filter-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.45); /* پس‌زمینه نیمه‌شفاف */
+    z-index: 1060; /* بالاتر از مودال قبلی */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
+    direction: rtl; /* اطمینان از راست‌چین بودن */
+}
+
+.filter-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.filter-modal-content {
+    position: fixed;
+    top: 0;
+    left: 0; /* مودال از سمت چپ وارد می‌شود (برای RTL) */
+    width: 100%;
+    max-width: 360px; /* عرض نوار کناری فیلتر، می‌توانید تنظیم کنید */
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.15); /* سایه در سمت راست (برای RTL) */
+    transform: translateX(-100%); /* در ابتدا خارج از صفحه در سمت چپ */
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column; /* چیدمان عمودی برای هدر، بدنه، فوتر */
+    overflow: hidden; /* جلوگیری از سرریز محتوا قبل از اسکرول داخلی */
+}
+
+.filter-modal-overlay.active .filter-modal-content {
+    transform: translateX(0); /* ورود به صفحه */
+}
+
+.filter-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e9ecef; /* خط جداکننده هدر */
+    flex-shrink: 0; /* هدر کوچک نشود */
+}
+
+.filter-modal-header h2 {
+    font-size: 1.1rem; /* اندازه فونت عنوان "فیلترها" */
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.filter-modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 20px; /* اندازه آیکون ضربدر */
+    color: #6c757d; /* رنگ آیکون */
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+}
+.filter-modal-close-btn:hover {
+    color: #343a40;
+}
+
+.filter-modal-body {
+    flex-grow: 1; /* بدنه مودال فضای باقی‌مانده را اشغال کند */
+    padding: 8px 0; /* پدینگ عمودی برای بدنه */
+    overflow-y: auto; /* اسکرول در صورت نیاز */
+    background-color: #fff;
+}
+
+.filter-category {
+    border-bottom: 1px solid #f0f0f0;
+}
+.filter-category:last-child {
+    border-bottom: none;
+}
+
+.filter-category-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 14px 20px; /* پدینگ داخلی هر دسته فیلتر */
+    text-align: right;
+    cursor: pointer;
+    font-size: 0.95rem; /* اندازه فونت عنوان دسته */
+    color: #333;
+    transition: background-color 0.15s ease;
+}
+
+.filter-category-header:hover {
+    background-color: #f8f9fa; /* رنگ پس‌زمینه هاور */
+}
+
+.filter-category-icon {
+    margin-left: 12px; /* فاصله آیکون از متن (در RTL، سمت راست متن) */
+    color: #555;
+    width: 22px; /* عرض ثابت برای هم‌ترازی آیکون‌ها */
+    text-align: center;
+    font-size: 0.9rem; /* اندازه آیکون‌های دسته‌بندی */
+}
+
+.filter-category-label {
+    flex-grow: 1; /* لیبل فضای باقی‌مانده را بگیرد */
+    font-weight: 500;
+}
+
+.filter-category-chevron {
+    margin-right: 8px; /* فاصله آیکون شورون از لبه */
+    color: #777;
+    transition: transform 0.25s ease; /* انیمیشن چرخش شورون */
+    font-size: 0.8rem;
+}
+
+/* چرخش آیکون شورون هنگام باز شدن دسته */
+.filter-category-header[aria-expanded="true"] .filter-category-chevron i {
+    transform: rotate(180deg);
+}
+
+.filter-category-content {
+    padding: 10px 20px 15px 42px; /* پدینگ داخلی محتوای هر دسته، ایجاد تورفتگی نسبت به هدر دسته */
+                                 /* 42px = 20px padding + ~22px icon width */
+    background-color: #fff; /* یا #fdfdfd برای تمایز جزئی */
+    /* display: none; در HTML با استایل inline کنترل می‌شود، یا توسط JS */
+}
+
+.filter-category-content label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: #454545;
+    cursor: pointer;
+}
+.filter-category-content label:last-child {
+    margin-bottom: 0;
+}
+
+.filter-category-content input[type="radio"],
+.filter-category-content input[type="checkbox"] {
+    margin-left: 8px; /* فاصله چک‌باکس/رادیوباتن از متن (در RTL) */
+    vertical-align: middle;
+    transform: scale(0.9); /* کمی کوچک‌تر کردن خود کنترل */
+}
+
+.filter-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-top: 1px solid #e9ecef; /* خط جداکننده فوتر */
+    background-color: #f8f9fa; /* پس‌زمینه برای فوتر */
+    flex-shrink: 0; /* فوتر کوچک نشود */
+}
+
+.filter-modal-footer button {
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    flex: 1; /* دکمه‌ها عرض مساوی بگیرند */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-clear-filters {
+    background-color: #fff;
+    border: 1px solid #ced4da; /* بوردر دکمه پاک کردن */
+    color: #495057; /* رنگ متن دکمه پاک کردن */
+    margin-left: 10px; /* فاصله بین دو دکمه */
+}
+.btn-clear-filters:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.btn-apply-filters {
+    background-color: #333; 
+    border-radius: 15px;
+    color: #fff;
+}
+.btn-apply-filters:hover {
+    background-color: #fff;
+    color: #333;
+    border:1px solid #ddd;
+}
+
+/* === Filter Modal Styles End === */

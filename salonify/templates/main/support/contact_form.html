@@ -1,0 +1,273 @@
+{% extends "main_template.html" %}
+{% block head %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .contact-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .header h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        .char-count {
+            text-align: left;
+            font-size: 13px;
+            color: #95a5a6;
+            margin-top: -15px;
+            margin-bottom: 20px;
+        }
+        .btn-submit {
+            background-color: #df50cf;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #df50cf;
+        }
+        .social-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .social-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .social-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .social-info {
+            display: flex;
+            align-items: center;
+        }
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            font-size: 18px;
+            color: white;
+        }
+        .google-icon {
+            background-color: #DB4437;
+        }
+        .facebook-icon {
+            background-color: #4267B2;
+        }
+        .social-status {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .social-status.connected {
+            color: #27ae60;
+        }
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        .help-text {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+        .alert {
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock head %}
+{% block title %}پشتیبانی{% endblock title %}
+{% block content %}
+
+    <div class="container">
+        <div class="contact-container">
+            <div class="header">
+                <h1>با ما تماس بگیرید</h1>
+                <p>چگونه می‌توانیم به شما کمک کنیم؟</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" id="supportForm">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label required">ایمیل</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="اگر حساب سالنی فای دارید، آدرس ایمیلی که با آن وارد می‌شوید را وارد کنید" required value="{{ form.email.value|default:'' }}">
+                    {% if form.email.errors %}
+                        <div class="text-danger mt-1">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="reason" class="form-label required">دلیل تماس با پشتیبانی</label>
+                    <select class="form-select" id="reason" name="reason" required>
+                        <option value="" disabled selected>لطفاً انتخاب کنید</option>
+                        <option value="account" {% if form.reason.value == 'account' %}selected{% endif %}>مشکل در حساب کاربری</option>
+                        <option value="payment" {% if form.reason.value == 'payment' %}selected{% endif %}>مشکل در پرداخت</option>
+                        <option value="booking" {% if form.reason.value == 'booking' %}selected{% endif %}>مشکل در رزرو</option>
+                        <option value="technical" {% if form.reason.value == 'technical' %}selected{% endif %}>مشکل فنی</option>
+                        <option value="other" {% if form.reason.value == 'other' %}selected{% endif %}>سایر</option>
+                    </select>
+                    {% if form.reason.errors %}
+                        <div class="text-danger mt-1">{{ form.reason.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label required">توضیح دهید به چه کمک نیاز دارید</label>
+                    <textarea class="form-control" id="description" name="description" rows="5" maxlength="2000" placeholder="مشکل خود را به طور دقیق شرح دهید" required>{{ form.description.value|default:'' }}</textarea>
+                    <div class="char-count">0/2000</div>
+                    {% if form.description.errors %}
+                        <div class="text-danger mt-1">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-submit">ارسال درخواست</button>
+            </form>
+
+            {% comment %} <div class="social-section">
+                <h4 class="mb-4">اتصال حساب‌های اجتماعی</h4>
+                
+                <div class="social-card">
+                    <div class="social-info">
+                        <div class="social-icon google-icon">
+                            <i class="fab fa-google"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">گوگل</h5>
+                        </div>
+                    </div>
+                    <span class="social-status">متصل نشده</span>
+                </div>
+
+                <div class="social-card">
+                    <div class="social-info">
+                        <div class="social-icon facebook-icon">
+                            <i class="fab fa-facebook-f"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">فیسبوک</h5>
+                        </div>
+                    </div>
+                    <span class="social-status">متصل نشده</span>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('description');
+            const charCount = document.querySelector('.char-count');
+            
+            if (textarea && charCount) {
+                // مقدار اولیه
+                charCount.textContent = textarea.value.length + '/2000';
+                
+                textarea.addEventListener('input', function() {
+                    const length = this.value.length;
+                    charCount.textContent = `${length}/2000`;
+                });
+            }
+            
+            // اعتبارسنجی فرم
+            const form = document.getElementById('supportForm');
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    let isValid = true;
+                    
+                    // بررسی ایمیل
+                    const email = document.getElementById('email');
+                    if (!email.value) {
+                        isValid = false;
+                        email.classList.add('is-invalid');
+                    } else {
+                        email.classList.remove('is-invalid');
+                    }
+                    
+                    // بررسی دلیل تماس
+                    const reason = document.getElementById('reason');
+                    if (!reason.value) {
+                        isValid = false;
+                        reason.classList.add('is-invalid');
+                    } else {
+                        reason.classList.remove('is-invalid');
+                    }
+                    
+                    // بررسی توضیحات
+                    const description = document.getElementById('description');
+                    if (!description.value) {
+                        isValid = false;
+                        description.classList.add('is-invalid');
+                    } else {
+                        description.classList.remove('is-invalid');
+                    }
+                    
+                    if (!isValid) {
+                        event.preventDefault();
+                        alert('لطفاً تمام فیلدهای ضروری را پر کنید.');
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock content %}

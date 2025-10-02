@@ -1,0 +1,97 @@
+{% extends 'dashboard_template.html' %}
+{% load static %}
+
+{% block head %}
+  {# در صورت نیاز: استایل اختصاصی #}
+  <link rel="stylesheet" href="{% static 'css/dashboard/catalog.css' %}">
+  <style>
+    /* حداقل استایل‌های تعاملی */
+    .menu-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid #eee; border-radius:10px; text-decoration:none; color:inherit; background:#fff; transition:transform .06s ease, background-color .2s; }
+    .menu-item:hover { background:#f8fafc; }
+    .menu-item.is-active { transform: scale(0.99); background:#f1f5f9; }
+    .item-content { display:flex; align-items:center; gap:12px; }
+    .item-title { font-weight:600; }
+    .item-icon { color:#64748b; font-size:1.1rem; }
+    .chevron-icon { color:#94a3b8; }
+    .back-arrow { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; color:#334155; text-decoration:none; }
+    .back-arrow:hover { background:#f1f5f9; }
+    .page-title { font-size:1.5rem; font-weight:700; margin:10px 0 16px; }
+    .section-title { font-size:1.1rem; font-weight:700; margin:20px 0 10px; color:#334155; }
+    .card { border-radius:14px; border:1px solid #e5e7eb; background:#fff; margin-bottom:16px; overflow:hidden; }
+    .card-body { padding:6px; display:flex; flex-direction:column; gap:6px; }
+    html.focus-visible :where(a, button, .menu-item):focus { outline: 2px solid #2563eb; outline-offset: 2px; }
+  </style>
+{% endblock head %}
+
+{% block title %}کاتالوگ{% endblock title %}
+
+{# کلید ماژول صفحه #}
+{% block body_attrs %}data-page="catalog"{% endblock %}
+
+{% block content %}
+<div class="container catalog-page">
+  <a href="{% url 'dashboards:salon_manager_dashboard' %}" class="back-arrow" data-action="go-back" aria-label="بازگشت">
+    <i class="fa-solid fa-arrow-right"></i>
+  </a>
+
+  <h1 class="page-title">کاتالوگ</h1>
+
+  <div class="card">
+    <div class="card-body">
+      <a href="{% url 'dashboards:service_menu' %}" class="menu-item">
+        <div class="item-content">
+          <span class="item-title">منوی خدمات</span>
+          <div class="item-icon"><i class="fas fa-clipboard-list" aria-hidden="true"></i></div>
+        </div>
+        <span class="chevron-icon"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></span>
+      </a>
+
+      <a href="{% url 'dashboards:membership' %}" class="menu-item">
+        <div class="item-content">
+          <span class="item-title">عضویت‌ها</span>
+          <div class="item-icon"><i class="fas fa-id-card" aria-hidden="true"></i></div>
+        </div>
+        <span class="chevron-icon"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></span>
+      </a>
+
+      <a href="{% url 'dashboards:products' %}" class="menu-item">
+        <div class="item-content">
+          <span class="item-title">محصولات</span>
+          <div class="item-icon"><i class="fas fa-box-open" aria-hidden="true"></i></div>
+        </div>
+        <span class="chevron-icon"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></span>
+      </a>
+    </div>
+  </div>
+
+  <h2 class="section-title">موجودی</h2>
+
+  <div class="card">
+    <div class="card-body">
+      <a href="{% url 'dashboards:stocktakes' %}" class="menu-item">
+        <div class="item-content">
+          <span class="item-title">موجودی‌گیری</span>
+          <div class="item-icon"><i class="fas fa-book" aria-hidden="true"></i></div>
+        </div>
+        <span class="chevron-icon"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></span>
+      </a>
+
+      <a href="#" class="menu-item" aria-disabled="true">
+        <div class="item-content">
+          <span class="item-title">سفارش‌های موجودی</span>
+          <div class="item-icon"><i class="fas fa-box" aria-hidden="true"></i></div>
+        </div>
+        <span class="chevron-icon"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></span>
+      </a>
+
+      <a href="#" class="menu-item" aria-disabled="true">
+        <div class="item-content">
+          <span class="item-title">تامین‌کنندگان</span>
+          <div class="item-icon"><i class="fas fa-truck" aria-hidden="true"></i></div>
+        </div>
+        <span class="chevron-icon"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

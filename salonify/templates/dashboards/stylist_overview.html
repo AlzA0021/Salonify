@@ -1,0 +1,432 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+
+<link rel="stylesheet" href="{% static "css/dashboard/stylist_overview.css" %}">
+
+{% endblock head %}
+
+{% block title %}{{ stylist.get_fullName }}{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+        
+        <!-- Fixed Header Section (Profile + Tabs) -->
+        <div class="fixed-header">
+            <!-- Profile Section -->
+            <div class="profile-section">
+                <div class="profile-info">
+                    <h2 class="profile-name" id="stylistName">{{ stylist.get_fullName }}</h2>
+                    <button class="action-btn" id="actionsBtn">
+                        اقدامات
+                        <span style="margin-right: 5px;"><i class="fa-solid fa-sort-down"></i></span>
+                    </button>
+                </div>
+                <div class="profile-image">
+                    {% if stylist.profile_image %}
+                    <img id="profileImage" src="{{ stylist.profile_image.url }}" alt="تصویر پروفایل" onerror="this.src='/static/images/default-profile.png'" />
+                    {% else %}
+                    <img id="profileImage" src="{% static "images/default-avatar.jpg" %}" alt="تصویر پروفایل" />
+                    {% endif %}
+                </div>
+                <a  href="{% url "dashboards:team_member" %}" class="close-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </a>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" data-tab="overview">نمای کلی</div>
+                <div class="tab" data-tab="personal">شخصی</div>
+                <div class="tab" data-tab="workspace">فضای کاری</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content (نمای کلی) -->
+        <div class="dashboard-content active" id="overview-tab">
+            <!-- Dashboard Title -->
+            <div class="dashboard-title">
+                <div>
+                    <h3>داشبورد عملکرد</h3>
+                    <a href="#" class="view-link">مشاهده داشبورد کامل</a>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-card">
+                <div class="stats-title">درآمد</div>
+                <div class="stats-value"> <span id="salesValue">{{ stats.sales|default:0 }}</span> تومان </div>
+                <div class="comparison">
+                    {% if stats.sales_change > 0 %}
+                        <span class="change-indicator" style="background-color: #DEF7EC; color: #03543F;">+{{ stats.sales_change|floatformat:1 }}%</span>
+                    {% elif stats.sales_change < 0 %}
+                        <span class="change-indicator" style="background-color: #FDE8E8; color: #9B1C1C;">{{ stats.sales_change|floatformat:1 }}%</span>
+                    {% else %}
+                        <span class="change-indicator no-change">0%</span>
+                    {% endif %}
+                </div>
+                <span>در مقایسه با ماه قبل</span>
+                <div class="bar-chart">
+                    <div class="chart-item">
+                        <div class="chart-label">{{ stats.sales|floatformat:0 }} تومان</div>
+                        <div class="chart-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <div class="stats-title">نوبت ها </div>
+                <div class="stats-value" id="appointmentsValue">{{ stats.appointments|default:0 }}</div>
+                <div class="comparison">
+                    {% if stats.appointments_change > 0 %}
+                        <span class="change-indicator" style="background-color: #DEF7EC; color: #03543F;">+{{ stats.appointments_change|floatformat:1 }}%</span>
+                    {% elif stats.appointments_change < 0 %}
+                        <span class="change-indicator" style="background-color: #FDE8E8; color: #9B1C1C;">{{ stats.appointments_change|floatformat:1 }}%</span>
+                    {% else %}
+                        <span class="change-indicator no-change">0%</span>
+                    {% endif %}
+                </div>
+                <span>در مقایسه با ماه قبل</span>
+            </div>
+
+            <div class="stats-card">
+                <div class="stats-title">مشتریان</div>
+                <div class="stats-value" id="clientsValue">{{ stats.clients|default:0 }}</div>
+                <div class="comparison">
+                    {% if stats.clients_change > 0 %}
+                        <span class="change-indicator" style="background-color: #DEF7EC; color: #03543F;">+{{ stats.clients_change|floatformat:1 }}%</span>
+                    {% elif stats.clients_change < 0 %}
+                        <span class="change-indicator" style="background-color: #FDE8E8; color: #9B1C1C;">{{ stats.clients_change|floatformat:1 }}%</span>
+                    {% else %}
+                        <span class="change-indicator no-change">0%</span>
+                    {% endif %}
+                </div>
+                <span>در مقایسه با ماه قبل</span>
+            </div>
+
+            <div class="stats-card">
+                <div class="stats-title">اشغال</div>
+                <div class="stats-value" id="occupancyValue">{{ stats.occupancy|default:0 }}%</div>
+                <div class="comparison">
+                    {% if stats.occupancy_change > 0 %}
+                        <span class="change-indicator" style="background-color: #DEF7EC; color: #03543F;">+{{ stats.occupancy_change|floatformat:1 }}%</span>
+                    {% elif stats.occupancy_change < 0 %}
+                        <span class="change-indicator" style="background-color: #FDE8E8; color: #9B1C1C;">{{ stats.occupancy_change|floatformat:1 }}%</span>
+                    {% else %}
+                        <span class="change-indicator no-change">0%</span>
+                    {% endif %}
+                </div>
+                <span>در مقایسه با ماه قبل</span>
+            </div>
+
+            <div class="stats-card" style="margin-bottom: 70px;">
+                <div class="stats-title">حفظ مشتری</div>
+                <div class="stats-value" id="retentionValue">{{ stats.retention|default:0 }}%</div>
+                <div class="comparison">
+                    {% if stats.retention_change > 0 %}
+                        <span class="change-indicator" style="background-color: #DEF7EC; color: #03543F;">+{{ stats.retention_change|floatformat:1 }}%</span>
+                    {% elif stats.retention_change < 0 %}
+                        <span class="change-indicator" style="background-color: #FDE8E8; color: #9B1C1C;">{{ stats.retention_change|floatformat:1 }}%</span>
+                    {% else %}
+                        <span class="change-indicator no-change">0%</span>
+                    {% endif %}
+                </div>
+                <span>در مقایسه با ماه قبل</span>
+            </div>
+        </div>
+
+        <!-- Personal Content (شخصی) -->
+        <div class="personal-content" id="personal-tab">
+            <!-- Profile Section -->
+            <div class="section-title">
+                <div>پروفایل</div>
+                <a href="{% url "dashboards:edit_stylist" stylist_id=stylist.user.id %}?tab=profile" class="edit-link">ویرایش</a>
+            </div>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="info-label">نام کامل</div>
+                    <div class="info-value">{{ stylist.get_fullName }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ایمیل</div>
+                    <div class="info-value">{{ stylist.user.email }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">شماره تلفن</div>
+                    <div class="info-value">{{ stylist.user.mobile_number }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">تاریخ تولد</div>
+                    <div class="info-value">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">رنگ تقویم</div>
+                    <div class="info-value">
+                        {% if stylist.calendar_color %}
+                            <span class="color-dot" style="background-color: {{ stylist.calendar_color }}">
+                        {% else %}
+                            <span class="color-dot" style="background-color: #007bff;"></span>
+                            آبی (پیش‌فرض)
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">عنوان شغلی</div>
+                    <div class="info-value">{{ stylist.expert|default:"-" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">توضیحات</div>
+                    <div class="info-value">{{ stylist.description|default:"-" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">آدرس</div>
+                    <div class="info-value">{{ stylist.address|default:"-" }}</div>
+                </div>
+            </div>
+
+            <!-- Work Details Section -->
+            <div class="section-title work-details">
+                <div>جزئیات کاری</div>
+                <a href="#" class="edit-link">ویرایش</a>
+            </div>
+            <div class="info-list">
+                {% if job_detail %}
+                    {% for job in job_detail %}
+                    <div class="info-item">
+                        <div class="info-label">تاریخ شروع</div>
+                        <div class="info-value">{{ job.start_date|default:"-" }}</div>
+                    </div>
+                    {% if job.end_date %}
+                    <div class="info-item">
+                        <div class="info-label">تاریخ پایان</div>
+                        <div class="info-value">{{ job.end_date }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="info-item">
+                        <div class="info-label">نوع استخدام</div>
+                        <div class="info-value">{{ job.employment_type|default:"-" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">محل کار</div>
+                        <div class="info-value">{{ job.salon.salon_name|default:"-" }}</div>
+                    </div>
+                    {% if not forloop.last %}<hr style="margin: 10px 0; border: 1px solid #eee;">{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="info-item">
+                        <div class="info-label">اطلاعات شغلی</div>
+                        <div class="info-value">اطلاعاتی موجود نیست</div>
+                    </div>
+                {% endif %}
+                
+                <div class="info-item">
+                    <div class="info-label">لینکدین</div>
+                    <div class="info-value">{{ stylist.linkedin_link|default:"-" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">اینستاگرام</div>
+                    <div class="info-value">{{ stylist.insta_link|default:"-" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">تلگرام</div>
+                    <div class="info-value">{{ stylist.telegram_link|default:"-" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">وضعیت</div>
+                    <div class="info-value">{% if stylist.is_active %}فعال{% else %}غیرفعال{% endif %}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace Content (فضای کاری) -->
+        <div class="workspace-content" id="workspace-tab">
+            <!-- Services Section -->
+            <div class="section-container">
+                <div class="section-header">
+                    <h3>خدمات</h3>
+                    <a href="{% url 'dashboards:edit_stylist' stylist_id=stylist.user.id %}#services">ویرایش </a>
+                </div>
+                <div class="section-content">
+                    {% with stylist_services=stylist.services_of_stylist.all %}
+                    <div class="info-item">
+                        <div class="info-label">خدمات ارائه شده</div>
+                        <div class="info-value">{{ stylist_services.count }} خدمت</div>
+                    </div>
+                    {% comment %} {% if stylist_services %}
+                    <div class="services-list">
+                        {% for service in stylist_services %}
+                        <div class="service-item">
+                            <div class="service-name">{{ service.service_name }}</div>
+                            {% if service.service_prices.all %}
+                                {% with price=service.service_prices.all.first %}
+                                    {% if price %}
+                                    <div class="service-price">{{ price.price }} تومان</div>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %} {% endcomment %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="section-container">
+                <div class="section-header">
+                    <h3>تنظیمات</h3>
+                    <a href="#" class="edit-link">ویرایش</a>
+                </div>
+                <div class="section-content">
+                    <div class="info-item">
+                        <div class="info-label">رزرو تقویم</div>
+                        <div class="info-value">{% if stylist.is_active %}فعال{% else %}غیرفعال{% endif %}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">سطح دسترسی</div>
+                        <div class="info-value">آرایشگر</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Works at Section -->
+            <div class="section-container">
+                <div class="section-header">
+                    <h3>محل کار</h3>
+                    <a href="#" class="edit-link">ویرایش</a>
+                </div>
+                <div class="section-content">
+                    {% for salon in stylist.stylists_of_salon.all %}
+                    <div class="workplace-item">
+                        <div class="workplace-image">
+                            {% if salon.banner_image %}
+                            <img src="{{ salon.banner_image.url }}" alt="{{ salon.salon_name }}" onerror="this.src='/static/images/default-salon.png'" />
+                            {% else %}
+                            <img src="/static/images/default-salon.png" alt="{{ salon.salon_name }}" />
+                            {% endif %}
+                        </div>
+                        <div class="workplace-info">
+                            <div class="workplace-name">{{ salon.salon_name }}</div>
+                            <div class="workplace-address">{{ salon.address }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Modal -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal" id="actionsModal">
+                <div class="modal-close" id="modalClose">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
+                <div class="modal-content">
+                    <div class="modal-option" id="editOption">ویرایش</div>
+                    <div class="modal-option" id="viewCalendarOption">مشاهده تقویم</div>
+                    <div class="modal-option" id="viewShiftsOption">مشاهده شیفت های برنامه ریزی شده</div>
+                    <div class="modal-option" id="addTimeOffOption">افزودن مرخصی</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const contentSections = {
+                'overview': document.getElementById('overview-tab'),
+                'personal': document.getElementById('personal-tab'),
+                'workspace': document.getElementById('workspace-tab')
+            };
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Hide all content sections
+                    for (const key in contentSections) {
+                        contentSections[key].classList.remove('active');
+                    }
+                    
+                    // Show the selected content section
+                    const tabName = this.getAttribute('data-tab');
+                    contentSections[tabName].classList.add('active');
+                });
+            });
+            
+            // Modal functionality
+            const actionsBtn = document.getElementById('actionsBtn');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const actionsModal = document.getElementById('actionsModal');
+            const modalClose = document.getElementById('modalClose');
+            
+            // Modal options
+            const editOption = document.getElementById('editOption');
+            const viewCalendarOption = document.getElementById('viewCalendarOption');
+            const viewShiftsOption = document.getElementById('viewShiftsOption');
+            const addTimeOffOption = document.getElementById('addTimeOffOption');
+            
+            // Open modal when clicking the actions button
+            actionsBtn.addEventListener('click', function() {
+                modalOverlay.style.display = 'block';
+                setTimeout(() => {
+                    actionsModal.classList.add('show');
+                }, 10);
+            });
+            
+            // Close modal function
+            function closeModal() {
+                actionsModal.classList.remove('show');
+                setTimeout(() => {
+                    modalOverlay.style.display = 'none';
+                }, 300);
+            }
+            
+            // Close modal when clicking the close button
+            modalClose.addEventListener('click', closeModal);
+            
+            // Close modal when clicking outside the modal
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            
+            // Modal options click handlers
+            editOption.addEventListener('click', function() {
+                console.log('Edit clicked');
+                closeModal();
+                
+            });
+            
+            viewCalendarOption.addEventListener('click', function() {
+                console.log('View calendar clicked');
+                closeModal();
+                // Add your calendar view functionality here
+            });
+            
+            viewShiftsOption.addEventListener('click', function() {
+                console.log('View shifts clicked');
+                closeModal();
+                // Add your shifts view functionality here
+            });
+            
+            addTimeOffOption.addEventListener('click', function() {
+                console.log('Add time off clicked');
+                closeModal();
+                // Add your time off functionality here
+            });
+        });
+    </script>
+
+{% endblock content %}

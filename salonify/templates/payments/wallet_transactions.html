@@ -1,0 +1,663 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}تاریخچه تراکنش‌های کیف پول{% endblock %}
+
+{% block head %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(90deg, #6b5bff 0%, #ff59c7 100%);
+        min-height: 100vh;
+        font-family: 'Iranian Sans', 'Tahoma', sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Header Section */
+    .wallet-header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        color: white;
+        text-align: center;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .header-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .balance-display {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .balance-label {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 1rem;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .action-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 15px;
+        padding: 1rem 1.5rem;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .action-btn:hover {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        color: #333;
+        text-decoration: none;
+    }
+
+    .action-btn.primary {
+        background: linear-gradient(90deg, #28a745 0%, #20c997 100%;)
+        color: white;
+    }
+
+    .action-btn.primary:hover {
+        background: linear-gradient(90deg, #218838 0%, #1aa589 100%);
+        color: white;
+    }
+
+    /* Statistics Row */
+    .stats-row {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .stat-primary .stat-value { color: #667eea; }
+    .stat-success .stat-value { color: #28a745; }
+    .stat-info .stat-value { color: #17a2b8; }
+    .stat-warning .stat-value { color: #ffc107; }
+
+    /* Transactions Container */
+    .transactions-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .transactions-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .transactions-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .transaction-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f1f3f4;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .transaction-item:last-child {
+        border-bottom: none;
+    }
+
+    .transaction-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .transaction-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .transaction-deposit .transaction-icon {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .transaction-withdraw .transaction-icon {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    .transaction-purchase .transaction-icon {
+        background-color: rgba(253, 126, 20, 0.1);
+        color: #fd7e14;
+    }
+
+    .transaction-refund .transaction-icon {
+        background-color: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+    }
+
+    .transaction-info {
+        flex-grow: 1;
+    }
+
+    .transaction-type {
+        font-weight: bold;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        color: #333;
+    }
+
+    .transaction-date {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .transaction-description {
+        color: #6c757d;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .transaction-amounts {
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .transaction-amount {
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .transaction-balance {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .transaction-deposit .transaction-amount { color: #28a745; }
+    .transaction-withdraw .transaction-amount { color: #dc3545; }
+    .transaction-purchase .transaction-amount { color: #fd7e14; }
+    .transaction-refund .transaction-amount { color: #17a2b8; }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+        color: #667eea;
+    }
+
+    .empty-state h4 {
+        margin-bottom: 1rem;
+        color: #495057;
+    }
+
+    .empty-state p {
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .empty-state .btn {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 15px;
+        padding: 1rem 2rem;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .empty-state .btn:hover {
+        background: linear-gradient(90deg, #5a4bef 0%, #6a3f92 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Pagination */
+    .pagination-wrapper {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .page-item {
+        list-style: none;
+    }
+
+    .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .page-link:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+        color: #495057;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+    }
+
+    .page-info {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+
+        .balance-display {
+            font-size: 2rem;
+        }
+
+        .action-buttons {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .transaction-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .transaction-amounts {
+            text-align: left;
+            align-self: flex-end;
+        }
+
+        .pagination {
+            gap: 0.25rem;
+        }
+
+        .page-link {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animated {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    /* Loading Animation */
+    .loading {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Wallet Header -->
+    <div class="wallet-header animated">
+        <h4 class="header-title">
+            <i class="fas fa-history"></i>
+            تاریخچه تراکنش‌های کیف پول
+        </h4>
+        {% if wallet %}
+        <div class="balance-label">موجودی فعلی</div>
+        <div class="balance-display">
+            {{ wallet.balance|floatformat:0|intcomma }} تومان
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons animated">
+        <a href="{% url 'payments:detail' %}" class="action-btn">
+            <i class="fas fa-arrow-right"></i>
+            بازگشت به کیف پول
+        </a>
+        <a href="{% url 'payments:charge' %}" class="action-btn primary">
+            <i class="fas fa-plus"></i>
+            شارژ کیف پول
+        </a>
+    </div>
+
+    {% if transactions %}
+    <!-- Statistics -->
+    <div class="stats-row animated">
+        <div class="stats-grid">
+            <div class="stat-item stat-primary">
+                <div class="stat-value">{{ page_obj.paginator.count }}</div>
+                <div class="stat-label">کل تراکنش‌ها</div>
+            </div>
+            <div class="stat-item stat-success">
+                <div class="stat-value">{{ transactions|length }}</div>
+                <div class="stat-label">تراکنش‌های این صفحه</div>
+            </div>
+            <div class="stat-item stat-info">
+                <div class="stat-value">{{ page_obj.number }}</div>
+                <div class="stat-label">صفحه فعلی</div>
+            </div>
+            <div class="stat-item stat-warning">
+                <div class="stat-value">{{ page_obj.paginator.num_pages }}</div>
+                <div class="stat-label">کل صفحات</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions List -->
+    <div class="transactions-container animated">
+        <div class="transactions-header">
+            <h5 class="transactions-title">
+                <i class="fas fa-list"></i>
+                جزئیات تراکنش‌ها
+            </h5>
+        </div>
+        
+        {% for transaction in transactions %}
+        <div class="transaction-item transaction-{{ transaction.transaction_type|lower }}">
+            <div class="transaction-icon">
+                {% if transaction.transaction_type == 'DEPOSIT' %}
+                    <i class="fas fa-arrow-down"></i>
+                {% elif transaction.transaction_type == 'WITHDRAW' %}
+                    <i class="fas fa-arrow-up"></i>
+                {% elif transaction.transaction_type == 'PURCHASE' %}
+                    <i class="fas fa-shopping-cart"></i>
+                {% else %}
+                    <i class="fas fa-undo"></i>
+                {% endif %}
+            </div>
+            
+            <div class="transaction-info">
+                <div class="transaction-type">
+                    {{ transaction.get_transaction_type_display }}
+                </div>
+                <div class="transaction-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ transaction.created_at|date:"l، j F Y - H:i" }}
+                </div>
+                {% if transaction.description %}
+                <div class="transaction-description">
+                    <i class="fas fa-comment-alt"></i>
+                    {{ transaction.description }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="transaction-amounts">
+                <div class="transaction-amount">
+                    {% if transaction.amount > 0 %}+{% endif %}
+                    {{ transaction.amount|floatformat:0|intcomma }} تومان
+                </div>
+                <div class="transaction-balance">
+                    موجودی: {{ transaction.running_balance|floatformat:0|intcomma }} تومان
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination-wrapper animated">
+        <nav aria-label="صفحه‌بندی تراکنش‌ها">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="صفحه اول" title="صفحه اول">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="صفحه قبل" title="صفحه قبل">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="صفحه بعد" title="صفحه بعد">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="صفحه آخر" title="صفحه آخر">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <div class="page-info">
+            صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }} 
+            ({{ page_obj.paginator.count }} تراکنش)
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="transactions-container animated">
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h4>هیچ تراکنشی یافت نشد</h4>
+            <p>
+                تاکنون هیچ تراکنشی در کیف پول شما انجام نشده است.<br>
+                برای شروع، کیف پول خود را شارژ کنید.
+            </p>
+            <a href="{% url 'payments:charge' %}" class="btn">
+                <i class="fas fa-plus"></i>
+                شارژ اولیه کیف پول
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // انیمیشن ورود عناصر
+    const animatedElements = document.querySelectorAll('.animated');
+    animatedElements.forEach((element, index) => {
+        element.style.animationDelay = `${index * 0.1}s`;
+    });
+
+    // انیمیشن برای تراکنش‌ها
+    const transactionItems = document.querySelectorAll('.transaction-item');
+    transactionItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            item.style.transition = 'all 0.5s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        }, (index * 50) + 500); // شروع بعد از انیمیشن اولیه
+    });
+
+    // افکت hover برای آمار
+    const statItems = document.querySelectorAll('.stat-item');
+    statItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px) scale(1.05)';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // بهبود UX برای موبایل
+    if (window.innerWidth <= 768) {
+        const transactionItems = document.querySelectorAll('.transaction-item');
+        transactionItems.forEach(item => {
+            item.addEventListener('touchstart', function() {
+                this.style.backgroundColor = '#f8f9fa';
+            });
+            
+            item.addEventListener('touchend', function() {
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                }, 150);
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

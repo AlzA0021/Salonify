@@ -1,0 +1,92 @@
+<!-- Popular Stylists Card -->
+<div class="card">
+    <h2>آرایشگران برتر</h2>
+    <div class="stylist-list">
+        {% if popular_stylists %}
+            {% for stylist in popular_stylists %}
+                <div class="stylist-item">
+                    <div class="stylist-name">{{ stylist.stylist__user__name }} {{ stylist.stylist__user__family }}</div>
+                    <div class="stylist-stats">
+                        {{ stylist.current_month_count }} این ماه / {{ stylist.last_month_count }} ماه گذشته
+                        {% if stylist.change_percent != 0 %}
+                            <span class="change-indicator {% if stylist.is_growing %}positive{% else %}negative{% endif %}">
+                                ({% if stylist.is_growing %}+{% endif %}{{ stylist.change_percent }}%)
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if not forloop.last %}
+                    <hr class="divider">
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="stylist-item">
+                <div class="stylist-name">هیچ آرایشگری یافت نشد</div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 0 0 16px 0;
+}
+
+.stylist-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.stylist-item {
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stylist-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.stylist-stats {
+    font-size: 14px;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.change-indicator {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.change-indicator.positive {
+    color: #28a745;
+}
+
+.change-indicator.negative {
+    color: #dc3545;
+}
+
+.divider {
+    border: none;
+    height: 1px;
+    background-color: #e9ecef;
+    margin: 0;
+}
+</style>

@@ -1,0 +1,91 @@
+<!-- مودال مرور کلی -->
+<div class="modal-overlay" id="overview-modal">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title">مرور کلی </h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-content">
+      <!-- بخش کیف پول -->
+      <div class="mb-20">
+        <div class="flex-between mb-10">
+          <h4>کیف پول</h4>
+          <a href="{% url "payments:detail" %}" class="link-primary">مشاهده کیف پول</a>
+        </div>
+        
+        <div class="wallet-card">
+          <div class="flex-between">
+            <p class="text-secondary mb-5">موجودی</p>
+            <div class="tooltip">
+              <i class="info-icon">&#9432;</i>
+              <span class="tooltiptext">موجودی کیف پول این مشتری</span>
+            </div>
+          </div>
+          <h3 class="balance-amount">{{ wallet_balance|default:"۰" }} ریال</h3>
+        </div>
+      </div>
+
+      <!-- بخش خلاصه -->
+      <div class="mb-20">
+        <h4 class="mb-15">خلاصه</h4>
+        
+        <div class="sales-card">
+          <div class="flex-between">
+            <p class="text-secondary mb-5">فروش کل</p>
+            <div class="tooltip">
+              <i class="info-icon">&#9432;</i>
+              <span class="tooltiptext">مجموع مبلغ تمام سفارش‌های نهایی شده این مشتری</span>
+            </div>
+          </div>
+          <h3 class="balance-amount">{{ total_sales|default:"۰" }} ریال</h3>
+        </div>
+        
+        <div class="grid-2-cols">
+          <div class="summary-card">
+            <div class="flex-between">
+              <p class="text-secondary mb-5">قرارهای ملاقات</p>
+              <div class="tooltip">
+                <i class="info-icon">&#9432;</i>
+                <span class="tooltiptext">تعداد کل قرارهای ملاقات این مشتری</span>
+              </div>
+            </div>
+            <h3 class="balance-amount">{{ appointments_count }}</h3>
+          </div>
+          
+          <div class="summary-card">
+            <div class="flex-between">
+              <p class="text-secondary mb-5">امتیازدهی</p>
+              <div class="tooltip">
+                <i class="info-icon">&#9432;</i>
+                <span class="tooltiptext">میانگین امتیازات ثبت شده توسط این مشتری</span>
+              </div>
+            </div>
+            <h3 class="balance-amount">{{ rating }}</h3>
+          </div>
+          
+          <div class="summary-card">
+            <div class="flex-between">
+              <p class="text-secondary mb-5">لغو شده</p>
+              <div class="tooltip">
+                <i class="info-icon">&#9432;</i>
+                <span class="tooltiptext">تعداد قرارهای لغو شده توسط این مشتری</span>
+              </div>
+            </div>
+            <h3 class="balance-amount">{{ canceled_count|default:"۰" }}</h3>
+          </div>
+          
+          <div class="summary-card">
+            <div class="flex-between">
+              <p class="text-secondary mb-5">عدم حضور</p>
+              <div class="tooltip">
+                <i class="info-icon">&#9432;</i>
+                <span class="tooltiptext">تعداد دفعاتی که مشتری در قرار حاضر نشده است</span>
+              </div>
+            </div>
+            <h3 class="balance-amount">{{ no_show_count|default:"۰" }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,232 @@
+{% extends 'main_template.html' %}
+{% load render_partial %}
+{% load static %}
+{% load cache %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/salons.css' %}">
+  {# Vendor CSS مخصوص همین صفحه #}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+{% endblock head %}
+
+{% block title %}سالن ها{% endblock %}
+
+{# برای لود ماژول صفحه از app.js #}
+{% block body_attrs %}data-page="salons"{% endblock %}
+
+{% block content %}
+<div class="salons-user-dashboard">
+  <div class="salons-profile-greeting">
+    <h2>سلام، {{ user.name }}</h2>
+  </div>
+</div>
+
+{# 🆕 بخش رزرو مجدد #}
+{% if book_again_orders %}
+<section class="salons-slider-section book-again-section">
+  <div class="section-header">
+    <h3>رزرو مجدد</h3>
+    <p class="section-subtitle">آخرین سالن‌هایی که در آن‌ها خدمات دریافت کرده‌اید</p>
+  </div>
+  
+  <div class="swiper-container book-again-swiper">
+    <div class="swiper-wrapper">
+      {% for order in book_again_orders %}
+        <div class="swiper-slide book-again-swiper-slide">
+          {% include "salons/partials/book_again_card.html" %}
+        </div>
+      {% endfor %}
+    </div>
+    
+    {# Navigation buttons برای این بخش #}
+    {% comment %} <div class="swiper-button-next book-again-next"></div>
+    <div class="swiper-button-prev book-again-prev"></div> {% endcomment %}
+  </div>
+</section>
+{% endif %}
+
+{# بخش علاقه‌مندی‌ها #}
+{% if favorits_salons %}
+<section class="salons-slider-section">
+  <h3>علاقه‌مندی‌ها</h3>
+  <div class="swiper-container salons-recent-swiper">
+    <div class="swiper-wrapper">
+      {% for salon in favorits_salons %}
+        <div class="swiper-slide salons-swiper-slide">
+          {% include "csf/partials/favorits_salon_card.html" %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# بخش آخرین بازدیدها #}
+{% if last_visited_salons %}
+<section class="salons-slider-section">
+  <h3>اخیراً مشاهده شده</h3>
+  <div class="swiper-container salons-recent-swiper">
+    <div class="swiper-wrapper">
+      {% for salon in last_visited_salons %}
+        <div class="swiper-slide salons-swiper-slide">
+          {% include "salons/partials/salon_card.html" %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% cache 600 top_salons_list %}
+  {# بخش جدیدترین‌ها #}
+  <section class="salons-slider-section">
+    <h3>جدیدترین</h3>
+    <div class="swiper-container salons-recent-swiper">
+      <div class="swiper-wrapper">
+        {% for salon in recent_salons %}
+          <div class="swiper-slide salons-swiper-slide">
+            {% include "salons/partials/salon_card.html" %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  
+  {# بخش برترین‌ها #}
+  <section class="salons-slider-section">
+    <h3>برترین</h3>
+    <div class="swiper-container salons-top-swiper">
+      <div class="swiper-wrapper">
+        {% for salon in top_salons %}
+          <div class="swiper-slide salons-swiper-slide">
+            {% include "salons/partials/salon_card.html" %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  
+  {% render_partial "services:categories" %}
+{% endcache %}
+
+{% endblock content %}
+
+{% block js %}
+  {# Vendor JS مخصوص همین صفحه (Swiper) #}
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 🆕 Swiper برای بخش رزرو مجدد
+    const bookAgainSwiper = new Swiper('.book-again-swiper', {
+      slidesPerView: 1,
+      spaceBetween: 16,
+      navigation: {
+        nextEl: '.book-again-next',
+        prevEl: '.book-again-prev',
+      },
+      breakpoints: {
+        576: {
+          slidesPerView: 1.2,
+        },
+        768: {
+          slidesPerView: 2,
+        },
+        992: {
+          slidesPerView: 2.5,
+        },
+        1200: {
+          slidesPerView: 3,
+        }
+      }
+    });
+    
+    // Swiper های موجود
+    const swipers = document.querySelectorAll('.salons-recent-swiper, .salons-top-swiper');
+    swipers.forEach(swiperEl => {
+      new Swiper(swiperEl, {
+        slidesPerView: 1.2,
+        spaceBetween: 16,
+        breakpoints: {
+          576: {
+            slidesPerView: 2,
+          },
+          768: {
+            slidesPerView: 3,
+          },
+          992: {
+            slidesPerView: 4,
+          },
+          1200: {
+            slidesPerView: 5,
+          }
+        }
+      });
+    });
+
+    // 🆕 Event handler برای دکمه رزرو مجدد
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('btn-book-again')) {
+        const orderId = e.target.dataset.orderId;
+        
+        // انتقال به صفحه جزئیات قرار ملاقات
+        const appointmentUrl = `orders/reservation_detail/${orderId}/`;
+        window.location.href = appointmentUrl;
+      }
+    });
+  });
+  </script>
+{% endblock js %}
+
+<style>
+/* 🆕 استایل‌های اضافی برای بخش رزرو مجدد */
+.book-again-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  color: white;
+}
+
+.book-again-section .section-header h3 {
+  color: white;
+  margin-bottom: 4px;
+}
+
+.book-again-section .section-subtitle {
+  color: rgba(255,255,255,0.8);
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.book-again-swiper-slide {
+  height: auto;
+  display: flex;
+}
+
+.book-again-swiper-slide .book-again-card {
+  width: 100%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* Navigation buttons برای رزرو مجدد */
+.book-again-next,
+.book-again-prev {
+  color: white;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.book-again-next:hover,
+.book-again-prev:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.book-again-next::after,
+.book-again-prev::after {
+  font-size: 16px;
+  font-weight: 600;
+}
+</style>

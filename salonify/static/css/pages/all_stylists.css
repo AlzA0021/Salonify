@@ -1,0 +1,13 @@
+/* page: all_stylists */
+ @media (max-width: 768px) {
+      .calendar-container {
+        width: 100%;
+        margin: 0 auto;
+        padding: 10px; /* Adjust padding as needed */
+      }
+    
+      /* Adjust calendar text size or other styles as needed */
+      .fc-daygrid-day-number {
+        font-size: 12px; /* Decrease font size for mobile */
+      }
+    }

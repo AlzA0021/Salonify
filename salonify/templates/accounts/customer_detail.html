@@ -1,0 +1,231 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% load jalali_extras %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/detail_customer.css' %}">
+{% endblock head %}
+
+{% block title %} {{ customer.get_fullName }}{% endblock title %}
+
+{% block content %}
+
+  
+  <!-- هدر ثابت در بالای صفحه -->
+  <header class="header">
+    <div class="nav-container">
+      <div class="left-icons">
+        <!-- دکمه بستن را اینجا قرار می‌دهیم -->
+        <button class="close-btn" id="closeHeaderBtn">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <!-- عنصری برای نمایش نام مشتری در حالت اسکرول -->
+        <h2 class="header-customer-name" id="headerCustomerName"> {{ customer.get_fullName }} </h2>
+      </div>
+      <div class="right-icons">
+        <!-- اگر آیکون دیگری در هدر نیاز داشتید، اینجا اضافه کنید -->
+      </div>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <!-- بخش پروفایل -->
+    <section class="profile-section">
+      <div class="profile-info">
+        <div class="profile-image">
+          <img src="{{ media_url }}{{ customer.profile_image }}" alt="{{ customer.get_fullName }} ">
+        </div>
+        <h2 class="profile-name">{{ customer.get_fullName }} </h2>
+        <p class="profile-email">{{ customer.user.email }}</p>
+        <p class="profile-phone">{{ customer.user.mobile_number }}</p>
+        <span class="status-tag">جدید</span>
+      </div>
+      
+      <div class="action-buttons">
+        <a href="tel:{{ customer.user.mobile_number }}" class="call-button">
+          <i class="fa-solid fa-phone-flip"></i> &nbsp;&nbsp;  تماس
+        </a>
+        <button class="book-button">رزرو</button>
+      </div>
+    </section>
+
+    <!-- بخش جزئیات -->
+    <section class="detail-section">
+      <div class="detail-item" data-modal="birthday-modal">
+        <div class="detail-icon"><i class="fa-solid fa-cake-candles"></i></div>
+        <div class="detail-text">افزودن تاریخ تولد</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+      <div class="detail-item" data-modal="first-visit-modal">
+        <div class="detail-icon"><i class="fa-solid fa-person-through-window"></i></div>
+        <div class="detail-text">۱۳ فروردین ۱۴۰۴</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-item" data-modal="overview-modal">
+        <div class="detail-text">مرور کلی</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+      <div class="detail-item" data-modal="appointments-modal">
+        <div class="detail-text">وقت‌های ملاقات</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+      <div class="detail-item" data-modal="sales-modal">
+        <div class="detail-text">فروش</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+      <div class="detail-item" data-modal="customer-details-modal">
+        <div class="detail-text">جزئیات مشتری</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+      <div class="detail-item" data-modal="items-modal">
+        <div class="detail-text">آیتم‌ها</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+      <div class="detail-item" data-modal="documents-modal">
+        <div class="detail-text">اسناد</div>
+        <div class="arrow-icon dropdown-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+      <div class="detail-item" data-modal="wallet-modal">
+        <div class="detail-text">کیف پول</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+      <div class="detail-item" data-modal="reviews-modal">
+        <div class="detail-text">نظرات</div>
+        <div class="arrow-icon"><i class="fa-solid fa-angle-right"></i></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- مودال‌ها -->
+  
+  <!-- مودال تاریخ تولد -->
+  <div class="modal-overlay" id="birthday-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">تاریخ تولد</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-content">
+        <div class="form-group">
+          <label class="form-label">تاریخ تولد</label>
+          <input type="date" class="form-input" placeholder="تاریخ تولد">
+        </div>
+        <button class="modal-button">ذخیره</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال اولین مراجعه -->
+  <div class="modal-overlay" id="first-visit-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">اولین مراجعه</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-content">
+        <p>تاریخ اولین مراجعه: ۱۳ فروردین ۱۴۰۴</p>
+        <p>زمان سپری شده: ۱ ماه و ۲ روز</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال مرور کلی -->
+  {% include "accounts/partials/customer_overview.html" with customer=customer appointments_count=appointments_count total_sales=total_sales rating=rating comments_count=comments_count %}
+
+  <!-- مودال وقت‌های ملاقات -->
+  {% include "accounts/partials/customer_appointment.html" with order_details=order_details %}
+
+  <!-- مودال فروش -->
+  {% include "accounts/partials/customer_sales.html" with completed_appointments=completed_appointments total_sales=total_sales %}
+  
+
+  <!-- مودال جزئیات مشتری -->
+  <div class="modal-overlay" id="customer-details-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">جزئیات مشتری</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-content">
+        <form class="customer-detail-form">
+          <div class="form-group">
+            <label class="form-label">نام</label>
+            <input type="text" class="form-input" value="علی">
+          </div>
+          <div class="form-group">
+            <label class="form-label">نام خانوادگی</label>
+            <input type="text" class="form-input" value="رضایی">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ایمیل</label>
+            <input type="email" class="form-input" value="ali.rezaei@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">شماره تماس</label>
+            <input type="tel" class="form-input" value="09123456789">
+          </div>
+          <div class="form-group">
+            <label class="form-label">آدرس</label>
+            <textarea class="form-input" rows="3">تهران، خیابان ولیعصر، کوچه بهار، پلاک ۱۲، واحد ۴</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">یادداشت‌ها</label>
+            <textarea class="form-input" rows="4">مشتری به ماساژ سنگ داغ علاقه دارد. حساسیت پوستی به روغن نارگیل دارد.</textarea>
+          </div>
+          <button class="modal-button">ذخیره تغییرات</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال آیتم‌ها -->
+  {% include "accounts/partials/customer_items.html" with order_details=order_details %}
+  
+  <!-- مودال اسناد -->
+  {% include "accounts/partials/customer_documents.html" with customer_notes=customer_notes customer_notes_count=customer_notes_count appointment_notes=appointment_notes appointment_notes_count=appointment_notes_count %}
+
+  <!-- مودال نظرات -->
+  {% include "accounts/partials/customer_comments.html" with customer_ratings=customer_ratings comments_count=comments_count rating=rating %}
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // افزودن رویداد کلیک برای باز کردن مودال‌ها
+        const detailItems = document.querySelectorAll('.detail-item');
+        detailItems.forEach(item => {
+          item.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+              modal.style.display = 'block';
+            }
+          });
+        });
+      
+        // افزودن رویداد کلیک برای دکمه‌های بستن مودال
+        const closeButtons = document.querySelectorAll('.modal-close');
+        closeButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const modal = this.closest('.modal-overlay');
+            if (modal) {
+              modal.style.display = 'none';
+            }
+          });
+        });
+      
+        // بستن مودال در صورت کلیک در خارج از محتوی مودال
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => {
+          modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+              modal.style.display = 'none';
+            }
+          });
+        });
+      });
+      </script>
+      
+    {% endblock content %}

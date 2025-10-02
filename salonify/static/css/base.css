@@ -1,0 +1,105 @@
+/* Minimal reset */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+img, svg { display: block; max-width: 100%; height: auto; }
+
+/* Tokens */
+
+:root {
+  --color-fff-1: #fff;
+  --color-333-2: #333;
+  --color-white-3: white;
+  --color-666-4: #666;
+  --color-555-5: #555;
+  --color-000-6: #000;
+  --color-f5f5f5-7: #f5f5f5;
+  --color-6c757d-8: #6c757d;
+  --color-6c5ce7-9: #6c5ce7;
+  --color-888-10: #888;
+  --color-f8f9fa-11: #f8f9fa;
+  --color-777-12: #777;
+  --font-size-16px-1: 16px;
+  --font-size-14px-2: 14px;
+  --font-size-20px-3: 20px;
+  --font-size-0-9rem-4: 0.9rem;
+  --font-size-24px-5: 24px;
+  --font-size-18px-6: 18px;
+  --font-size-12px-7: 12px;
+  --font-size-1rem-8: 1rem;
+  --radius-8px-1: 8px;
+  --radius-50-2: 50%;
+  --radius-12px-3: 12px;
+  --radius-10px-4: 10px;
+  --radius-4px-5: 4px;
+  --radius-5px-6: 5px;
+  --space-0-1: 0;
+  --space-20px-2: 20px;
+  --space-15px-3: 15px;
+  --space-0-auto-4: 0 auto;
+  --space-10px-5: 10px;
+  --space-1rem-6: 1rem;
+  --space-12px-7: 12px;
+  --space-15px-0-8: 15px 0;
+  --space-10px-0-9: 10px 0;
+  --space-15px-20px-10: 15px 20px;
+}
+
+/* Utilities */
+.u-container { width: min(1100px, 100% - 2rem); margin-inline: auto; }
+.u-flex { display: flex; align-items: center; }
+.u-flex-col { display: flex; flex-direction: column; }
+.u-center { display: grid; place-items: center; }
+.u-gap-s  { gap: 0.5rem; }
+.u-gap-m  { gap: 1rem; }
+.u-gap-l  { gap: 1.5rem; }
+.u-radius-s { border-radius: 4px; }
+.u-radius-m { border-radius: 8px; }
+.u-text-s { font-size: 12px; }
+.u-text-m { font-size: 14px; }
+.u-text-l { font-size: 16px; }
+
+@font-face {
+  font-family: 'Gandom';
+  src: url('Gandom/fonts/Gandom.ttf')format('ttf'),url('Gandom/fonts/Gandom.woff')format('woff'),url('Gandom/fonts/Gandom.eot')format('eot');
+}
+
+
+@font-face {
+  font-family: 'Gandom',sans-serif;
+  src: url(../fonts/Gandom/Gandom.eot);
+  src: url(../fonts/Gandom/Gandom.ttf);
+  src: url(../fonts/Gandom/Gandom.woff);
+}
+
+
+@font-face {
+  font-family: 'Gandom';
+  src: url(../fonts/Gandom/Gandom.eot),url(../fonts/Gandom/Gandom.ttf),url(../fonts/Gandom/Gandom.woff);
+}
+
+
+@font-face {
+  font-family: 'Vazir';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Vazir-Regular.eot');
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Vazir-Regular.eot?#iefix')format('embedded-opentype'),url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Vazir-Regular.woff2')format('woff2'),url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Vazir-Regular.woff')format('woff'),url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Vazir-Regular.ttf')format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'Vazir';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Farsi-Digits/Vazir-FD.eot');
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Farsi-Digits/Vazir-FD.eot?#iefix')format('embedded-opentype'),url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Farsi-Digits/Vazir-FD.woff2')format('woff2'),url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Farsi-Digits/Vazir-FD.woff')format('woff'),url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Farsi-Digits/Vazir-FD.ttf')format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'IRANSans';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/vazir-font/30.1/Vazir-Regular.woff2')format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+

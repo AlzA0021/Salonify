@@ -1,0 +1,32 @@
+/*! salonify: components/modal.css */
+.modal-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  display: none;
+  z-index: 999;
+}
+.modal-backdrop.is-open{ display: block; }
+
+.modal{
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  z-index: 1000;
+  pointer-events: none;
+}
+.modal .modal-content{
+  pointer-events: auto;
+  width: min(560px, 92vw);
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-6);
+}
+.modal-content, .modal_container{
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-lg);
+}
+.modal-actions{
+  display:flex; justify-content:flex-end; gap: var(--space-2);
+  margin-top: var(--space-4);
+}

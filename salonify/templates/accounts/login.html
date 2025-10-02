@@ -1,0 +1,78 @@
+{% extends "main_template.html" %}
+{% load static %}
+{% block title %}ورود {% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock head %}
+{% block content %}
+<div class="login-page">
+  <div class="login-container">
+    <h2>ورود به سایت</h2>
+    
+     {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %} 
+    
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <div class="form-group">
+        {{ form.mobile_number.label_tag }}
+        <div class="input-field">
+            <i class="fas fa-mobile-alt"></i>
+          {{ form.mobile_number }}
+        </div>
+        {% if form.mobile_number.errors %}
+          <div class="error">
+            {% for error in form.mobile_number.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        {{ form.password.label_tag }}
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          {{ form.password }}
+        </div>
+        {% if form.password.errors %}
+          <div class="error">
+            {% for error in form.password.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <button type="submit" class="btn btn-primary">ورود</button>
+    </form>
+    
+    <div class="alt-login">
+      <p>یا ورود با</p>
+      <div class="social-login">
+        <a href="#" class="social-btn facebook"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#" class="social-btn google"><i class="fa-brands fa-google"></i></a>
+      </div>
+    </div>
+    
+    <div class="register-link">
+      <a href="{% url 'accounts:register' %}">ثبت‌ نام</a>
+    </div>
+    
+    <div class="forgot-password">
+      <a href="{% url 'accounts:remember_password' %}">رمز عبور خود را فراموش کرده‌اید؟</a>
+    </div>
+    
+    <div class="salon-login">
+      <a href="#">ورود آرایشگران یا مدیران سالن</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

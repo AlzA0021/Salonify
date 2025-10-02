@@ -1,0 +1,23 @@
+{% load static %}
+<div class="index-service-group-body">
+  <div class="index-service-group-container">
+    <div class="index-group-header">
+      <h2 class="index-group-title">گروه خدمات</h2>
+      <a href="{% url 'services:all_services' %}" class="index-all-services-btn">همه</a>
+    </div>
+    <div class="index-service-group">
+      {% for group in service_groups %}
+        <div class="index-service-item">
+          <a href="{% url 'services:group_services' group.id %}" class="index-circle">
+              {% if group.group_image %}
+                <img src="{{ group.group_image.url }}" alt="{{ group.group_title }}" />
+              {% else %}
+                <img src="{% static 'images/default-service-group.png' %}" alt="{{ group.group_title }}" />
+              {% endif %}
+          </a>
+          <p class="index-service-title">{{ group.group_title }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

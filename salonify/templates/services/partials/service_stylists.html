@@ -1,0 +1,14 @@
+<div class="stylist-list">
+  {% for service_price in service.service_prices.all %}
+  <div class="stylist-card">
+    <img src="{{ service_price.stylist.profile_image.url }}" alt="{{ service_price.stylist.user.name }}" class="profile-img">
+    <div>
+      <p><strong>{{ service_price.stylist.user.name }} {{ service_price.stylist.user.family }}</strong></p>
+      <p>قیمت: {{ service_price.price }} تومان</p>
+      <a href="#" class="btn btn-primary">رزرو</a>
+    </div>
+  </div>
+  {% empty %}
+  <p>هیچ آرایشگری برای این خدمت موجود نیست.</p>
+  {% endfor %}
+</div>

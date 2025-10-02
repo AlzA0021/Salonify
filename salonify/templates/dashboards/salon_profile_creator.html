@@ -1,0 +1,29 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+{% block title %}جذب مشتری{% endblock title %}
+{% block content %}
+<div class="container">
+  <div class="back-button"><i class="fa-solid fa-arrow-right"></i></div>
+
+  <h1>جذب مشتریان جدید با نوبت‌دهی آنلاین</h1>
+  <p class="subtitle">به بزرگترین بازار زیبایی و سلامت بپیوندید</p>
+
+  <div class="features">
+    <div class="feature"><div class="feature-icon"><i class="fa-solid fa-check"></i></div><div class="feature-text">کسب‌وکار خود را ثبت کنید</div></div>
+    <div class="feature"><div class="feature-icon"><i class="fa-solid fa-check"></i></div><div class="feature-text">دسترسی به هزاران مشتری جدید</div></div>
+    <div class="feature"><div class="feature-icon"><i class="fa-solid fa-check"></i></div><div class="feature-text">رزرو آنلاین ۲۴/۷</div></div>
+  </div>
+
+  <div class="banner-image">
+    <img src="{% static 'images/banners/banner.JPG' %}" alt="بنر سرویس نوبت‌دهی آنلاین">
+  </div>
+
+  <div class="buttons">
+    <button class="btn btn-outline">بیشتر بدانید</button>
+    <a href="{% url 'dashboards:salon_profile_creator_step1' %}" class="btn btn-primary">شروع کنید</a>
+  </div>
+</div>
+{% endblock content %}

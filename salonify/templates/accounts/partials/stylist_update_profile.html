@@ -1,0 +1,6 @@
+<form method="post" action="{% url 'accounts:stylist_update_profile' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary mt-3">به‌روزرسانی پروفایل</button>
+  <a href="{% url 'accounts:user_panel' %}" class="btn btn-secondary mt-3">بازگشت</a>
+</form>

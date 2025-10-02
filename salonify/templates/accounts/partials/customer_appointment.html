@@ -1,0 +1,77 @@
+<!-- مودال وقت‌های ملاقات -->
+<div class="modal-overlay" id="appointments-modal">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title">قرارهای ملاقات</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-content">
+      <!-- تب‌های فیلتر -->
+      <div class="appointments-tabs">
+        <div class="tab-pill active">
+          <span>همه</span>
+          <span class="counter">{{ appointments_count }}</span>
+        </div>
+        <div class="tab-pill">
+          <span>تکمیل شده</span>
+          <span class="counter">{{ completed_appointments.count }}</span>
+        </div>
+        <div class="tab-dropdown">
+          <span>بیشتر</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+      </div>
+      
+      {% regroup order_details by date|date:"F" as appointments_by_month %}
+      {% for month_group in appointments_by_month %}
+      <!-- بخش ماه -->
+      <div class="month-section">
+        <h4 class="month-title">{{ month_group.grouper }}</h4>
+        
+        {% for appointment in month_group.list %}
+        <!-- قرار ملاقات با خط زمانی -->
+        <div class="timeline-appointment">
+          <div class="timeline-icon">
+            <i class="fa-regular fa-calendar"></i>
+          </div>
+          <div class="appointment-card ">
+            <div class="appointment-header">
+              <h4 class="appointment-title"> {{ appointment.service.service_name }}</h4>
+              <div class="appointment-meta">
+                <span>{{ appointment.date|date:"l d F" }} {{ appointment.time|time:"H:i" }}</span>
+                
+                <span>{{ appointment.salon.name }}</span>
+                
+                
+              </div>
+            </div>
+            
+            <div class="appointment-details">
+              <div class="service-info">
+                <span class="{% if appointment.order.is_finally %}status-completed{% else %}status-pending{% endif %}">
+                  {% if appointment.order.is_finally %}تکمیل شده{% else %}در انتظار{% endif %}
+                </span>
+              </div>
+              <div class="price-info">
+                <span class="price">{{ appointment.price }} ریال</span>
+              </div>
+            </div>
+            
+            <div class="appointment-actions">
+              {% if appointment.order.is_finally %}
+              <button class="action-button outline">مشاهده فاکتور</button>
+              {% endif %}
+              <button class="action-button solid">رزرو مجدد</button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% empty %}
+      <div class="no-appointments">
+        <p>هیچ قرار ملاقاتی برای این مشتری ثبت نشده است.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

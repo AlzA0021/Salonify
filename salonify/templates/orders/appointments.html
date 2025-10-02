@@ -1,0 +1,119 @@
+{% extends "main_template.html" %}
+{% load static %}
+{% load jalali_filters %}
+
+{% block title %}نوبت ها{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/appointments.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock head %}
+
+{# مهم: این صفحه باید appointments باشد تا app.js ==> pages/appointments.js را لود کند #}
+{% block body_attrs %}data-page="appointments"{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="page-title">نوبت‌های شما</h1>
+  
+  <!-- بخش نوبت‌های آینده -->
+  <section class="upcoming-section">
+    <div class="section-header">
+      <div class="section-title">آینده</div>
+      <span class="section-count">{{ upcoming_appointments|length }}</span>
+    </div>
+
+    {% if upcoming_appointments %}
+      <div class="appointments-grid">
+        {% for appointment in upcoming_appointments %}
+        <div class="appointment-card"
+             data-salon-lat="{{ appointment.salon.location.y|default:'' }}"
+             data-salon-lng="{{ appointment.salon.location.x|default:'' }}"
+             data-salon-name="{{ appointment.salon.salon_name }}"
+             data-appointment-date="{{ appointment.date|date:'Y-m-d' }}"
+             data-appointment-time="{{ appointment.time|time:'H:i' }}">
+
+          <a href="{% url 'orders:appointment_detail' order_id=appointment.order.id %}" class="no-decoration">
+            <div class="appointment-card-image"
+                 style="background-image: url('{{ media_url }}{{ appointment.salon.banner_image }}');">
+              <div class="image-overlay">
+                <div class="salon-name">{{ appointment.salon.salon_name }}</div>
+                <div class="remaining-days">{{ appointment.date|remaining_days }} روز باقی مانده</div>
+              </div>
+            </div>
+          </a>
+          
+          <div class="appointment-card-body">
+            <div class="appointment-datetime">
+              {{ appointment.date|jalali_date }} - ساعت: {{ appointment.time|time:"H:i" }}
+            </div>
+            
+            <div class="appointment-details">
+              <div class="service-name">خدمت: {{ appointment.service.service_name }}</div>
+              <div class="service-price">قیمت: {{ appointment.price }} تومان</div>
+            </div>
+            
+            <div class="appointment-actions">
+              <button class="btn btn-directions" data-navigate="true" aria-label="مسیر تا سالن">
+                <i class="fas fa-map-marker-alt"></i> دریافت مسیر
+              </button>
+              <button class="btn btn-calendar" aria-label="افزودن به تقویم گوگل">
+                <i class="fas fa-calendar-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-upcoming-appointments">
+        <div class="no-upcoming-icon">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <h2>بدون قرار ملاقات آینده</h2>
+        <p>وقتی رزرو می‌کنید، قرارهای آینده شما در اینجا ظاهر می‌شود.</p>
+        <a href="{% url 'search:search_page' %}" class="btn-search-salons">جستجوی سالن‌ها</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- بخش نوبت‌های گذشته -->
+  <section class="past-section">
+    <div class="section-header">
+      <div class="section-title">گذشته</div>
+      <span class="section-count">{{ past_appointments|length }}</span>
+    </div>
+    
+    <div class="past-appointments">
+      {% if past_appointments %}
+        {% for appointment in past_appointments %}
+          <div class="past-item">
+            <div class="past-item-image">
+              <img src="{{ media_url }}{{ appointment.salon.banner_image }}" alt="{{ appointment.salon.salon_name }}">
+            </div>
+            
+            <div class="past-item-details">
+              <div class="salon-name">{{ appointment.salon.salon_name }}</div>
+              <div class="appointment-date">
+                {{ appointment.date|jalali_date }} در {{ appointment.time|time:"H:i" }}
+              </div>
+              <div class="service-details">
+                 {{ appointment.price }} تومان
+                {% if appointment.status == 'canceled' %}
+                  • لغو شده
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="past-item-actions">
+              <button class="btn btn-rebook">رزرو مجدد</button>
+            </div>
+          </div>
+        {% empty %}
+          <p class="no-appointments">هیچ نوبت گذشته‌ای ثبت نشده است.</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock content %}

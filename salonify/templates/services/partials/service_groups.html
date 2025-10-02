@@ -1,0 +1,51 @@
+{% extends 'main_template.html' %}
+
+{% block title %}گروه‌های خدمات{% endblock title %}
+
+{% block content %}
+<div class="group-service-container">
+    <h1>گروه‌های خدمات</h1>
+
+    <!-- Radio buttons for service groups -->
+    <div class="group-service-radio-inputs">
+        {% for group in service_groups %}
+        <label class="group-service-radio">
+            <input type="radio" name="radio" id="group-{{ group.id }}" {% if forloop.first %}checked{% endif %} onclick="showGroup({{ group.id }})" />
+            <span class="group-service-name">{{ group.group_title }}</span>
+        </label>
+        {% endfor %}
+    </div>
+
+    <!-- محتوا برای نمایش زیرگروه‌ها -->
+    <div class="group-service-tab-content mt-4">
+        {% for group in service_groups %}
+        <div class="group-service-group-content" id="group-content-{{ group.id }}" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
+            <div class="row justify-content-center">
+                {% for subgroup in group.groups.all %}
+                <div class="col-md-3 d-flex justify-content-center mb-4">
+                    <div data-text="{{ subgroup.group_title }}" style="--r:-15;" class="group-service-glass">
+                        <img src="{{ subgroup.group_image.url }}" alt="{{ subgroup.group_title }}" class="img-fluid">
+                    </div>
+                </div>
+                {% empty %}
+                <p>هیچ زیرگروهی برای این گروه وجود ندارد.</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function showGroup(groupId) {
+    // پنهان کردن تمام گروه‌ها
+    var groups = document.querySelectorAll('.group-service-group-content');
+    groups.forEach(function(group) {
+        group.style.display = 'none';
+    });
+    
+    // نمایش گروه انتخابی
+    document.getElementById('group-content-' + groupId).style.display = 'block';
+}
+</script>
+{% endblock content %}

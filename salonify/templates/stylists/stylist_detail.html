@@ -1,0 +1,52 @@
+{% extends "main_template.html" %}
+
+{% block title %} {{ stylist.user.name }} {{ stylist.user.family }} {% endblock title %}
+
+{% block head %}
+
+
+
+{% endblock head %}
+
+{% block content %}
+
+<div class="container mt-5">
+  <div class="row">
+      <div class="col-md-8 offset-md-2">
+          <div class="stylist-detail-card">
+              <img src="{{ stylist.profile_image.url }}" alt="{{ stylist.user.name }}" class="profile-image">
+              <h2 class="stylist-name">{{ stylist.user.name }} {{ stylist.user.family }}</h2>
+              <p class="description">{{ stylist.description }}</p>
+              <div class="social-links">
+                  {% if stylist.insta_link %}
+                      <a href="{{ stylist.insta_link }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                  {% endif %}
+                  {% if stylist.linkedin_link %}
+                      <a href="{{ stylist.linkedin_link }}" target="_blank"><i class="fab fa-linkedin"></i></a>
+                  {% endif %}
+                  {% if stylist.telegram_link %}
+                      <a href="{{ stylist.telegram_link }}" target="_blank"><i class="fab fa-telegram"></i></a>
+                  {% endif %}
+              </div>
+          </div>
+          <div class="work-samples-section">
+              <h3 class="mt-5">نمونه کارها</h3>
+              <div class="row">
+                  {% for sample in work_samples %}
+                  <div class="col-md-4 col-sm-6">
+                      <img src="{{ sample.sample_image.url }}" alt="نمونه کار" class="sample-image">
+                  </div>
+                  {% endfor %}
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+
+
+
+{% endblock js %}

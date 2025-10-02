@@ -1,0 +1,163 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}کیف پول من{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/payments/wallet_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header with back button and wallet info -->
+    <div class="wallet-header">
+        <a href="javascript:history.back()" class="back-btn">
+            <i class="fas fa-arrow-right"></i>
+        </a>
+        
+        <div class="wallet-card">
+            <div class="balance-amount">
+                {{ wallet.balance|floatformat:0|intcomma }} تومان
+            </div>
+            <div class="balance-label">موجودی کیف پول</div>
+            <a href="{% url 'payments:charge' %}" class="gift-card-btn">
+                <i class="fas fa-plus"></i>
+                افزودن کارت هدیه
+            </a>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <!-- Quick actions -->
+        <div class="quick-actions">
+            <a href="{% url 'payments:charge' %}" class="action-btn">
+                <i class="fas fa-credit-card"></i>
+                شارژ کیف پول
+            </a>
+            <a href="{% url 'payments:transactions' %}" class="action-btn secondary">
+                <i class="fas fa-history"></i>
+                تاریخچه تراکنش‌ها
+            </a>
+        </div>
+
+        <!-- Cards section -->
+        <div class="section-title">کارت‌ها</div>
+        
+        <a href="#" class="card-add-item">
+            <div class="card-icon">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="card-text">افزودن کارت بانکی/اعتباری</div>
+        </a>
+
+        <!-- Recent transactions -->
+        <div class="transactions-card animate-slide">
+            <div class="card-header">
+                <h5 class="mb-0 section-title">
+                    <i class="fas fa-list me-2"></i>
+                    آخرین تراکنش‌ها
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if transactions %}
+                    {% for transaction in transactions %}
+                    <div class="transaction-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    {% if transaction.transaction_type == 'DEPOSIT' %}
+                                        <i class="fas fa-arrow-down text-success fa-lg"></i>
+                                    {% elif transaction.transaction_type == 'WITHDRAW' %}
+                                        <i class="fas fa-arrow-up text-danger fa-lg"></i>
+                                    {% elif transaction.transaction_type == 'PURCHASE' %}
+                                        <i class="fas fa-shopping-cart text-warning fa-lg"></i>
+                                    {% else %}
+                                        <i class="fas fa-undo text-info fa-lg"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="transaction-type transaction-{{ transaction.transaction_type|lower }}">
+                                        {{ transaction.get_transaction_type_display }}
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ transaction.created_at|date:"Y/m/d - H:i" }}
+                                    </small>
+                                    {% if transaction.description %}
+                                        <br>
+                                        <small class="text-muted">{{ transaction.description }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="transaction-amount transaction-{{ transaction.transaction_type|lower }}">
+                                    {% if transaction.amount > 0 %}+{% endif %}
+                                    {{ transaction.amount|floatformat:0|intcomma }} تومان
+                                </div>
+                                <small class="text-muted">
+                                    موجودی: {{ transaction.running_balance|floatformat:0|intcomma }} تومان
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if transactions|length == 10 %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'payments:transactions' %}" class="view-all-btn">
+                            مشاهده تمام تراکنش‌ها
+                            <i class="fas fa-arrow-left me-2"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h5>هیچ تراکنشی یافت نشد</h5>
+                        <p>پس از انجام اولین تراکنش، تاریخچه آن در اینجا نمایش داده خواهد شد.</p>
+                        <a href="{% url 'payments:charge' %}" class="primary-btn">
+                            شارژ اولیه کیف پول
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if created %}
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle me-2"></i>
+            کیف پول شما با موفقیت ایجاد شد. اکنون می‌توانید آن را شارژ کنید.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // انیمیشن ساده برای کارت‌ها
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.transaction-card, .card-add-item, .action-btn');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+
+    // Add hover effects for mobile
+    if ('ontouchstart' in window) {
+        document.querySelectorAll('.card-add-item, .action-btn, .transaction-card').forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            });
+            element.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    }
+</script>
+{% endblock %}

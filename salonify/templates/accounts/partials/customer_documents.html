@@ -1,0 +1,181 @@
+{% load jalali_extras %}
+
+<div class="modal-overlay" id="documents-modal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">یادداشت‌ها</h3>
+            <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-content">
+            <!-- هدر با دکمه افزودن -->
+            <div class="notes-header">
+                <div class="tabs-container">
+                    <button class="tab-button active" data-tab="customer-notes">
+                        یادداشت‌های مشتری <span class="count">{{ customer_notes_count }}</span>
+                    </button>
+                    <button class="tab-button" data-tab="appointment-notes">
+                        یادداشت‌های نوبت <span class="count">{{ appointment_notes_count }}</span>
+                    </button>
+                </div>
+                <button class="add-doc-button" id="addNoteBtn">افزودن</button>
+            </div>
+            
+            <!-- فرم کامل افزودن یادداشت -->
+            <div class="add-note-form" id="addNoteForm">
+                <div class="form-header">
+                    <h3 class="form-title">افزودن یادداشت جدید</h3>
+                    <button class="form-close" id="closeFormBtn">&times;</button>
+                </div>
+                <form method="post" action="{% url 'accounts:detail_customer' customer_id=customer.user.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="textarea-container">
+                        <textarea class="note-textarea" name="note" placeholder="یادداشت خود را اینجا بنویسید..." required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <label class="upload-button">
+                            <i class="fas fa-upload"></i> آپلود تصویر
+                            <input type="file" name="note_image" accept="image/*" style="display: none;">
+                        </label>
+                        <button type="submit" class="save-button">ذخیره یادداشت</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- لیست یادداشت‌های مشتری -->
+            <div class="note-list active" id="customer-notes-list">
+                {% if customer_notes %}
+                    {% regroup customer_notes by created_at|date:"F Y" as notes_by_month %}
+                    {% for month_group in notes_by_month %}
+                        <div class="month-label">{{ month_group.grouper }}</div>
+                        <div class="timeline">
+                            {% for note in month_group.list %}
+                            <div class="note-item">
+                                <div class="note-card">
+                                    <div class="note-header">
+                                        <span class="note-time">
+                                            {{ note.created_at|date:"D j M H:i" }} • {{ note.created_by.get_fullName }}
+                                        </span>
+                                    </div>
+                                    <div class="note-content">{{ note.note }}</div>
+                                    {% if note.note_image %}
+                                        <img src="{{ MEDIA_URL }}{{ note.note_image.url }}" alt="تصویر یادداشت" class="note-image">
+                                    {% endif %}
+                                    <div class="note-actions">
+                                        <form method="post" action="{% url 'accounts:delete_customer_note' customer_id=customer.user.id note_id=note.id %}" style="display:inline;" class="delete-note-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="delete-note-btn">حذف</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+                        <h4 class="empty-title">بدون یادداشت</h4>
+                        <p class="empty-description">هیچ یادداشتی برای این مشتری ایجاد نشده است</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- لیست یادداشت‌های نوبت -->
+            <div class="note-list" id="appointment-notes-list">
+                {% if appointment_notes %}
+                    {% regroup appointment_notes by register_date|date:"F Y" as notes_by_month %}
+                    {% for month_group in notes_by_month %}
+                        <div class="month-label">{{ month_group.grouper }}</div>
+                        <div class="timeline">
+                            {% for note in month_group.list %}
+                                <div class="note-item">
+                                    <div class="note-card appointment-note">
+                                        <div class="note-header">
+                                            <span class="note-time">
+                                                {% with first_detail=note.order_details1.all.0 %}
+                                                    {% if first_detail %}
+                                                        {{ first_detail.date|date:"D j M" }} {{ first_detail.time|time:"H:i" }}
+                                                    {% else %}
+                                                        {{ note.register_date|date:"D j M" }}
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </span>
+                                        </div>
+                                        <div class="note-content">{{ note.description }}</div>
+                                        <a href="{% url 'orders:appointment_detail' note.id %}" class="view-appointment">مشاهده نوبت</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                        <h4 class="empty-title">بدون یادداشت نوبت</h4>
+                        <p class="empty-description">هیچ یادداشت نوبتی برای این مشتری ایجاد نشده است</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  <script>
+    // ...existing code...
+// تایید قبل از حذف یادداشت
+    document.querySelectorAll('.delete-note-form').forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        if (!confirm('آیا از حذف این یادداشت مطمئن هستید؟')) {
+          e.preventDefault();
+        }
+      });
+    });
+// ...existing code...
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab switching
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const noteLists = document.querySelectorAll('.note-list');
+      
+      tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Remove active class from all tabs
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          noteLists.forEach(list => list.classList.remove('active'));
+          
+          // Add active class to clicked tab
+          this.classList.add('active');
+          
+          // Show corresponding content
+          const tabId = this.getAttribute('data-tab') + '-list';
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Add note form toggle
+      const addNoteBtn = document.getElementById('addNoteBtn');
+      const addNoteForm = document.getElementById('addNoteForm');
+      const closeFormBtn = document.getElementById('closeFormBtn');
+      const notesList = document.getElementById('customer-notes-list');
+      
+      addNoteBtn.addEventListener('click', function() {
+        addNoteForm.classList.add('active');
+        noteLists.forEach(list => list.classList.remove('active'));
+      });
+      
+      closeFormBtn.addEventListener('click', function() {
+        addNoteForm.classList.remove('active');
+        const activeTab = document.querySelector('.tab-button.active');
+        const activeTabId = activeTab.getAttribute('data-tab') + '-list';
+        document.getElementById(activeTabId).classList.add('active');
+      });
+      
+      // Close modal
+      const closeModalBtn = document.getElementById('closeModal');
+      const modal = document.getElementById('documents-modal');
+      
+      closeModalBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+    });
+  </script>

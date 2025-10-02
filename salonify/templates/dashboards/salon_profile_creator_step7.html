@@ -1,0 +1,113 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+{% endblock head %}
+
+{% block title %}ایجاد پروفایل برجسته{% endblock title %}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="navigation-header">
+    <a href="{% url 'dashboards:salon_profile_creator_step6' %}" class="back-btn" aria-label="بازگشت">
+      <i class="fa-solid fa-arrow-right"></i>
+    </a>
+    <div class="menu-icon">
+      <button class="close-btn" type="button" aria-label="بستن">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="content-section">
+    <h1 class="page-title">ایجاد پروفایل برجسته</h1>
+    <p class="page-description">امکانات و برجسته‌های سالن خود را انتخاب کنید.</p>
+
+    <form method="post" action="{% url 'dashboards:salon_profile_creator_step7' %}">
+      {% csrf_token %}
+
+      {# --- امکانات --- #}
+      <h2 class="section-title">امکانات</h2>
+      <div class="items-grid">
+        {% for item in categories.amenities %}
+        <div class="grid-item">
+          <div class="feature-item {% if item.title in selected_items %}selected{% endif %}"
+               data-tooltip="{{ item.description|default:'' }}"
+               role="button" tabindex="0">
+            <input type="checkbox"
+                   name="selected_items"
+                   value="{{ item.title }}|{{ item.icon_class }}"
+                   class="feature-checkbox"
+                   {% if item.title in selected_items %}checked{% endif %}>
+            <div class="feature-content">
+              <i class="{{ item.icon_class }}"></i>
+              <span class="feature-title">{{ item.title }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {# --- برجسته‌ها --- #}
+      <h2 class="section-title">برجسته‌ها</h2>
+      <div class="items-grid">
+        {% for item in categories.highlights %}
+        <div class="grid-item">
+          <div class="feature-item {% if item.title in selected_items %}selected{% endif %}"
+               data-tooltip="{{ item.description|default:'' }}"
+               role="button" tabindex="0">
+            <input type="checkbox"
+                   name="selected_items"
+                   value="{{ item.title }}|{{ item.icon_class }}"
+                   class="feature-checkbox"
+                   {% if item.title in selected_items %}checked{% endif %}>
+            <div class="feature-content">
+              <i class="{{ item.icon_class }}"></i>
+              <span class="feature-title">{{ item.title }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {# --- ارزش‌ها --- #}
+      <h2 class="section-title">ارزش‌ها</h2>
+      <div class="items-grid">
+        {% for item in categories.values %}
+        <div class="grid-item">
+          <div class="feature-item {% if item.title in selected_items %}selected{% endif %}"
+               data-tooltip="{{ item.description|default:'' }}"
+               role="button" tabindex="0">
+            <input type="checkbox"
+                   name="selected_items"
+                   value="{{ item.title }}|{{ item.icon_class }}"
+                   class="feature-checkbox"
+                   {% if item.title in selected_items %}checked{% endif %}>
+            <div class="feature-content">
+              <i class="{{ item.icon_class }}"></i>
+              <span class="feature-title">{{ item.title }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="action-button">
+        <button type="submit" class="continue-btn">ادامه</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}

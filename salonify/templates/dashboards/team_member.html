@@ -1,0 +1,157 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block title %}اعضای تیم{% endblock title %}
+
+{# کلید لود صفحات: #}
+{% block body_attrs %}data-page="team_member"{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static "css/dashboard/team_members.css" %}">
+{% endblock head %}
+
+{% block content %}
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <button class="btn-back" aria-label="بازگشت">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <h1>اعضای تیم</h1>
+      </div>
+      <div class="header-right">
+        <a href="{% url 'dashboards:add_stylist' %}" class="btn-add">
+          <span>افزودن</span>
+          <i class="fa-solid fa-plus"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="search-actions-container">
+      <div class="search-box-wrapper">
+        <i class="fa-solid fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-box" placeholder="جستجوی اعضای تیم...">
+      </div>
+      <button class="filter-button sort-button" aria-label="فیلتر">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+    </div>
+
+    <div id="teamMembersList">
+      {% for stylist in stylists %}
+        <a href="{% url "dashboards:stylist_overview" stylist.user.id %}" class="team-member">
+          <div class="team-member-info">
+            <div class="team-member-avatar"
+                 style="{% if stylist.calendar_color %}border: 2.5px solid {{ stylist.calendar_color }};{% else %}border: 2.5px solid #eee;{% endif %}">
+              {% if stylist.profile_image %}
+                <img src="{{ stylist.profile_image.url }}" alt="{{ stylist.get_fullName }}">
+              {% else %}
+                <img src="{% static 'images/default-avatar.jpg' %}" alt="{{ stylist.get_fullName }}">
+              {% endif %}
+            </div>
+            <div>
+              <div class="team-member-name">{{ stylist.get_fullName }}</div>
+              {% if stylist.expert %}
+                <div class="team-member-expert">{{ stylist.expert }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <button class="team-member-more" aria-label="گزینه‌های بیشتر برای {{ stylist.get_fullName }}">⋮</button>
+        </a>
+      {% empty %}
+        <p style="text-align: center; padding: 20px; color: #777;">موردی برای نمایش یافت نشد.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Member Actions Modal #}
+  <div id="memberActionsModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="modal-close-btn" aria-label="بستن">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ul class="modal-actions-list">
+          <li><a href="#" data-action="edit" class="modal-action-link">ویرایش</a></li>
+          <li><a href="#" data-action="view_calendar" class="modal-action-link">مشاهده تقویم</a></li>
+          <li><a href="#" data-action="view_shifts" class="modal-action-link">مشاهده شیفت‌های برنامه‌ریزی شده</a></li>
+          <li><a href="#" data-action="add_time_off" class="modal-action-link">افزودن مرخصی</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {# Filter Modal #}
+  <div id="filterModal" class="filter-modal-overlay">
+    <div class="filter-modal-content">
+      <div class="filter-modal-header">
+        <h2>فیلترها</h2>
+        <button class="filter-modal-close-btn" aria-label="بستن">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+
+      <div class="filter-modal-body">
+        {# مرتب‌سازی #}
+        <div class="filter-category">
+          <button class="filter-category-header" aria-expanded="false" aria-controls="filterSortByContent">
+            <span class="filter-category-icon"><i class="fa-solid fa-arrow-down-wide-short"></i></span>
+            <span class="filter-category-label">مرتب‌سازی بر اساس</span>
+            <span class="filter-category-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div id="filterSortByContent" class="filter-category-content" style="display: none;">
+            <label><input type="radio" name="sort_by" value="name_asc" class="filter-option" {% if applied_filters.sort_by == 'name_asc' or not applied_filters.sort_by %}checked{% endif %}> نام (صعودی)</label>
+            <label><input type="radio" name="sort_by" value="name_desc" class="filter-option" {% if applied_filters.sort_by == 'name_desc' %}checked{% endif %}> نام (نزولی)</label>
+            <label><input type="radio" name="sort_by" value="rating_desc" class="filter-option" {% if applied_filters.sort_by == 'rating_desc' %}checked{% endif %}> امتیاز (بیشترین)</label>
+            <label><input type="radio" name="sort_by" value="rating_asc" class="filter-option" {% if applied_filters.sort_by == 'rating_asc' %}checked{% endif %}> امتیاز (کمترین)</label>
+            <label><input type="radio" name="sort_by" value="newest" class="filter-option" {% if applied_filters.sort_by == 'newest' %}checked{% endif %}> جدیدترین</label>
+            <label><input type="radio" name="sort_by" value="oldest" class="filter-option" {% if applied_filters.sort_by == 'oldest' %}checked{% endif %}> قدیمی ترین</label>
+          </div>
+        </div>
+
+        {# تخصص‌ها #}
+        <div class="filter-category">
+          <button class="filter-category-header" aria-expanded="false" aria-controls="filterExpertiseContent">
+            <span class="filter-category-icon"><i class="fa-solid fa-tags"></i></span>
+            <span class="filter-category-label">تخصص</span>
+            <span class="filter-category-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div id="filterExpertiseContent" class="filter-category-content" style="display: none;">
+            {% if all_group_services %}
+              {% for group in all_group_services %}
+                <label>
+                  <input type="checkbox" name="expertise" value="{{ group.id }}" class="filter-option"
+                         {% if group.id|stringformat:"s" in applied_filters.expertise %}checked{% endif %}>
+                  {{ group.group_title }}
+                </label>
+              {% endfor %}
+            {% else %}
+              <p style="font-size: .85em; color: #666;">موردی برای فیلتر تخصص یافت نشد.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        {# وضعیت #}
+        <div class="filter-category">
+          <button class="filter-category-header" aria-expanded="false" aria-controls="filterStatusContent">
+            <span class="filter-category-icon"><i class="fa-solid fa-toggle-on"></i></span>
+            <span class="filter-category-label">وضعیت</span>
+            <span class="filter-category-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div id="filterStatusContent" class="filter-category-content" style="display: none;">
+            <label><input type="radio" name="status_filter" value="all" class="filter-option" {% if applied_filters.status_filter == 'all' or not applied_filters.status_filter %}checked{% endif %}> همه</label>
+            <label><input type="radio" name="status_filter" value="active" class="filter-option" {% if applied_filters.status_filter == 'active' %}checked{% endif %}> فعال</label>
+            <label><input type="radio" name="status_filter" value="inactive" class="filter-option" {% if applied_filters.status_filter == 'inactive' %}checked{% endif %}> غیرفعال</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-modal-footer">
+        <button class="btn-clear-filters">پاک کردن فیلترها</button>
+        <button class="btn-apply-filters">اعمال</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}

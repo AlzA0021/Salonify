@@ -1,0 +1,60 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% load render_partial %}
+{% load cache %}
+
+{% block title %}خانه{% endblock title %}
+
+{# برای لودر صفحات #}
+{% block body_attrs %}data-page="dashboard_home"{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/home.css' %}">
+{% endblock head %}
+
+{% block content %}
+<div class="fixed-header dashboard-home-page">
+  <button class="back-button"
+          type="button"
+          data-action="go-back"
+          data-fallback-url="{% url 'dashboards:salon_manager_dashboard' %}">
+    <i class="fa-solid fa-arrow-right"></i>
+  </button>
+  <h1 class="header-title">خانه</h1>
+</div>
+
+<div class="container main-content" style="direction: rtl;">
+  <div id="home-view">
+   
+    
+      {% render_partial 'apps.dashboards.views.recently_sales' salon=salon %}
+    
+
+    
+      {% render_partial 'apps.dashboards.views.upcoming_appointments' salon=salon %}
+    
+
+    
+    
+      {% render_partial 'apps.dashboards.views.appointments_activity' salon=salon %}
+    
+
+    
+      {% render_partial 'apps.dashboards.views.today_appointment' salon=salon %}
+    
+
+    
+      {% render_partial 'apps.dashboards.views.get_popular_services' salon=salon %}
+
+
+
+      {% render_partial 'apps.dashboards.views.get_popular_stylists' salon=salon %}
+    
+
+
+
+  <div id="appointments-view" style="display:none;">
+    {# محتوای نمای نوبت‌ها (در صورت نیاز) #}
+  </div>
+</div>
+{% endblock content %}

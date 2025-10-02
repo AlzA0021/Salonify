@@ -1,0 +1,913 @@
+/* ==========================================================================
+   1. Global & Reset Styles
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'IranSans', Arial, sans-serif; /* Ensure IranSans is correctly loaded */
+}
+
+body {
+  background-color: #f8f9fa; /* Slightly lighter gray */
+  direction: rtl;
+  padding: 0;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   2. Layout (Container, Header)
+   ========================================================================== */
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #fff;
+  min-height: 100vh;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px; /* Adjusted padding */
+  border-bottom: 1px solid #e9ecef; /* Lighter border */
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 1000; /* Ensure header is on top */
+}
+
+.header h1 {
+  font-size: 18px; /* Adjusted to match images */
+  font-weight: 600; /* Bold as in images */
+  color: #212529;
+}
+
+.close-btn {
+  cursor: pointer;
+  font-size: 28px; /* Larger X */
+  text-decoration: none;
+  color: #6c757d; /* Muted color for close button */
+}
+.close-btn:hover {
+  color: #212529;
+}
+
+/* ==========================================================================
+   3. Navigation (Tabs)
+   ========================================================================== */
+
+.tabs {
+  display: flex;
+  padding: 8px 12px; /* Reduced padding */
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 60px; /* Adjust based on actual header height (header height: 57px + border) */
+  background-color: #fff;
+  z-index: 990;
+  overflow-x: auto; /* Allow horizontal scrolling for many tabs */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.tabs::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.tab {
+  padding: 8px 16px; /* Adjusted padding for tabs */
+  cursor: pointer;
+  margin-left: 8px; /* Use margin-left for RTL, equivalent to margin-right in LTR for spacing between tabs */
+  white-space: nowrap;
+  border-radius: 20px; /* Rounded shape for all tabs */
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  border: 2px solid transparent;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.tab:last-child {
+  margin-left: 0;
+}
+
+.tab.active {
+  background-color: #2d3748; /* Dark background for active tab (from services buttons) */
+  color: white;
+  border-color: #2d3748;
+}
+.tab:not(.active):hover {
+  background-color: #f1f3f5;
+}
+
+.tab-content {
+  display: none;
+  padding: 20px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ==========================================================================
+   4. Forms
+   ========================================================================== */
+
+/* 4.1 General Form Elements */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px; /* Consistent gap */
+  margin-bottom: 20px;
+}
+.form-row .form-group {
+  flex: 1; /* Allow form groups in a row to share space */
+  margin-bottom: 0; /* Remove bottom margin if they are in a row */
+}
+
+label {
+  display: block;
+  margin-bottom: 8px; /* Increased space */
+  font-size: 14px; /* Slightly smaller label */
+  font-weight: 600; /* Bolder labels */
+  color: #343a40;
+}
+label.required::after {
+  content: '*';
+  color: #dc3545; /* Red for required */
+  margin-right: 5px; /* margin-right for RTL */
+}
+
+.job-title {
+  /* This seems like a specific label or heading style */
+  margin-bottom: 0;
+  font-weight: 800;
+  font-size: 28px;
+}
+.subtitle {
+  /* This seems like a helper text style */
+  color: #6c757d;
+  font-size: 13px;
+  margin-top: 12px;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='number'],
+input[type='tel'],
+select,
+textarea {
+  width: 100%;
+  padding: 12px 16px; /* Comfortable padding */
+  border: 1px solid #ced4da; /* Standard border color */
+  border-radius: 8px; /* More rounded corners like images */
+  font-size: 16px;
+  background-color: #fff; /* Ensure background is white */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: #e9ecef; /* Style for disabled inputs */
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #6c5ce7; /* Accent color on focus, similar to services tab */
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2); /* Subtle focus ring */
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* 4.2 Specific Form Structures */
+.phone-input {
+  display: flex;
+  gap: 8px; /* Gap between prefix and number */
+}
+.phone-prefix {
+  width: auto; /* Or a fixed width if desired e.g., 80px */
+}
+.phone-prefix select {
+  text-align: center; /* Center the prefix if it's a select */
+}
+.phone-number {
+  flex: 1;
+}
+.phone-number input[type='tel'] {
+  text-align: left; /* Phone numbers are typically LTR */
+  direction: ltr;
+}
+
+/* 4.3 Date Picker Input (Flatpickr related) */
+.date-input {
+  /* Container for date input and icon */
+  position: relative;
+}
+/* input[type="date"] styling will be handled by flatpickr's altInput */
+.flatpickr-alt-input {
+  /* Style for the visible flatpickr input */
+  width: 100%;
+  padding: 12px 45px 12px 16px; /* Adjusted padding for RTL: right for icon, left for text */
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #fff;
+  cursor: pointer; /* Indicate it's clickable */
+}
+.flatpickr-alt-input:focus {
+  /* Focus styles are inherited from general input:focus */
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+.date-icon {
+  position: absolute;
+  right: 16px; /* Position icon to the right for RTL */
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 16px;
+  cursor: pointer;
+  pointer-events: none; /* Icon itself is not interactive, the input is */
+}
+
+/* 4.4 Color Selector */
+.color-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  padding-bottom: 10px; /* Space if it's the last element */
+}
+.color-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease, transform 0.1s ease;
+}
+.color-dot:hover {
+  transform: scale(1.1);
+}
+.color-dot.selected {
+  border-color: #2d3748; /* Dark border for selected color */
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #2d3748; /* Halo effect */
+}
+input[name='calendar_color'] {
+  /* Hidden actual input for calendar color */
+  display: none !important;
+}
+
+/* 4.5 Buttons */
+.btn-primary {
+  background-color: #212529; /* Dark button, matches active tab style */
+  color: white;
+  border: none;
+  padding: 14px 20px; /* Adjusted padding */
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px; /* Consistent border-radius */
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+  display: block; /* Ensure it takes full width if not already */
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+.btn-primary:hover {
+  background-color: #343a40; /* Slightly lighter on hover */
+}
+.form-submit-section {
+  /* Wrapper for the submit button */
+  padding: 10px 20px 20px; /* Padding around the button */
+  background-color: #fff; /* Ensure background matches container if sticky or at bottom */
+  /* Consider making this sticky to the bottom if form is long */
+}
+
+/* ==========================================================================
+   5. Profile Section
+   ========================================================================== */
+
+.profile-picture {
+  /* Container for the avatar */
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.avatar {
+  width: 100px; /* Or your desired size */
+  height: 100px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.avatar input[type='file'] {
+  /* Hides the default browser file input, triggered by label/avatar click */
+  display: none;
+}
+.avatar #preview_image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* Initially hidden, shown by JS */
+}
+.avatar .avatar-icon {
+  /* Placeholder icon when no image */
+  display: flex; /* Shown by JS when no image */
+  justify-content: center;
+  align-items: center;
+}
+.avatar .avatar-icon i {
+  font-size: 40px;
+  color: #6c757d;
+}
+
+.edit-avatar {
+  /* Small edit icon on the avatar */
+  position: absolute;
+  bottom: 5px;
+  right: 5px; /* For RTL, this is fine as it's visually on the "end" side */
+  background-color: #495057;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid white;
+  /* pointer-events: none; /* Remove if this was causing issues with label functionality or clicking the avatar itself */
+}
+.edit-avatar i {
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   6. Tab-Specific Content
+   ========================================================================== */
+
+/* 6.1 General Tab Content Styling */
+.tab-content > h2 {
+  /* Common styling for titles within tab content */
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* 6.2 Commission Tab */
+.commission-item {
+  padding: 15px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+.commission-item:last-child {
+  border-bottom: none;
+}
+.commission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.commission-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+}
+.toggle-switch {
+  /* Custom toggle switch */
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.toggle-switch input {
+  /* Hide the actual checkbox */
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ced4da;
+  transition: 0.4s;
+  border-radius: 24px;
+}
+.toggle-slider:before {
+  /* The moving part of the slider */
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: 3px; /* Initial position for LTR, adjust if RTL needs specific override */
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+input:checked + .toggle-slider {
+  background-color: #6c5ce7; /* Active color */
+}
+input:checked + .toggle-slider:before {
+  transform: translateX(20px); /* Movement distance */
+}
+.commission-settings {
+  /* Container for settings below toggle */
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+.commission-settings select,
+.commission-settings input[type='number'] {
+  flex: 1; /* Share space equally */
+}
+.commission-settings input[type='number'] {
+  text-align: left; /* Numbers are typically LTR */
+  direction: ltr;
+}
+
+/* 6.3 Services Tab (Modern Design) */
+.services-modern-container {
+  background: white;
+  /* border-radius: 12px; /* Consider if padding is inside or outside this container */
+  /* overflow: hidden; /* Can cause issues with sticky elements if not handled carefully */
+}
+
+.services-header {
+  /* Header section within the services tab */
+  padding: 0 0 16px 0; /* No horizontal padding, assumes parent .tab-content provides it */
+}
+.services-header h2 {
+  /* Overrides general .tab-content > h2 if needed, or use a different class */
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 8px;
+  padding-bottom: 0; /* Remove border if not desired here */
+  border-bottom: none;
+}
+.services-subtitle {
+  color: #6c757d;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+/* Sticky Search and Filter Section */
+.services-search-section {
+  /* padding: 0 0 16px 0; /* Padding is applied to children if needed */
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  /* محاسبه تقریبی: 60 پیکسل (ارتفاع هدر اصلی) + 53 پیکسل (ارتفاع بخش تب‌های اصلی) */
+  top: 113px; /* Header height (approx 57px + 1px border) + Tabs height (approx 45px + 1px border + 8px padding-top) */
+  background-color: #fff;
+  z-index: 980;
+  /* Add a bottom border or shadow to distinguish when scrolling */
+  /* border-bottom: 1px solid #e9ecef; */
+  /* padding-bottom: 16px; /* Ensure space below filters before list starts */
+}
+
+.services-search-container {
+  position: relative;
+  margin-bottom: 16px; /* Space between search and category filters */
+}
+.services-search-input {
+  width: 100%;
+  padding: 12px 48px 12px 16px; /* RTL: padding-right for icon */
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #f8f9fa; /* Light background for search input */
+}
+.services-search-input:focus {
+  border-color: #6c5ce7;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+.services-search-icon {
+  position: absolute;
+  right: 16px; /* Icon on the right for RTL */
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.services-category-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px; /* Space below filters, also helps with scrollbar visibility */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.services-category-filters::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+.services-category-btn {
+  padding: 8px 16px;
+  border: 1px solid #ced4da;
+  border-radius: 20px;
+  background: white;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0; /* Prevent buttons from shrinking if container is too small */
+}
+.services-category-btn.active {
+  background: #2d3748;
+  color: white;
+  border-color: #2d3748;
+}
+.services-category-btn:hover:not(.active) {
+  border-color: #adb5bd;
+  background: #f8f9fa;
+}
+
+/* Services List Styling */
+/* .services-list {
+  /* overflow-y: auto; /* This might be handled by the page scroll */
+/* border-top: 1px solid #e9ecef; 
+  margin-top: 16px; 
+ 
+}
+.service-group {
+    /* margin-bottom: 10px; /* Optional: space between groups 
+} */
+.group-header {
+  padding: 12px 12px 12px 20px; /* RTL: more padding on the end (left) */
+  position: sticky;
+  /* This top value needs to be calculated based on header, tabs, AND search filter section height */
+  /* top: 113px (tabs end) + height of .services-search-section (approx 50px for search + 45px for filters + paddings) ~ 220px */
+  /* Let's assume services-search-section height is around 120px for calculation */
+  top: calc(113px + 120px); /* Placeholder, needs precise calculation or JS */
+  background: #f8f9fa; /* Background for sticky header */
+  z-index: 10; /* Above service items, below main sticky elements */
+  border-bottom: 1px solid #e0e0e0;
+}
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #2d3748;
+  font-weight: 600;
+  font-size: 15px;
+}
+.group-checkbox {
+  /* Checkbox for selecting all items in a group */
+  width: 22px;
+  height: 22px;
+  border: 2px solid #adb5bd;
+  border-radius: 6px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+/* CSS اصلاح شده برای نمایش صحیح آیکون‌های گروه */
+.group-checkbox .fa-check,
+.group-checkbox .fa-minus {
+  display: none !important; /* اطمینان از مخفی بودن به طور پیش‌فرض */
+  color: white; /* این را می‌توان در صورت نیاز برای هر آیکون جداگانه تنظیم کرد */
+  font-size: 12px;
+}
+
+.group-checkbox.checked .fa-check {
+  display: inline-block !important; /* نمایش آیکون تیک وقتی والد کلاس checked دارد */
+}
+
+.group-checkbox.partial .fa-minus {
+  display: inline-block !important; /* نمایش آیکون منفی وقتی والد کلاس partial دارد */
+}
+
+/* برای چک‌باکس سرویس، کد شما از قبل درست به نظر می‌رسد: */
+.service-checkbox i.fa-check {
+  /* یا فقط .service-checkbox i اگر فقط یک آیکون دارید */
+  display: none !important;
+  color: white;
+  font-size: 12px;
+}
+.service-checkbox.checked i.fa-check {
+  /* یا فقط .service-checkbox.checked i */
+  display: inline-block !important;
+}
+.group-checkbox.checked {
+  background: #6c5ce7; /* Accent color */
+  border-color: #6c5ce7;
+}
+.group-checkbox.partial {
+  /* Indeterminate state */
+  background: #a59ff0; /* Lighter accent or distinct color */
+  border-color: #a59ff0;
+}
+.group-count {
+  /* Number of items in the group */
+  color: #6c757d;
+  font-size: 13px;
+  font-weight: normal;
+  margin-right: auto; /* Pushes to the end in RTL (left side) */
+  background-color: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* .service-items-container {
+    Container for individual service items within a group 
+} */
+.service-item {
+  padding: 12px 12px; /* Consistent padding */
+  border-bottom: 1px solid #f1f3f5; /* Light separator */
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  /* display: flex; /* Changed to grid in .service-content */
+  /* align-items: center; */
+}
+.service-item:last-child {
+  border-bottom: none;
+}
+.service-item:hover {
+  background: #f8f9fa; /* Hover feedback */
+}
+.service-item.selected {
+  background: #e6e6ff; /* Highlight for selected items */
+}
+.service-content {
+  /* Grid layout for service item content */
+  display: grid;
+  grid-template-columns: 22px 1fr auto; /* Checkbox | Info | Price */
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+.service-checkbox {
+  /* Individual service item checkbox */
+  width: 22px;
+  height: 22px;
+  border: 2px solid #adb5bd;
+  border-radius: 6px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+.service-checkbox i {
+  /* Checkmark icon */
+  display: none; /* Hidden by default */
+  color: white;
+  font-size: 12px;
+}
+.service-checkbox.checked i {
+  display: inline-block;
+}
+.service-checkbox.checked {
+  background: #6c5ce7; /* Accent color */
+  border-color: #6c5ce7;
+}
+.service-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* Small gap between name and duration */
+}
+.service-name {
+  font-weight: 500;
+  color: #2d3748;
+  font-size: 15px;
+}
+.service-duration {
+  color: #6c757d;
+  font-size: 13px;
+}
+.service-price {
+  color: #2d3748;
+  font-weight: 600;
+  font-size: 15px;
+  text-align: left; /* Prices are usually LTR aligned */
+  white-space: nowrap; /* Prevent price from wrapping */
+}
+
+/* Sticky Selected Count Footer */
+.selected-count {
+  /* Appears at the bottom when services are selected */
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  bottom: 0; /* Sticks to the bottom of its scrolling container or viewport */
+  background: #e8f5e8; /* Light green background */
+  color: #2d5a2d; /* Dark green text */
+  padding: 12px 20px;
+  font-weight: 500;
+  font-size: 14px;
+  border-top: 1px solid #d4edda; /* Separator line */
+  z-index: 979; /* Above content, below other sticky headers if they overlap */
+  text-align: center;
+  /* This was previously trying to stick relative to other sticky headers,
+     but bottom: 0 is more common for a "footer" like element.
+     The previous 'top' value for this was complex and might not work as expected.
+     If it needs to stick below the group headers, its container structure is important.
+     For now, bottom: 0 is a simpler approach.
+  */
+  /* Original top:
+     top: 242px; /* محاسبه تقریبی: 113 پیکسل (موقعیت بالای services-search-section) + 129 پیکسل (ارتفاع تقریبی services-search-section) */
+  /* This top value would only work if .services-list has a fixed height and overflow.
+     If the whole page scrolls, bottom:0 is more appropriate.
+  */
+}
+.no-results-message {
+  /* Style for when no services match filters */
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+  font-size: 15px;
+}
+.loading-message,
+.error-message {
+  padding: 20px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 15px;
+}
+.error-message {
+  color: #dc3545; /* Red for errors */
+}
+
+/* ==========================================================================
+   7. Third-Party Plugin Styling
+   ========================================================================== */
+
+/* 7.1 Flatpickr Calendar Theme */
+.flatpickr-calendar {
+  direction: rtl; /* Ensure calendar itself is RTL */
+  font-family: 'IranSans', tahoma, arial, sans-serif;
+  border-radius: 8px;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.15);
+  /* width: auto !important; /* Allow it to size naturally or set a specific width */
+}
+.flatpickr-month {
+  height: 40px; /* Adjust as needed */
+  color: #333; /* Month name color */
+}
+.flatpickr-current-month {
+  padding-top: 8px; /* Adjust vertical alignment */
+  font-size: 16px;
+  font-weight: 500;
+}
+.flatpickr-day {
+  font-size: 14px;
+  /* max-width: 36px; /* Ensure days are not too wide */
+  /* height: 36px; */
+  /* line-height: 36px; */
+}
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.today.selected /* Ensure today selected also has priority */ {
+  background: #6c5ce7 !important; /* Use !important if needed to override base styles */
+  border-color: #6c5ce7 !important;
+  color: #fff !important;
+}
+.flatpickr-day:hover {
+  background: #e9ecef;
+  color: #333;
+}
+.flatpickr-day.today:not(.selected) {
+  border-color: #6c5ce7; /* Highlight today's date */
+  color: #6c5ce7;
+}
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  color: #6c5ce7; /* Arrow color */
+  fill: #6c5ce7; /* SVG fill color */
+  height: auto;
+  padding: 8px; /* Make arrows easier to click */
+}
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover {
+  color: #2d3748; /* Darker on hover */
+  fill: #2d3748;
+}
+.flatpickr-weekdays {
+  background-color: #f8f9fa; /* Light background for weekday names */
+}
+span.flatpickr-weekday {
+  color: #343a40; /* Darker weekday names */
+  font-weight: 500;
+}
+
+/* 7.2 Select2 Theme (Ensure Select2 is initialized for RTL) */
+.select2-container {
+  direction: rtl; /* Ensure the whole container is RTL */
+}
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+  border: 1px solid #ced4da !important;
+  border-radius: 8px !important;
+  padding: 6px 12px; /* Adjust padding as needed */
+  height: auto !important; /* Allow height to adjust to content */
+  min-height: 46px; /* Match other inputs */
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: #495057;
+  line-height: 24px; /* Adjust line height */
+  padding-right: 20px !important; /* Space for text, arrow is on the left in RTL */
+  padding-left: 0 !important;
+  text-align: right;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 44px !important; /* Match input height */
+  left: 8px !important; /* Arrow on the left for RTL */
+  right: auto !important;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #495057;
+  border-radius: 4px;
+  margin: 2px 0 2px 5px; /* RTL: margin-left for spacing between choices */
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+  color: #6c757d;
+  margin-right: 5px; /* RTL: X button on the right of choice text */
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+  color: #dc3545;
+}
+
+.select2-dropdown {
+  /* The dropdown panel */
+  border: 1px solid #ced4da !important;
+  border-radius: 8px !important;
+  direction: rtl; /* Ensure dropdown content is also RTL */
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  direction: rtl; /* Search field within dropdown */
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 8px 12px;
+  margin: 8px; /* Add some margin around search field */
+  width: calc(100% - 16px); /* Adjust width to account for margin */
+}
+.select2-results__options {
+  max-height: 250px; /* Limit height of options list */
+}
+.select2-results__option {
+  padding: 8px 12px;
+  text-align: right;
+}
+.select2-container--default
+  .select2-results__option--highlighted.select2-results__option--selectable {
+  background-color: #6c5ce7; /* Accent color for highlighted option */
+  color: white;
+}
+.select2-container--default .select2-results__option--selected {
+  background-color: #f1f3f5; /* Slightly different background for already selected items */
+}

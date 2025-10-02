@@ -1,0 +1,93 @@
+<!-- مودال فروش -->
+<div class="modal-overlay" id="sales-modal">
+  <div class="modal-container">
+      <div class="modal-header">
+          <h3 class="modal-title">فروش</h3>
+          <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-content">
+          <!-- تب‌های فیلتر -->
+          <div class="sales-tabs">
+              <div class="tab-pill active" data-filter="all">
+                  <span>همه</span>
+                  <span class="counter">{{ order_details.count }}</span>
+              </div>
+              <div class="tab-pill" data-filter="paid">
+                  <span>پرداخت شده</span>
+                  <span class="counter">{{ completed_appointments.count }}</span>
+              </div>
+              <div class="tab-dropdown">
+                  <span>بیشتر</span>
+                  <i class="fa-solid fa-chevron-down"></i>
+              </div>
+          </div>
+          
+          <!-- بخش فروش با خط زمانی -->
+          {% for detail in order_details %}
+          <div class="timeline-sale" data-status="{% if detail.order.is_finally %}paid{% else %}unpaid{% endif %}">
+              <div class="timeline-icon">
+                  <i class="fa-solid fa-tag"></i>
+              </div>
+              <div class="sale-card">
+                  <div class="sale-header">
+                      <h4 class="sale-title">{{ detail.service.service_name }}</h4>
+                      <div class="sale-meta">
+                          <span>{{ detail.date|date:"l d F" }} {{ detail.time|time:"H:i" }}</span>
+                      </div>
+                  </div>
+                  
+                  <div class="sale-item-row">
+                      <div class="sale-item-name">
+                        <span class="{% if detail.order.is_finally %}status-paid{% else %}status-unpaid{% endif %}">
+                        {% if detail.order.is_finally %}پرداخت شده{% else %}پرداخت نشده{% endif %}
+                    </span>
+                </div>
+                      <div class="sale-item-price">{{ detail.price|floatformat:0}} ریال</div>
+                  </div>
+                  
+                  <div class="sale-total-row">
+                      <div class="sale-total-label">جمع کل</div>
+                      <div class="sale-total-amount">{{ detail.order.get_order_total_price|floatformat:0 }} ریال</div>
+                  </div>
+              </div>
+          </div>
+          {% empty %}
+          <div class="no-sales">
+              <p>هیچ فروشی برای این مشتری ثبت نشده است.</p>
+          </div>
+          {% endfor %}
+      </div>
+  </div>
+</div>
+
+<script>
+  // فیلتر کردن سفارش‌ها بر اساس وضعیت پرداخت
+  document.addEventListener('DOMContentLoaded', function() {
+      const tabs = document.querySelectorAll('.tab-pill');
+      const saleItems = document.querySelectorAll('.timeline-sale');
+      
+      tabs.forEach(tab => {
+          tab.addEventListener('click', function() {
+              const filter = this.getAttribute('data-filter');
+              
+              // فعال کردن تب کلیک شده
+              tabs.forEach(t => t.classList.remove('active'));
+              this.classList.add('active');
+              
+              // فیلتر کردن آیتم‌ها
+              saleItems.forEach(item => {
+                  if (filter === 'all' || item.getAttribute('data-status') === filter) {
+                      item.style.display = 'flex';
+                  } else {
+                      item.style.display = 'none';
+                  }
+              });
+          });
+      });
+      
+      // بستن مودال
+      document.querySelector('.modal-close').addEventListener('click', function() {
+          document.getElementById('sales-modal').style.display = 'none';
+      });
+  });
+</script>

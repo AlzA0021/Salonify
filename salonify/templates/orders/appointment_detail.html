@@ -1,0 +1,129 @@
+{% extends "main_template.html" %}
+{% load static %}
+{% load jalali_filters %}
+
+{% block title %}جزئیات نوبت{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/appointment_detail.css' %}">
+  {# توجه: اسکریپت صفحه را مستقیماً اینجا لود نکن؛ app.js خودش ماژول را بارگذاری می‌کند. #}
+{% endblock head %}
+
+{% block body_attrs %}data-page="appointment_detail"{% endblock %}
+
+{% block content %}
+<div class="appointment-detail-container">
+  <!-- Back Navigation -->
+  <button type="button" class="back-arrow" data-action="go-back" aria-label="بازگشت">
+    <i class="fas fa-arrow-right"></i>
+  </button>
+
+  {# ---- Meta: تمام داده‌های لازم برای JS در یک عنصر ---- #}
+  <div id="appointment-meta"
+       data-date="{{ appointment.date|date:'Y-m-d' }}"
+       data-time="{{ appointment.time|time:'H:i' }}"
+       data-salon='{"name":"{{ appointment.salon.salon_name|escapejs }}","address":"{{ appointment.salon.address|default_if_none:''|escapejs }}"}'
+       data-service='{"name":"{{ appointment.service.service_name|escapejs }}","duration":{{ appointment.service.duration_minutes|default:60 }}}'
+       data-lat="{{ appointment.salon.location.y|default:'' }}"
+       data-lng="{{ appointment.salon.location.x|default:'' }}"
+       data-venue-url="{% url 'salons:detail_salon' appointment.salon.id %}"
+       {# اگر URL مدیریت نوبت دارید همین‌جا ست کنید؛ نمونه: orders:reservation_detail #}
+       data-manage-url="{% url 'orders:reservation_detail' order_id=appointment.order.id %}">
+  </div>
+
+  <!-- Salon Banner Header -->
+  <div class="detail-header" style="background-image: url('{{ media_url }}{{ appointment.salon.banner_image }}');">
+    <div class="overlay"></div>
+    <div class="bottom-bar">
+      <p class="salon-name">{{ appointment.salon.salon_name }}</p>
+    </div>
+  </div>
+
+  <!-- Appointment Status and Time Information -->
+  <div class="detail-status-section">
+    {% if status %}
+      <span class="status-badge confirmed">تایید شده</span>
+    {% else %}
+      <span class="status-badge pending">در انتظار تایید</span>
+    {% endif %}
+
+    <div class="appointment-time">
+      {{ appointment.date|jalali_date }} ساعت {{ appointment.time|time:"H:i" }}
+    </div>
+
+    <div class="appointment-duration">
+      مدت تقریبی:
+      {% if appointment.service.duration_minutes %}
+        {{ appointment.service.duration_minutes }} دقیقه
+      {% else %}
+        (مدت زمان محاسبه یا ثبت نشده)
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Quick Action Buttons -->
+  <div class="detail-actions">
+    <button class="action-button" data-action="add-to-google">
+      <i class="fas fa-calendar-plus"></i>
+      افزودن به تقویم
+    </button>
+
+    {# مسیریابی به Google Maps Web (سازگار با همه دستگاه‌ها) #}
+    {% if appointment.salon.location %}
+      <a class="action-button"
+         href="https://www.google.com/maps/search/?api=1&query={{ appointment.salon.location.y }},{{ appointment.salon.location.x }}"
+         target="_blank" rel="noopener"
+         aria-label="مسیریابی">
+        <i class="fas fa-map-marker-alt"></i>
+        مسیریابی
+      </a>
+    {% else %}
+      <button class="action-button" disabled title="موقعیت ثبت نشده">
+        <i class="fas fa-map-marker-alt"></i>
+        مسیریابی
+      </button>
+    {% endif %}
+
+    {# مدیریت نوبت: لینک به صفحهٔ مدیریت/جزئیات رزرو #}
+    <a class="action-button"
+       href="{% url 'orders:reservation_detail' order_id=appointment.order.id %}">
+      <i class="fas fa-edit"></i>
+      مدیریت نوبت
+    </a>
+
+    <a class="action-button"
+       href="{% url 'salons:detail_salon' appointment.salon.id %}">
+      <i class="fas fa-info-circle"></i>
+      جزئیات سالن
+    </a>
+  </div>
+
+  <!-- Salon Address -->
+  <div class="venue-address">
+    <strong>آدرس سالن: </strong> {{ appointment.salon.address }}
+  </div>
+
+  <!-- Appointment Overview -->
+  <div class="overview-section">
+    <h2>بازبینی سفارش</h2>
+
+    <div class="services-list">
+      <div class="service-item">
+        <div class="service-name">{{ appointment.service.service_name }}</div>
+        <div class="service-price">{{ appointment.price }} تومان</div>
+        <div class="service-duration">
+          {{ appointment.service.duration_minutes }} دقیقه با {{ appointment.stylist }}
+        </div>
+      </div>
+    </div>
+
+    <div class="total-price">
+      مجموع: {{ appointment.price }} تومان
+    </div>
+
+    <div class="booking-ref">
+      کد رزرو: {{ appointment.order.booking_ref }}
+    </div>
+  </div>
+</div>
+{% endblock content %}

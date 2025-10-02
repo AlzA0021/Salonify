@@ -1,0 +1,51 @@
+{% extends "dashboard_template.html" %} 
+{% block title %}افزودن مرخصی برای {{ stylist.get_fullName }} {% endblock %}
+ {% block head %}
+
+{% endblock head %} {% block content %}
+<div class="container">
+  <div class="form-header">
+    <h2>افزودن مرخصی/تعطیلی</h2>
+    <p>برای {{ stylist.get_fullName }}</p>
+  </div>
+
+  <form method="post">
+    {% csrf_token %} {{ form.stylist }} {{ form.date }}
+
+    <div class="form-group">
+      {{ form.reason_choice.label_tag }} {{ form.reason_choice }}
+    </div>
+
+    <div class="form-group">
+      <label>تاریخ</label>
+      <div class="static-date-display">{{ jalali_date_display }}</div>
+    </div>
+
+    <div class="time-fields">
+      <div class="form-group">
+        {{ form.start_time.label_tag }} {{ form.start_time }}
+      </div>
+      <div class="form-group">
+        {{ form.end_time.label_tag }} {{ form.end_time }}
+      </div>
+    </div>
+    <small
+      style="
+        color: #777;
+        display: block;
+        margin-top: -15px;
+        margin-bottom: 20px;
+      "
+    >
+      برای ثبت مرخصی تمام روز، ساعت‌ها را خالی بگذارید.
+    </small>
+
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" onclick="history.back()">
+        انصراف
+      </button>
+      <button type="submit" class="save-btn">ذخیره</button>
+    </div>
+  </form>
+</div>
+{% endblock content %}

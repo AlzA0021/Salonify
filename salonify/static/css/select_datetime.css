@@ -1,0 +1,468 @@
+body {
+  margin: 0;
+  padding: 0;
+  direction: rtl;
+  font-family: sans-serif;
+  background: #fff;
+  color: #333;
+}
+/* هدر ثابت */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+}
+.header-title {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.calendar-icon-container {
+  position: relative;
+  display: inline-block;
+}
+.calendar-icon {
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #333;
+}
+/* مودال تقویم */
+.calendar-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  z-index: 2000;
+  border-radius: 8px;
+  width: 300px;
+  max-width: 90%;
+}
+
+/* نمایش مودال تقویم */
+.calendar-modal.show {
+  display: block;
+}
+
+.calendar-modal button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #6c63ff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0.5rem auto;
+  display: block;
+  width: 100px;
+}
+.calendar-modal .close-modal {
+  background-color: #ddd;
+  color: #333;
+}
+/* فضای اصلی */
+.content {
+  margin-top: 70px;
+  padding: 1rem;
+  margin-top: 6rem;
+}
+/* تب‌های آرایشگر */
+.tabs-container {
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  overflow-x: auto;
+  padding: 0 1rem;
+}
+.tab {
+  flex: none;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  font-size: 1rem;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab.active {
+  border-bottom: 3px solid #6c63ff;
+  color: #6c63ff;
+  font-weight: bold;
+}
+.tabs-contents {
+  padding: 1rem;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+.month-header {
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  color: #666;
+  font-weight: bolder;
+}
+.days-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.days-container::-webkit-scrollbar {
+  display: none;
+}
+.day-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+.day-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid #ddd;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+}
+.day-circle small {
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 2px;
+  transition: color 0.2s;
+}
+.day-circle:hover:not(.active) {
+  transform: scale(1.05);
+  background: #333;
+  color: #fff;
+  border: none;
+}
+.day-circle:hover:not(.active) small {
+  color: #fff;
+}
+.day-circle.active {
+  background: #333;
+  color: #fff;
+  border: none;
+}
+.day-circle.active small {
+  color: #fff;
+}
+.day-content {
+  margin-top: 1rem;
+}
+.time-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.time-slot {
+  padding: 0.5rem;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+  width: 100%;
+}
+.time-slot:hover:not(.selected) {
+  background: #333;
+  color: #fff;
+  border: none;
+}
+.time-slot.selected {
+  background: #333;
+  color: #fff;
+  border: none;
+}
+.fully-booked-msg {
+  text-align: center;
+  color: #333;
+  font-weight: normal;
+  padding: 1rem;
+}
+.finalize-button {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto 40px;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: normal;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+.finalize-button.ready {
+  background-color: #333;
+  color: #fff;
+  transform: translateY(-2px);
+}
+.finalize-button:not(.ready) {
+  background-color: #f0f0f0;
+  color: #666;
+}
+.finalize-button:hover {
+  opacity: 0.9;
+}
+
+/* Persian Datepicker styles */
+.datepicker-plot-area {
+  font-family: sans-serif !important;
+  z-index: 9999 !important;
+}
+
+/* بهبود استایل تقویم */
+#inlineCalendarContainer {
+  direction: rtl;
+  width: 100%;
+}
+
+#inlineCalendarContainer .datepicker-plot-area {
+  width: 100% !important;
+  padding: 5px;
+  box-shadow: none;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+#inlineCalendarContainer .datepicker-day-view td {
+  cursor: pointer;
+}
+
+#inlineCalendarContainer .datepicker-day-view td:not(.disabled):hover {
+  background-color: #f0f0f0;
+}
+
+#inlineCalendarContainer .datepicker-day-view td.selected,
+#inlineCalendarContainer .datepicker-day-view td.selected span {
+  background-color: #6c63ff !important;
+  color: white !important;
+  border-radius: 50%;
+}
+
+/* حل مشکل نمایش تقویم در موبایل */
+@media screen and (max-width: 480px) {
+  .calendar-modal {
+    width: 280px;
+    padding: 1rem;
+  }
+
+  #inlineCalendarContainer .datepicker-plot-area {
+    padding: 2px;
+  }
+
+  #inlineCalendarContainer .datepicker-day-view td span {
+    font-size: 12px !important;
+  }
+
+  .dropdown-header img,
+  .stylist-option img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .dropdown-header span {
+    font-size: 0.9rem;
+  }
+}
+
+/* دراپداون آرایشگر */
+.stylist-dropdown {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.dropdown-header:hover {
+  background-color: #c0a8dd38;
+}
+
+.dropdown-header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 10px;
+}
+
+.dropdown-header span {
+  flex-grow: 1;
+  font-size: 1rem;
+  color: #333;
+}
+
+.dropdown-header i {
+  color: #666;
+  transition: transform 0.2s;
+  margin-right: 2rem;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0 0 8px 8px;
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-content.show {
+  display: block;
+}
+
+.stylist-option {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.stylist-option:hover {
+  background-color: #f5f5f5;
+}
+
+.stylist-option img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 10px;
+}
+
+.stylist-option span {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.stylist-option .slot-count {
+  margin-right: auto;
+  font-size: 0.8rem;
+  color: #6c63ff;
+  padding-right: 5px;
+}
+
+/* Add new CSS for dropdown container with calendar icon */
+.stylist-dropdown-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.stylist-dropdown {
+  flex-grow: 1;
+  margin-right: 10px;
+  margin-bottom: 0;
+}
+
+.calendar-icon-container {
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: #000;
+}
+
+.calendar-icon-container:hover {
+  background-color: #000;
+  color: #fff;
+  border: none;
+}
+
+.calendar-icon {
+  color: inherit;
+  font-size: 1.4rem;
+  transition: color 0.2s;
+}
+
+/* Styles for selected-date-info when displaying dates from different months */
+.selected-date-info {
+  background-color: #f8f8f8;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.selected-date-info h3 {
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.selected-date-info .fully-booked-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #ff4444;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.selected-date-info .fa-calendar-xmark {
+  font-size: 18px;
+}

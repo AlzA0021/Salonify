@@ -1,0 +1,137 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% load render_partial %}
+
+{% block title %}داشبورد کسب و کار{% endblock %}
+
+
+{% block content %}
+    {% comment %} <!-- Top setup bar -->
+    <div class="top-bar">
+        <div class="setup-btn">
+            <i class="fas fa-rocket"></i>
+            <div>تکمیل راه‌اندازی</div>
+        </div>
+        <div class="arrow-icon">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </div> {% endcomment %}
+
+    {% render_partial 'apps.dashboards.views.salonManagerHeader' salon_manager=salon_manager %}
+
+    <!-- Menu grid -->
+    <div class="menu-grid">
+        <!-- Home -->
+        <a href="{% url "dashboards:home" %}" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <div class="menu-text">خانه</div>
+        </a>
+        
+        <!-- Clients -->
+        <a  href="{% url "dashboards:salons_customers_page" %}" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-smile"></i>
+            </div>
+            <div class="menu-text">مشتریان</div>
+        </a>
+        
+        <!-- Online booking -->
+        <a href="{% url "dashboards:online_booking" %}" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="menu-text">رزرو آنلاین</div>
+        </a>
+        
+        <!-- Catalog -->
+        <a href="{% url 'dashboards:catalog' %}" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="menu-text">کاتالوگ</div>
+        </a>
+        
+        <!-- Marketing -->
+        <div class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <div class="menu-text">بازاریابی</div>
+        </div>
+        
+        <!-- Team -->
+        <a href="{% url 'dashboards:team_managment' %}" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="menu-text">تیم</div>
+        </a>
+        
+        <!-- Reports -->
+        <div class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="menu-text">گزارش‌ها</div>
+        </div>
+        
+        <!-- Add-ons -->
+        <div class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-puzzle-piece"></i>
+            </div>
+            <div class="menu-text">افزونه‌ها</div>
+        </div>
+        
+        <!-- Settings -->
+        <div class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="menu-text">تنظیمات</div>
+        </div>
+    </div>
+    
+    <!-- Language and Support options -->
+    <div class="language-support">
+        <div class="option">
+            <div class="option-left">
+                <div class="flag-icon">
+                    <i class="fas fa-flag"></i>
+                </div>
+                <div class="option-text">فارسی</div>
+            </div>
+            <div>
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+        
+        <div class="option">
+            <div class="option-left">
+                <div class="flag-icon">
+                    <i class="fas fa-life-ring"></i>
+                </div>
+                <div class="option-text">راهنما و پشتیبانی</div>
+            </div>
+            <div>
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+    </div>
+    
+    
+
+    <script>
+        
+        document.querySelector('.add-button').addEventListener('click', function() {
+            alert('افزودن آیتم جدید');
+        });
+        
+        // For demonstration purposes
+        document.querySelector('.setup-btn').addEventListener('click', function() {
+            alert('تکمیل فرآیند راه‌اندازی');
+        });
+    </script>
+    {% endblock content %}

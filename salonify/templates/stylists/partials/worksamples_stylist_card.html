@@ -1,0 +1,30 @@
+
+  <div class="topSection-workSamples-container">
+    <h2 class="topSection-workSamples-title">نمونه کارها</h2>
+    
+    <div class="topSection-workSamples-row">
+      {% for work in worksamples %}
+        <div class="topSection-workSamples-item">
+          <div class="topSection-workSamples-image-container">
+            <!-- در اینجا تصویر نمونه کار -->
+            <img src="{{ work.sample_image.url }}" alt="نمونه کار" onclick="enlargeImage('{{ work.sample_image.url }}')"  />
+          </div>
+          <!-- نام یا توضیح خدمت -->
+          <p class="topSection-workSamples-service-name">
+            {{ work.service.service_name }} 
+            <!-- یا اگر می‌خواهید متنی ثابت (مثلا براشینگ) نمایش دهید یا چیزی از فیلدهای دیگر -->
+          </p>
+        </div>
+
+        {# اگر به سومین آیتم رسیدیم، ردیف را ببندیم و دوباره باز کنیم (مگر این که آخر باشد) #}
+        {% if forloop.counter|divisibleby:3 and not forloop.last %}
+          </div> <!-- بسته شدن worksamples-row -->
+          <hr class="topSection-workSamples-row-separator" />
+          <div class="topSection-workSamples-row"> <!-- باز کردن ردیف جدید -->
+        {% endif %}
+      {% endfor %}
+    </div>
+    
+
+  </div>
+

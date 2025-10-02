@@ -1,0 +1,22 @@
+<div class="gallery-slider">
+    {% for sample in work_samples %}
+    <div class="gallery-item">
+        <div class="image-container">
+            <img src="{{ sample.sample_image.url }}" alt="Sample Image">
+            <div class="like-overlay">
+                <span class="like-button {% if sample.id in liked_samples %}liked{% endif %}" data-sample-id="{{ sample.id }}">
+                    <!-- آیکون قلب -->
+                    <i class="fas fa-heart"></i> <!-- قلب پر برای لایک شده -->
+                    <i class="far fa-heart"></i> <!-- قلب خالی برای لایک نشده -->
+                </span>
+                <span class="like-count" id="like-count-{{ sample.id }}">{{ sample.like_count }}</span>
+            </div>
+        </div>
+        <div class="stylist-info">
+            <img src="{{ sample.stylist.profile_image.url }}" alt="{{ sample.stylist.user.name }}" class="stylist-profile-img">
+            <span>{{ sample.stylist.user.name }} {{ sample.stylist.user.family }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+

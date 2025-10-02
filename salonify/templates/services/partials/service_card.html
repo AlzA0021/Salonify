@@ -1,0 +1,25 @@
+<div class="top-section-card">
+  <!-- تصویر خدمات -->
+  <a href="{% url 'services:service_detail' service.id %}" class="top-section-image"><img src="{{ service.service_image.url }}" alt="{{ service.service_name }}" /></a>
+
+  <!-- جزئیات خدمات -->
+  <div class="top-section-details">
+    <h3 class="top-section-title">
+      {{ service.service_name }}
+      <span class="top-section-discount">50%</span>
+    </h3>
+
+    <p class="top-section-description">{{ service.summery_description|truncatechars:50 }}</p>
+    <div class="top-section-card-body">
+      <div class="top-section-views">
+        <span class="view-count"><i class="fa-solid fa-eye"></i>&nbsp;&nbsp;۲۶,۰۰۰ &nbsp;بازدید</span>
+      </div>
+
+      <div class="top-section-actions">
+        <button type="button" class="action-btn" onclick="get_service_worksample_card({{ service.id }},this)"><i class="fas fa-images"></i>نمونه کار&nbsp;&nbsp;{{ service.work_samples_services.count }}</button>
+        <button type="button" class="action-btn" onclick="get_service_priceList({{ service.id }},this)"><i class="fas fa-list-alt"></i>لیست قیمت&nbsp;&nbsp;{{ service.stylists.count }}</button>
+        <button type="button" class="action-btn" onclick="get_service_comments({{ service.id }},this)"><i class="fas fa-comments"></i> نظرات&nbsp;&nbsp;{{ service.comment_services.count }}</button>
+      </div>
+    </div>
+  </div>
+</div>

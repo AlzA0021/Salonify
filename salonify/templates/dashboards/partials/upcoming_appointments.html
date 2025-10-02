@@ -1,0 +1,39 @@
+
+<!-- Upcoming Appointments -->
+<div class="card">
+    <div class="section-title">
+        <span>نوبت‌های پیش رو</span>
+        <button class="options-button">⋮</button>
+    </div>
+    <div class="section-subtitle">۷ روز آینده</div>
+    <div class="big-number">{{ confirmed_count }} رزرو شده</div>
+    <div class="summary-stats">
+        <div class="stat-item">نوبت‌های تایید شده <span class="stat-value">{{ confirmed_count }}</span></div>
+        <div class="stat-item">نوبت‌های لغو شده <span class="stat-value">{{ canceled_count }}</span></div>
+    </div>
+    <div class="chart-container">
+        <canvas id="appointmentsChart"></canvas>
+    </div>
+    <div class="chart-legend">
+        <div class="legend-item">
+            <div class="legend-color legend-purple"></div>
+            <span>تایید شده</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-red"></div>
+            <span>لغو شده</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const upcomingAppointmentsData = {{ appointments_chart_data|safe }};
+    
+    // ایجاد نمودار اگر المان canvas موجود باشد
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartCanvas = document.getElementById('appointmentsChart');
+        if (chartCanvas && typeof createDynamicAppointmentsChart === 'function') {
+            createDynamicAppointmentsChart(upcomingAppointmentsData);
+        }
+    });
+</script>

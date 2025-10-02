@@ -1,0 +1,6 @@
+<form action="{% url 'accounts:salon_manager_update_profile' %}" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ salon_manager_update_profile_form.as_p }}
+  <img src="{{ media_url }}{{ profile_image }}" style="width: 250px; height: 250px;" alt="" />
+  <button type="submit" class="btn btn-primary mt-3">ویرایش</button>
+</form>

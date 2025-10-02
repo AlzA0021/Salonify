@@ -1,0 +1,221 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+  <title>{% block title %}افزودن عضو تیم{% endblock title %}</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard/add_stylist.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock head %}
+
+{# برای لود ماژول صفحه #}
+{% block body_attrs %}data-page="add_stylist"{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+  <form method="post" enctype="multipart/form-data" id="addStylistForm" class="bg-white shadow-md rounded-lg p-6">
+    {% csrf_token %}
+
+    <div class="header flex justify-between items-center mb-6 pb-4 border-b">
+      <h1 class="text-2xl font-semibold text-gray-700">افزودن عضو تیم</h1>
+      <a href="{% url 'dashboards:team_member' %}" class="close-btn text-gray-500 hover:text-gray-700 text-2xl" title="بازگشت">&times;</a>
+    </div>
+
+    <div class="tabs flex border-b mb-6">
+      <div class="tab active cursor-pointer py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2 border-transparent hover:border-blue-500" data-tab="profile">پروفایل</div>
+      <div class="tab cursor-pointer py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2 border-transparent hover:border-blue-500" data-tab="emergency">اطلاعات اضطراری</div>
+      <div class="tab cursor-pointer py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2 border-transparent hover:border-blue-500" data-tab="services">خدمات</div>
+      <div class="tab cursor-pointer py-2 px-4 text-gray-600 hover:text-blue-500 border-b-2 border-transparent hover:border-blue-500" data-tab="commission">کمیسیون‌ها</div>
+    </div>
+
+    {# --- تب پروفایل --- #}
+    <div class="tab-content active" id="profile">
+      <div class="profile-picture mb-6 text-center">
+        <label for="{{ profile_form.profile_image.id_for_label }}" class="avatar relative inline-block cursor-pointer">
+          {{ profile_form.profile_image }}
+          <img id="preview_image" src="#" alt="پیش‌نمایش تصویر" class="w-32 h-32 rounded-full object-cover border-2 border-gray-300 hidden">
+          <div id="avatar_icon_placeholder" class="avatar-icon w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-4xl">
+            <i class="fa-solid fa-user-plus"></i>
+          </div>
+          <div class="edit-avatar absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full shadow-md hover:bg-blue-600">
+            <i class="fa-solid fa-pen"></i>
+          </div>
+        </label>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div class="form-group">
+          <label for="{{ user_form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 required">نام</label>
+          {{ user_form.name }}
+        </div>
+        <div class="form-group">
+          <label for="{{ user_form.family.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">نام خانوادگی</label>
+          {{ user_form.family }}
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="{{ user_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 required">ایمیل</label>
+        {{ user_form.email }}
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="{{ profile_form.expert.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">تخصص</label>
+        {{ profile_form.expert }}
+        <p class="subtitle text-xs text-gray-500 mt-1">قابل مشاهده برای مشتریان آنلاین</p>
+      </div>
+
+      <div class="form-group mb-2">
+        <label class="block text-sm font-semibold text-gray-800">جزئیات کاری</label>
+        <p class="subtitle text-xs text-gray-500 mt-1">مدیریت تاریخ شروع و جزئیات استخدام عضو تیم</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div class="form-group">
+          <label for="{{ job_form.start_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">تاریخ شروع</label>
+          <div class="date-input relative">
+            {{ job_form.start_date }}
+            <div class="date-icon absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" id="start_date_icon">
+              <i class="fa-solid fa-calendar-days"></i>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="{{ job_form.end_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">تاریخ پایان</label>
+          <div class="date-input relative">
+            {{ job_form.end_date }}
+            <div class="date-icon absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" id="end_date_icon">
+              <i class="fa-solid fa-calendar-days"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="{{ job_form.employment_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">نوع استخدام</label>
+        {{ job_form.employment_type }}
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="{{ user_form.mobile_number.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">شماره تلفن</label>
+        {{ user_form.mobile_number }}
+      </div>
+
+      <div class="form-group mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">رنگ تقویم</label>
+        {{ profile_form.calendar_color }} {# hidden input #}
+        <div class="color-selector flex flex-wrap gap-2 mt-2">
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400 selected" data-color="#80DEEA" style="background-color:#80DEEA;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#64B5F6" style="background-color:#64B5F6;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#7986CB" style="background-color:#7986CB;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#9575CD" style="background-color:#9575CD;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#B39DDB" style="background-color:#B39DDB;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#CE93D8" style="background-color:#CE93D8;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#F48FB1" style="background-color:#F48FB1;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#FF8A80" style="background-color:#FF8A80;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#FFB74D" style="background-color:#FFB74D;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#FFD54F" style="background-color:#FFD54F;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#FFF176" style="background-color:#FFF176;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#AED581" style="background-color:#AED581;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#A1887F" style="background-color:#A1887F;"></div>
+          <div class="color-dot w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400" data-color="#90A4AE" style="background-color:#90A4AE;"></div>
+        </div>
+      </div>
+    </div>
+
+    {# --- تب اضطراری --- #}
+    <div class="tab-content" id="emergency">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">اطلاعات تماس اضطراری</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div class="form-group">
+          <label for="{{ emergency_form.emergency_contact_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">نام</label>
+          {{ emergency_form.emergency_contact_name }}
+        </div>
+        <div class="form-group">
+          <label for="{{ emergency_form.emergency_contact_family.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">نام خانوادگی</label>
+          {{ emergency_form.emergency_contact_family }}
+        </div>
+      </div>
+      <div class="form-group mb-4">
+        <label for="{{ emergency_form.relationship.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">نسبت</label>
+        {{ emergency_form.relationship }}
+      </div>
+      <div class="form-group mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">شماره تلفن</label>
+        <div class="phone-input flex">
+          <div class="phone-prefix mr-2">{{ emergency_form.emergency_phone_prefix }}</div>
+          <div class="phone-number flex-grow">{{ emergency_form.emergency_phone }}</div>
+        </div>
+      </div>
+    </div>
+
+    {# --- تب خدمات --- #}
+    <div class="tab-content" id="services">
+      <div class="services-modern-container">
+        <div class="services-header mb-6">
+          <h2 class="text-xl font-semibold text-gray-700">خدمات</h2>
+          <p class="services-subtitle text-sm text-gray-600 mt-1">خدماتی که این عضو تیم ارائه می‌دهد را انتخاب کنید</p>
+        </div>
+
+        <div class="services-search-section mb-4">
+          <div class="services-search-container relative mb-3">
+            <input type="text" class="services-search-input w-full p-2 pl-10 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="جستجوی خدمات..." id="servicesSearchInput">
+            <i class="fas fa-search services-search-icon absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          </div>
+          <div class="services-category-filters flex flex-wrap gap-2" id="servicesCategoryFiltersContainer">
+            <button type="button" class="services-category-btn py-1 px-3 rounded-full text-sm border border-gray-300 hover:bg-gray-100 active" data-category="all">همه</button>
+            {% for group in salon_service_groups %}
+              <button type="button" class="services-category-btn py-1 px-3 rounded-full text-sm border border-gray-300 hover:bg-gray-100" data-category="{{ group.id }}">{{ group.group_title }}</button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="selected-count text-sm text-blue-600 font-medium mb-3" id="selectedServicesCount" style="display:none">
+          ۰ خدمت انتخاب شده
+        </div>
+
+        <div class="services-list bg-gray-50 p-4 rounded-md border min-h-[200px]" id="servicesList">
+          <div class="loading-message text-center text-gray-500 py-5">در حال بارگذاری خدمات...</div>
+        </div>
+      </div>
+    </div>
+
+    {# --- تب کمیسیون --- #}
+    <div class="tab-content" id="commission">
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">تنظیمات کمیسیون</h2>
+      <h3 class="text-md text-gray-500">این بخش به زودی راه‌اندازی می‌شود</h3>
+    </div>
+
+    <input type="hidden" name="selected_services_input" id="selectedServicesInput">
+
+    <div class="form-submit-section mt-8 pt-6 border-t text-right">
+      <button type="submit" class="btn-primary bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm transition">
+        افزودن
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock content %}
+
+{% block js %}
+  {# Vendor JS: قبل از app.js لود شوند تا ماژول به آنها دسترسی داشته باشد #}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUIK8WcJQz1WY5H1dqf4bF1n5A4b7Cq1C6vS0v2U5iYkGJQn8Iu4H6hMZ3YFh2RF2tG7g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fa.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  <script>
+    // پیکربندی قابل‌استفاده در JS ماژول
+    window.appConfig = {
+      servicesListUrl: "{% url 'dashboards:services_list' %}",
+      profileImageInputId: "{{ profile_form.profile_image.id_for_label }}",
+      // تصویر موجود (در حالت ویرایش)
+      hasExistingImage: {% if profile_form.instance and profile_form.instance.profile_image %}true{% else %}false{% endif %},
+      existingImageUrl: {% if profile_form.instance and profile_form.instance.profile_image %}"{{ profile_form.instance.profile_image.url }}"{% else %}""{% endif %},
+      // سرویس‌های از پیش انتخاب‌شده (در حالت ویرایش). اگر متغیر سمت سرور نداری، این خط را نگه‌دار تا خالی باشد.
+      stylistServiceIds: {% if stylist_service_ids %}{{ stylist_service_ids|safe }}{% else %}[]{% endif %}
+    };
+  </script>
+{% endblock js %}

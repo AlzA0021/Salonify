@@ -1,0 +1,17 @@
+{% extends 'main_template.html' %}
+{% load render_partial %}
+{% load humanize %}
+
+{% block title %}
+  سبد خرید
+{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+  <div id="order_cart_list">
+    {% render_partial 'orders:show_order_cart' %}
+  </div>
+{% endblock %}

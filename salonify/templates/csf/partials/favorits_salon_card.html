@@ -1,0 +1,25 @@
+<div class="salons-card">
+    <a href="{% url 'salons:detail_salon' salon.id %}" class="salons-card-image">
+      <img src="{{ salon.banner_image.url }}" alt="{{ salon.salon_name }}">
+    </a>
+    <div class="like-button" data-salon-id="{{ salon.id }}">
+      <i class="fas fa-heart liked"></i>
+    </div>
+    <div class="salons-card-details">
+      <h3 class="salons-card-title">
+        {{ salon.salon_name }}
+        <span class="salons-card-discount">50%</span>
+      </h3>
+      <p class="salons-card-address">{{ salon.address }}</p>
+      <div class="salons-card-body">
+        <p>
+            <i class="fas fa-star"></i>&nbsp;
+            {# ✅ بهینه‌سازی اصلی: استفاده از مقدار annotate شده به جای فراخوانی متد #}
+            {{ salon.avg_score|floatformat:1|default:"0.0" }}
+        </p>
+        <p>
+            <i class="fas fa-location-dot"></i>&nbsp;{{ salon.zone }} کیلومتر
+        </p>
+      </div>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+{% endblock head %}
+
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+
+{# اتصال به ماژول pages/salon_profile_creator.js از طریق app.js #}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="navigation-header">
+    <a href="#" class="back-btn" aria-label="بازگشت">
+      <i class="fas fa-arrow-right"></i>
+    </a>
+    <div style="flex-grow:1;"></div>
+    <div style="width:20px;"></div>
+    <button class="close-btn" type="button" aria-label="بستن">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="content-section" style="text-align:right;">
+    <div style="text-align:center;margin:40px 0;">
+      {# Decorative SVG kept #}
+      <svg width="150" height="150" viewBox="0 0 150 150" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#6239FB"/>
+            <stop offset="100%" style="stop-color:#E039FB"/>
+          </linearGradient>
+        </defs>
+        <rect x="30" y="10" width="90" height="30" rx="10" fill="url(#grad1)" />
+        <rect x="20" y="25" width="110" height="110" rx="20" fill="url(#grad1)" opacity=".5" />
+        <rect x="35" y="40" width="80" height="80" rx="15" fill="white" opacity=".7" />
+        <path d="M50 70 L65 85 L100 50" stroke="white" stroke-width="10" fill="none" />
+      </svg>
+    </div>
+
+    <h1 class="page-title">پذیرش رزرو آنلاین در سالنی‌فای</h1>
+    <p class="page-description">با تکمیل پروفایل، آماده پذیرش رزروهای آنلاین هستید.</p>
+  </div>
+
+  <div class="action-button">
+    <button class="continue-btn" type="button"
+            onclick="window.location.href='{% url 'dashboards:salon_profile_creator_step10' %}'">
+      ادامه
+    </button>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,118 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% load jalali_extras %}
+
+{% block body_attrs %}data-page="service_menu"{% endblock %}
+
+{% block head %}
+  <meta name="service-edit-url" content="{% url 'dashboards:edit_service' service_id=0 %}" />
+  <meta name="service-archive-url" content="{% url 'dashboards:archieve_service' service_id=0 %}" />
+  <meta name="service-remove-url" content="{% url 'dashboards:remove_service' service_id=0 %}" />
+  <link rel="stylesheet" href="{% static "css/dashboard/service_menu.css" %}">
+{% endblock head %}
+
+{% block title %} منوی خدمات {% endblock title %}
+
+{% block content %}
+<div class="container">
+  <div class="header">
+    <a href="{% url 'dashboards:catalog' %}" class="back-btn">
+      <i class="fa-solid fa-arrow-right"></i>
+    </a>
+    <div class="page-title">منوی خدمات</div>
+    <div class="action-buttons">
+      <a href="{% url "dashboards:add_service" %}" class="add-btn">+ افزودن</a>
+    </div>
+  </div>
+
+  <div class="description">
+    مشاهده و مدیریت خدمات ارائه شده توسط سالن شما. <a href="#" class="learn-more">بیشتر بدانید</a>
+  </div>
+
+  <div class="category-tabs-container">
+    <div class="category-tabs" id="categoryTabs">
+      <a href="#all-services" class="category-tab active" data-category="all">
+        <span>همه دسته‌ها</span>
+        <span class="count-badge">{{ total_services_count }}</span>
+      </a>
+      {% for group, services in services_by_group.items %}
+        <a href="#group-{{ group.id|default:'uncategorized' }}" class="category-tab" data-category="{{ group.id|default:'uncategorized' }}">
+          <span>{{ group.group_title|default:group }}</span>
+          <span class="count-badge">{{ services|length }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div id="all-services"></div>
+
+  {% for group, services in services_by_group.items %}
+    {% with color_index=forloop.counter|modulo:8|add:1 %}
+    <div class="service-category" id="group-{{ group.id|default:'uncategorized' }}" data-color="{{ color_index }}">
+      <div class="category-header">
+        <div class="category-title">{{ group.group_title|default:group }}</div>
+      </div>
+
+      {% for service in services %}
+        <div class="service-item" data-service-id="{{ service.id }}">
+          <div class="service-name">{{ service.service_name }}</div>
+          <div class="service-details">
+            <div class="service-duration">
+              <span class="duration-icon"><i class="fa-regular fa-clock"></i></span>
+              {% with duration_minutes=service.duration_minutes %}
+                {% if duration_minutes >= 60 %}
+                  {% with hours=duration_minutes|intdiv:60 remaining_minutes=duration_minutes|modulo:60 %}
+                    {{ hours }} ساعت
+                    {% if remaining_minutes > 0 %} و {{ remaining_minutes }} دقیقه {% endif %}
+                  {% endwith %}
+                {% else %}
+                  {{ duration_minutes }} دقیقه
+                {% endif %}
+              {% endwith %}
+            </div>
+            <div class="service-price">
+              {% if service.min_price and service.max_price %}
+                {% if service.min_price == service.max_price %}
+                  {{ service.min_price|floatformat:"0" }} تومان
+                {% else %}
+                  {{ service.min_price|floatformat:"0" }} - {{ service.max_price|floatformat:"0" }} تومان
+                {% endif %}
+              {% else %}
+                قیمت ثبت نشده
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    {% endwith %}
+  {% endfor %}
+</div>
+
+{# اگر مودال رو در تمپلیت نگه می‌داری، کد JS از همین استفاده می‌کنه؛ اگر حذفش کنی ماژول خودش می‌سازه #}
+<div id="serviceModal" class="service-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close-modal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="modal-option" id="editOption">
+        <i class="fa-solid fa-edit"></i>
+        <span>ویرایش</span>
+      </div>
+      <div class="modal-option" id="quickBookingOption">
+        <i class="fa-solid fa-link"></i>
+        <span>لینک رزرو سریع</span>
+      </div>
+      <div class="modal-option" id="archiveOption">
+        <i class="fa-solid fa-archive"></i>
+        <span>بایگانی</span>
+      </div>
+      <div class="modal-option delete-option" id="deleteOption">
+        <i class="fa-solid fa-trash"></i>
+        <span>حذف دائمی</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

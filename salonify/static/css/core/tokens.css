@@ -1,0 +1,65 @@
+/*! salonify: core/tokens.css */
+:root{
+  /* Fonts */
+  --font-sans: Vazir, Gandom, "Segoe UI", Tahoma, Arial, sans-serif;
+
+  /* Font sizes */
+  --font-size-100: .75rem;     /* 12px */
+  --font-size-200: .875rem;    /* 14px */
+  --font-size-300: 1rem;       /* 16px */
+  --font-size-400: 1.125rem;   /* 18px */
+  --font-size-500: 1.25rem;    /* 20px */
+  --font-size-600: 1.5rem;     /* 24px */
+  --font-size-700: 1.75rem;    /* 28px */
+
+  /* Base colors */
+  --color-bg: #ffffff;
+  --color-fg: #222222;
+  --color-muted: #6b7280;
+
+  /* Primary palette */
+  --primary-50:  #ecebff;
+  --primary-100: #ddd9ff;
+  --primary-200: #beb7ff;
+  --primary-300: #9b94ff;
+  --primary-400: #7b74ff;
+  --primary-500: #6c63ff; /* main */
+  --primary-600: #5a52f0;
+  --primary-700: #4a43d6;
+
+  /* Status */
+  --accent-500:  #f2b3a6;
+  --success-500: #22c55e;
+  --warning-500: #f59e0b;
+  --danger-500:  #ef4444;
+
+  /* Grays */
+  --gray-50:  #f8f9fa;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+
+  /* Spacing */
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Radius & shadows */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 10px rgba(0,0,0,.08);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.12);
+}

@@ -1,0 +1,23 @@
+<!-- Top Services -->
+<div class="card">
+    <h2>خدمات پرطرفدار</h2>
+    <div class="service-list">
+      {% if popular_services %}
+        {% for item in popular_services %}
+          <div class="service-item">
+            <div class="service-name">{{ item.service__service_name }}</div>
+            <div class="service-stats">
+              {{ item.current_month_count }} این ماه / {{ item.last_month_count }} ماه گذشته
+            </div>
+          </div>
+          {% if not forloop.last %}
+            <hr class="divider">
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="service-item">
+          <div class="service-name">هیچ خدمت پرطرفداری یافت نشد</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>

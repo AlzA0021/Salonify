@@ -1,0 +1,466 @@
+/* page: reservation_preview */
+/* Base Styles */
+body {
+  background-color: #fafafa;
+  font-family: Vazirmatn, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header Section */
+.header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  background-color: white;
+  height: 60px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.header-spacer {
+  width: 40px;
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.back-button,
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.back-button:hover,
+.close-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Main Content */
+.content-wrapper {
+  max-width: 700px;
+  margin: 80px auto 30px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Salon Section */
+.salon-card {
+  padding: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.salon-image {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-left: 16px;
+}
+
+.salon-rating {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  color: #757575;
+  margin-right: 8px;
+}
+
+.salon-rating i {
+  color: #ffc107;
+  margin-left: 4px;
+}
+
+.salon-address {
+  font-size: 14px;
+  color: #757575;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.salon-address i {
+  margin-left: 6px;
+  font-size: 16px;
+}
+
+/* Stylist Section */
+.stylists-section {
+  padding: 0;
+}
+
+.stylist-card {
+  padding: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.stylist-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.stylist-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 12px;
+}
+
+.default-stylist-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e5e5e5;
+}
+
+.default-stylist-icon {
+  color: #6b7280;
+}
+
+.stylist-name {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.stylist-datetime {
+  display: flex;
+  background-color: #f0dbdb4a;
+  justify-content: space-between;
+}
+
+.date-section,
+.time-section {
+  display: flex;
+  align-items: center;
+  margin: auto;
+}
+
+.date-section {
+  margin-right: auto;
+}
+
+.time-section {
+  margin-left: auto;
+}
+
+.date-section i,
+.time-section i {
+  margin-left: 8px;
+  color: #555;
+}
+
+/* Service Items */
+.stylist-service-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.stylist-service-item:last-child {
+  border-bottom: none;
+}
+
+.stylist-service-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.stylist-service-duration {
+  font-size: 13px;
+  color: #757575;
+  display: flex;
+  align-items: center;
+}
+
+.stylist-service-duration i {
+  margin-left: 4px;
+  font-size: 12px;
+}
+
+.stylist-service-price {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Discount Section */
+.discount-section {
+  padding: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.discount-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.discount-form {
+  display: flex;
+}
+
+.discount-input {
+  flex-grow: 1;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-left: 8px;
+}
+
+.discount-button {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.discount-button:hover {
+  background-color: #333;
+  color: white;
+}
+
+.discount-value {
+  color: #059669;
+}
+
+/* Price Summary */
+.price-summary {
+  padding: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.price-row:last-child {
+  margin-bottom: 0;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.price-label {
+  color: #555;
+}
+
+.price-value {
+  font-weight: 500;
+}
+
+.price-row:last-child .price-label,
+.price-row:last-child .price-value {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Payment Section */
+.payment-section {
+  padding: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.payment-title {
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.payment-option.active {
+  border-color: #cfa5d5;
+  background-color: rgba(255, 149, 243, 0.05);
+}
+
+.payment-option-radio {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  margin-left: 12px;
+  position: relative;
+}
+
+.payment-option.active .payment-option-radio {
+  border-color: #cfa5d5;
+}
+
+.payment-option.active .payment-option-radio::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #b13cb9;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.payment-option-info {
+  flex-grow: 1;
+}
+
+.payment-option-title {
+  font-weight: 500;
+}
+
+.payment-option-description {
+  font-size: 13px;
+  color: #757575;
+  margin-top: 2px;
+}
+
+/* Final Section */
+.final-section {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.final-price {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.confirm-button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.confirm-button:hover {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+/* Error Message */
+.error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.error-message i {
+  margin-left: 8px;
+  font-size: 18px;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+  .content-wrapper {
+    margin: 70px 15px 30px;
+    max-width: 100%;
+  }
+
+  .salon-image {
+    width: 100%;
+    height: auto;
+  }
+
+  .stylist-datetime {
+    flex-direction: row;
+    padding: 10px;
+  }
+
+  .discount-form {
+    flex-wrap: wrap;
+  }
+
+  .discount-input {
+    width: 100%;
+    margin-bottom: 10px;
+    margin-left: 0;
+  }
+
+  .discount-button {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .header {
+    padding: 0 10px;
+    height: 50px;
+  }
+
+  .salon-image {
+    width: 100%;
+    height: auto;
+  }
+
+  .stylist-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .page-title {
+    font-size: 16px;
+  }
+
+  .stylist-name {
+    font-size: 14px;
+  }
+
+  .price-row:last-child .price-label,
+  .price-row:last-child .price-value {
+    font-size: 14px;
+  }
+
+  .final-price {
+    font-size: 16px;
+  }
+
+  .confirm-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}

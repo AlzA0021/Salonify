@@ -1,0 +1,8 @@
+{% if services %}
+  <!-- کارت نمایش یک خدمت (مثلاً از مدل Services) -->
+  {% for service in services %}
+    {% include 'services/partials/service_card.html' %}
+  {% endfor %}
+{% else %}
+  <p class="no-content">محتوای مورد نظر پیدا نشد</p>
+{% endif %}

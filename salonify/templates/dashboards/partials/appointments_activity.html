@@ -1,0 +1,46 @@
+{% load jalali_extras %}
+
+<!-- بخش فعالیت قرارها -->
+<div class="today-appointments-container">
+    <h3 class="appointments-title"> فعالیت قرار ملاقات ها</h3>
+    
+    {% for date, appointments in appointments_by_date.items %}
+        {% for appointment in appointments %}
+            <div class="appointment-card">
+                <div class="appointment-date">
+                    {% with date_obj=appointment.date|date:"d" %}
+                        {{ date_obj }}
+                        <div class="month">
+                            {% with month=appointment.date|date:"F"|slice:":3" %}
+                                {{ month }}
+                            {% endwith %}
+                        </div>
+                    {% endwith %}
+                </div>
+                
+                <div class="appointment-details">
+                    <div class="time-status">
+                        <span class="time">{{ appointment.time|date:"H:i" }}</span>
+                        <span class="status-booked">رزرو شده</span>
+                    </div>
+                    
+                    <div class="service-name">{{ appointment.service_name }}</div>
+                    
+                    <div class="client-info">
+                        {{ appointment.customer_name }}, {{ appointment.duration }}
+                        <div class="stylist">با {{ appointment.stylist_name }}</div>
+                    </div>
+                </div>
+                
+                <div class="price-info">
+                    <span class="price">{{ appointment.price }} تومان</span>
+                    <span class="arrow"><i class="fa-solid fa-angle-right"></i></span>
+                </div>
+            </div>
+            
+            {% if not forloop.last %}
+                <hr class="appointment-divider">
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</div>

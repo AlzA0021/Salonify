@@ -1,0 +1,444 @@
+{% extends 'main_template.html' %}
+{% load template_extras %}
+{% load static %}
+
+{% block title %}
+  {{ service.service_name }}
+{% endblock %}
+
+{% block content %}
+
+
+ 
+
+<!-- محتوای صفحه: نمایش سرویس -->
+<div class="serviceDetails">
+  <!-- بخش تصویر سرویس -->
+  <div class="serviceDetails-image">
+    {% if service.service_image %}
+      <img src="{{ service.service_image.url }}" alt="{{ service.service_name }}" />
+    {% else %}
+      <img src="#" alt="خدمت" />
+    {% endif %}
+  </div>
+
+  <!-- عنوان خدمت -->
+  <h2 class="serviceDetails-title">{{ service.service_name }}</h2>
+
+  <!-- اطلاعات کلی خدمت -->
+  <div class="serviceDetails-info">
+    <!-- امتیاز میانگین و تعداد رای‌دهنده‌ها -->
+    <div class="serviceDetails-info-item">
+      <i class="fa fa-star"></i>
+      <span>{{ service.get_average_score }} ({{ service.scoring_services.count }})</span>
+    </div>
+    <!-- مدت زمان خدمت -->
+    <div class="serviceDetails-info-item">
+      <i class="fa fa-clock"></i>
+      <span>{{ service.duration_minutes }} دقیقه</span>
+    </div>
+    <!-- تعداد بازدید -->
+    <div class="serviceDetails-info-item">
+      <i class="fa fa-eye"></i>
+      <span>{{ service.view_count }} بازدید</span>
+    </div>
+    <!-- تعداد آرایشگران -->
+    <div class="serviceDetails-info-item">
+      <i class="fa fa-scissors"></i>
+      <span>{{ service.stylists.count }} نفر</span>
+    </div>
+    <!-- کمترین و بیشترین قیمت -->
+    {% with min_max=service.get_min_max_price %}
+      {% if min_max.0 and min_max.1 %}
+        <div class="serviceDetails-info-item">
+          <i class="fa fa-arrow-up"></i>
+          <span>{{ min_max.1|intcomma_custom }} تومان</span>
+        </div>
+        <div class="serviceDetails-info-item">
+          <i class="fa fa-arrow-down"></i>
+          <span>{{ min_max.0|intcomma_custom }} تومان</span>
+        </div>
+      {% else %}
+        <div class="serviceDetails-info-item">
+          <i class="fa fa-times-circle"></i>
+          <span>قیمت نامشخص</span>
+        </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+  <!-- /serviceDetails-info -->
+
+  <!-- آکاردیون: توضیحات و آرایشگران -->
+  <div class="serviceDetails-accordion-container">
+    <!-- توضیحات (پیش‌فرض باز) -->
+    <div class="serviceDetails-accordion-header active" data-accordion="serviceDetails-desc">
+      <span>توضیحات</span>
+      <i class="fa fa-chevron-up"></i>
+    </div>
+    <div id="serviceDetails-desc" class="serviceDetails-accordion-content show">
+      <div class="serviceDetails-desc-content">{{ service.description|safe }}</div>
+    </div>
+
+    <hr class="serviceDetails-accordion-separator" />
+
+    <!-- آرایشگران (پیش‌فرض بسته) -->
+    <div class="serviceDetails-accordion-header" data-accordion="serviceDetails-stylists">
+      <span>آرایشگران</span>
+      <i class="fa fa-chevron-down"></i>
+    </div>
+    <div id="serviceDetails-stylists" class="serviceDetails-accordion-content">
+      <!-- نوار ابزار مرتب‌سازی و فیلتر -->
+      <div class="serviceDetails-stylist-toolbar">
+        <div class="serviceDetails-stylist-toolbar-left">
+          <i class="fa-solid fa-arrow-down-wide-short"></i>
+          <!-- این آیکن فیلتر را کلیک می‌کنیم تا کشو از پایین نمایش داده شود -->
+          <i class="fa fa-filter" id="openFilterModal" style="cursor: pointer;"></i>
+        </div>
+        <span class="serviceDetails-stylist-sort-title">عنوان مرتب‌سازی</span>
+      </div>
+
+      <!-- لیست آرایشگران -->
+      <div class="serviceDetails-stylist-list">
+        {% if stylists_data %}
+          {% for item in stylists_data %}
+            <div class="serviceDetails-stylist-item">
+              <!-- بخش چپ: قیمت و ... -->
+              <div class="serviceDetails-stylist-left-section">
+                <i class="fas fa-coins"></i>
+                <div class="serviceDetails-stylist-price-wrapper">
+                  {% if item.discounted_price < item.normal_price %}
+                    <del class="serviceDetails-stylist-normal-price">
+                      {{ item.normal_price|intcomma_custom }}
+                    </del>
+                    <div class="serviceDetails-stylist-discount-price">
+                      ({{ item.discounted_price|intcomma_custom }})
+                    </div>
+                  {% else %}
+                    <div class="serviceDetails-stylist-normal-price">
+                      {{ item.normal_price|intcomma_custom }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <!-- بخش راست: نام، امتیاز، عکس -->
+              <div class="serviceDetails-stylist-right-section">
+                <div class="serviceDetails-stylist-top-row">
+                  <div class="serviceDetails-stylist-name">
+                    {{ item.stylist.user.name }} {{ item.stylist.user.family }}
+                  </div>
+                  <div class="serviceDetails-stylist-star">
+                    <i class="fa fa-star"></i>
+                    <span>{{ item.score|default:'0' }}</span>
+                  </div>
+                </div>
+
+                {% if item.stylist.profile_image %}
+                  <img src="{{ item.stylist.profile_image.url }}" alt="Stylist Profile" />
+                {% else %}
+                  <img src="#" alt="Stylist Profile" />
+                {% endif %}
+              </div>
+            </div>
+            <hr class="serviceDetails-stylist-separator" />
+          {% endfor %}
+        {% else %}
+          <p style="text-align:center;">هیچ آرایشگری برای این خدمت تعریف نشده است.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <!-- /accordion-container -->
+
+  <!-- بخش مقالات مرتبط (اسلایدر Swiper) -->
+  <section class="serviceDetails-related-articles">
+    <h3 class="serviceDetails-related-articles-title">
+      مقالات مربوط به {{ service.service_name }}
+    </h3>
+    {% if related_blogs %}
+      <div class="swiper myArticleSwiper">
+        <div class="swiper-wrapper">
+          {% for blog in related_blogs %}
+            <div class="swiper-slide">
+              <div class="serviceDetails-article-slide">
+                {% if blog.image %}
+                  <img src="{{ blog.image.url }}" alt="{{ blog.title }}" />
+                {% else %}
+                  <img src="{% static 'images/default_blog.jpg' %}" alt="Blog Image" />
+                {% endif %}
+                <div class="serviceDetails-article-info">
+                  <div class="serviceDetails-article-title">{{ blog.title }}</div>
+                  <div class="serviceDetails-article-author">{{ blog.author }}</div>
+                  <div class="serviceDetails-article-date">{{ blog.register_date }}</div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <!-- نقاط صفحه‌بندی (Pagination) -->
+        <div class="swiper-pagination"></div>
+      </div>
+    {% else %}
+      <p style="text-align:center;">مقاله‌ای ثبت نشده است.</p>
+    {% endif %}
+  </section>
+  <!-- /related-articles -->
+</div>
+<!-- /serviceDetails -->
+
+<!-- ===================== کشوی فیلتر (Drawer) از پایین صفحه ===================== -->
+<div class="filter-drawer" id="filterDrawer">
+  <div class="filter-drawer-header">
+    <span>فیلترها</span>
+    <!-- آیکن بستن -->
+    <i class="fa fa-times" id="closeFilterModal" style="cursor: pointer;"></i>
+  </div>
+  <hr />
+  <div class="filters-container">
+    <!-- فیلتر منطقه -->
+    <details>
+      <summary>انتخاب منطقه <i class="fa fa-map-marker"></i></summary>
+      <div>
+        <label><input type="radio" name="region" /> آجودانیه (۴)</label><br>
+        <label><input type="radio" name="region" /> پاسداران (۴)</label><br>
+        <label><input type="radio" name="region" /> سعادت‌آباد (۲)</label><br>
+        <label><input type="radio" name="region" /> الهیه (۱)</label><br>
+        <label><input type="radio" name="region" /> فرمانیه (۱)</label>
+      </div>
+    </details>
+    <!-- فیلتر تاریخ و زمان -->
+    <details>
+      <summary>انتخاب تاریخ و زمان <i class="fa fa-calendar"></i></summary>
+      <div>
+        <p>تقویم و ساعت...</p>
+      </div>
+    </details>
+    <!-- فیلتر محدوده قیمت -->
+    <details>
+      <summary>انتخاب محدوده قیمت <i class="fa fa-balance-scale"></i></summary>
+      <div>
+        <p>اسلایدر قیمت...</p>
+      </div>
+    </details>
+  </div>
+  <hr />
+  <!-- دکمه‌های پایین -->
+  <div class="filter-actions">
+    <button class="btn-reset">حذف فیلترها</button>
+    <button class="btn-apply">اعمال</button>
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'main_template.html' %}
+{% load template_extras %}
+{% load static %}
+
+{% block title %}
+  {{ service.service_name }}
+{% endblock %}
+
+{% block content %}
+  <div class="serviceDetails">
+    <div class="serviceDetails-image">
+      {% if service.service_image %}
+        <img src="{{ service.service_image.url }}" alt="{{ service.service_name }}" />
+      {% else %}
+        <img src="#" alt="خدمت" />
+      {% endif %}
+    </div>
+
+    <!-- عنوان خدمت -->
+    <h2 class="serviceDetails-title">{{ service.service_name }}</h2>
+
+    <!-- مشخصات کلی خدمت -->
+    <div class="serviceDetails-info">
+      <!-- امتیاز میانگین و تعداد رای‌دهنده‌ها -->
+      <div class="serviceDetails-info-item">
+        <i class="fa fa-star"></i>
+        <span>{{ service.get_average_score }} ({{ service.scoring_services.count }})</span>
+      </div>
+
+      <!-- مدت زمان خدمت -->
+      <div class="serviceDetails-info-item">
+        <i class="fa fa-clock"></i>
+        <span>{{ service.duration_minutes }} دقیقه</span>
+      </div>
+
+      <!-- تعداد بازدید -->
+      <div class="serviceDetails-info-item">
+        <i class="fa fa-eye"></i>
+        <span>{{ service.view_count }} بازدید</span>
+      </div>
+
+      <!-- تعداد آرایشگران -->
+      <div class="serviceDetails-info-item">
+        <i class="fa fa-scissors"></i>
+        <span>{{ service.stylists.count }} نفر</span>
+      </div>
+
+      <!-- کمترین و بیشترین قیمت -->
+      {% with min_max=service.get_min_max_price %}
+        {% if min_max.0 and min_max.1 %}
+          <div class="serviceDetails-info-item">
+            <i class="fa fa-arrow-up"></i>
+            <span>{{ min_max.1|intcomma_custom }} تومان</span>
+          </div>
+          <div class="serviceDetails-info-item">
+            <i class="fa fa-arrow-down"></i>
+            <span>{{ min_max.0|intcomma_custom }} تومان</span>
+          </div>
+        {% else %}
+          <div class="serviceDetails-info-item">
+            <i class="fa fa-times-circle"></i>
+            <span>قیمت نامشخص</span>
+          </div>
+        {% endif %}
+      {% endwith %}
+    </div>
+    <!-- /service-info -->
+
+    <!-- آکاردیون (زیر هم) برای توضیحات و آرایشگران -->
+    <div class="serviceDetails-accordion-container">
+      <!-- بلوک آکاردیون: توضیحات (پیش‌فرض باز باشد) -->
+      <div class="serviceDetails-accordion-header active" data-accordion="serviceDetails-desc">
+        <span>توضیحات</span>
+        <i class="fa fa-chevron-up"></i>
+      </div>
+      <div id="serviceDetails-desc" class="serviceDetails-accordion-content show">
+        <div class="serviceDetails-desc-content">{{ service.description|safe }}</div>
+      </div>
+
+      <hr class="serviceDetails-accordion-separator" />
+
+      <!-- بلوک آکاردیون: آرایشگران (پیش‌فرض بسته) -->
+      <div class="serviceDetails-accordion-header" data-accordion="serviceDetails-stylists">
+        <span>آرایشگران</span>
+        <i class="fa fa-chevron-down"></i>
+      </div>
+      <div id="serviceDetails-stylists" class="serviceDetails-accordion-content">
+        <!-- نوار ابزار مرتب‌سازی و فیلتر -->
+        <div class="serviceDetails-stylist-toolbar">
+          <div class="serviceDetails-stylist-toolbar-left">
+            <i class="fa-solid fa-arrow-down-wide-short"></i>
+            <i class="fa fa-filter" id="openFilterModal" style="cursor: pointer;"></i>
+          </div>
+          <span class="serviceDetails-stylist-sort-title">عنوان مرتب‌سازی</span>
+        </div>
+
+        <!-- لیست آرایشگران -->
+        <div class="serviceDetails-stylist-list">
+          {% if stylists_data %}
+            {% for item in stylists_data %}
+              <div class="serviceDetails-stylist-item">
+                <!-- بخش چپ: قیمت، تگ و ... -->
+                <div class="serviceDetails-stylist-left-section">
+                  <i class="fas fa-coins"></i>
+                  <div class="serviceDetails-stylist-price-wrapper">
+                    {% if item.discounted_price < item.normal_price %}
+                      <del class="serviceDetails-stylist-normal-price">{{ item.normal_price|intcomma_custom }}</del>
+                      <div class="serviceDetails-stylist-discount-price">({{ item.discounted_price|intcomma_custom }})</div>
+                    {% else %}
+                      <div class="serviceDetails-stylist-normal-price">{{ item.normal_price|intcomma_custom }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <!-- بخش راست: نام، امتیاز، عکس -->
+                <div class="serviceDetails-stylist-right-section">
+                  <div class="serviceDetails-stylist-top-row">
+                    <div class="serviceDetails-stylist-name">{{ item.stylist.user.name }} {{ item.stylist.user.family }}</div>
+                    <div class="serviceDetails-stylist-star">
+                      <i class="fa fa-star"></i>
+                      <span>{{ item.score|default:'0' }}</span>
+                    </div>
+                  </div>
+
+                  {% if item.stylist.profile_image %}
+                    <img src="{{ item.stylist.profile_image.url }}" alt="Stylist Profile" />
+                  {% else %}
+                    <img src="#" alt="Stylist Profile" />
+                  {% endif %}
+                </div>
+              </div>
+
+              <hr class="serviceDetails-stylist-separator" />
+            {% endfor %}
+          {% else %}
+            <p style="text-align:center;">هیچ آرایشگری برای این خدمت تعریف نشده است.</p>
+          {% endif %}
+        </div>
+      </div>
+      <!-- /آکاردیون آرایشگران -->
+    </div>
+    <!-- /accordion-container -->
+
+    <!-- بخش مقالات مرتبط (اسلایدر Swiper) -->
+    <section class="serviceDetails-related-articles">
+      <h3 class="serviceDetails-related-articles-title">مقالات مربوط به {{ service.service_name }}</h3>
+
+      {% if related_blogs %}
+        <div class="swiper myArticleSwiper">
+          <div class="swiper-wrapper">
+            {% for blog in related_blogs %}
+              <div class="swiper-slide">
+                <div class="serviceDetails-article-slide">
+                  {% if blog.image %}
+                    <img src="{{ blog.image.url }}" alt="{{ blog.title }}" />
+                  {% else %}
+                    <img src="{% static 'images/default_blog.jpg' %}" alt="Blog Image" />
+                  {% endif %}
+                  <div class="serviceDetails-article-info">
+                    <div class="serviceDetails-article-title">{{ blog.title }}</div>
+                    <div class="serviceDetails-article-author">{{ blog.author }}</div>
+                    <div class="serviceDetails-article-date">{{ blog.register_date }}</div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <!-- نقاط صفحه‌بندی (Pagination) -->
+          <div class="swiper-pagination"></div>
+        </div>
+      {% else %}
+        <p style="text-align:center;">مقاله‌ای ثبت نشده است.</p>
+      {% endif %}
+    </section>
+    <!-- /related-articles -->
+  </div> <!-- /service-details -->
+
+{% endblock %}
+
+  {% endcomment %}

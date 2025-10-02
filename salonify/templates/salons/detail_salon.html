@@ -1,0 +1,579 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% load salons_filters %}
+{% load humanize %}    
+
+{# =========================================
+   <head> : عنوان، متا، استایل‌ها
+   ========================================= #}
+{% block head %}
+  <title>{{ salon.salon_name }}</title>
+  <meta property="og:title" content="{{ salon.salon_name }}" />
+  <meta property="og:description" content="{{ salon.address }}" />
+  {% if salon.banner_image %}
+    <meta property="og:image" content="{{ salon.banner_image.url }}" />
+  {% endif %}
+  <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+
+  <!-- CSS صفحه -->
+  <link rel="stylesheet" href="{% static 'css/detail_salon.css' %}" />
+
+  <!-- Vendor CSS (فقط همین صفحه) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+{% endblock %}
+
+{% block title %}{{ salon.salon_name }}{% endblock %}
+
+{# مهم: برای لود ماژول صفحه در app.js #}
+{% block body_attrs %}data-page="detail_salon"{% endblock %}
+
+{# =========================================
+   محتوا
+   ========================================= #}
+{% block content %}
+<!-- اسلایدر بالای صفحه -->
+<div class="detailSalon-hero-slider" id="detailSalon_heroSlider">
+  {% for image in salon.gallery_images.all %}
+    <div
+      class="detailSalon-slide {% if forloop.first %}active{% endif %}"
+      style="background-image: url('{{ media_url }}{{ image.salon_image }}');"
+    ></div>
+  {% empty %}
+    <div class="detailSalon-slide active"
+         style="background:#f2f2f2;display:flex;align-items:center;justify-content:center;">
+      <span>بدون تصویر</span>
+    </div>
+  {% endfor %}
+
+  <div class="detailSalon-controls">
+    <button id="detailSalon_prevSlide" aria-label="قبلی">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+    <button id="detailSalon_nextSlide" aria-label="بعدی">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+  </div>
+</div>
+
+<!-- نوار بالایی (Top Bar) -->
+<div class="detailSalon-top-bar" id="detailSalon_topBar">
+  <div class="detailSalon-left-buttons">
+    <button title="بازگشت" data-action="go-back"><i class="fa-solid fa-arrow-right"></i></button>
+    <div class="detailSalon-title-when-scrolled">{{ salon.salon_name }}</div>
+  </div>
+  <div class="detailSalon-right-buttons">
+    <button title="اشتراک‌گذاری" data-action="share-page"><i class="fa-solid fa-share-nodes"></i></button>
+    <button title="علاقه‌مندی" class="like-button" data-salon-id="{{ salon.id }}">
+      <i class="{% if user.is_authenticated and is_favorite %}fa-solid fa-heart liked{% else %}fa-regular fa-heart{% endif %}"></i>
+    </button>
+  </div>
+</div>
+
+<!-- اطلاعات کلی سالن -->
+<div class="detailSalon-salon-info" id="detailSalon_salonInfo">
+  <h2>{{ salon.salon_name }}</h2>
+  <div class="detailSalon-rating-and-address">
+    <div class="detailSalon-average-stars">
+      {% if average_score %}
+        {% for i in 5|make_range %}
+          {% if average_score >= i %}
+            <i class="fa-solid fa-star detailSalon-star"></i>
+          {% elif average_score >= i|subtract:0.5 %}
+            <i class="fa-solid fa-star-half-stroke fa-flip-horizontal"></i>
+          {% else %}
+            <i class="fa-regular fa-star detailSalon-star"></i>
+          {% endif %}
+        {% endfor %}
+        <span class="detailSalon-rating-value"> ({{ average_score|floatformat:1 }}) </span>
+      {% else %}
+        <span>امتیازی ثبت نشده</span>
+      {% endif %}
+    </div>
+    <p class="detailSalon-address">{{ salon.address }}</p>
+  </div>
+
+  <div class="detailSalon-tags">
+    <span class="detailSalon-tag" style="background-color:#8a2be2">Featured</span>
+    <span class="detailSalon-tag" style="background-color:#adff2f;color:#333">Deals</span>
+  </div>
+</div>
+
+<!-- نوار تب‌های صفحه -->
+<nav class="detailSalon-tab-nav" id="detailSalon_tabNav">
+  <ul>
+    <li><a href="#detailSalon_work_samples">نمونه‌کارها</a></li>
+    <li><a href="#detailSalon_services">خدمات</a></li>
+    <li><a href="#detailSalon_team">آرایشگران</a></li>
+    <li><a href="#detailSalon_reviews">دیدگاه‌ها</a></li>
+    <li><a href="#detailSalon_buy">خرید</a></li>
+    <li><a href="#detailSalon_about">درباره سالن</a></li>
+    <li><a href="#detailSalon_salon_info">اطلاعات تکمیلی</a></li>
+    <li><a href="#detailSalon_location">موقعیت</a></li>
+  </ul>
+</nav>
+
+<!-- نمونه کارها -->
+<section id="detailSalon_work_samples" class="detailSalon-content-section">
+  <h2>نمونه‌کارها</h2>
+  <div class="swiper-container" id="detailSalon_gallerySwiper">
+    <div class="swiper-wrapper">
+      {% for stylist in stylists %}
+        {% for sample in stylist.work_samples_of_stylist.all %}
+          <div class="swiper-slide photo-slide detailSalon-sample-card"
+               data-image-url="{{ sample.sample_image.url }}">
+            <img src="{{ sample.sample_image.url }}" alt="Sample Image" class="detailSalon-photo-slide-image" />
+            <div class="detailSalon-photo-slide-info">
+              <p class="detailSalon-stylist-name">{{ stylist.get_fullName }}</p>
+              <p class="detailSalon-service-name">
+                {% if sample.service %}{{ sample.service.service_name }}{% else %}نامشخص{% endif %}
+              </p>
+            </div>
+          </div>
+        {% endfor %}
+      {% empty %}
+        <div class="swiper-slide"><div class="detailSalon-empty">نمونه‌کاری ثبت نشده است</div></div>
+      {% endfor %}
+    </div>
+    <div class="swiper-button-next" aria-label="بعدی"></div>
+    <div class="swiper-button-prev" aria-label="قبلی"></div>
+  </div>
+  <div class="detailSalon-see-all-container">
+    <button class="detailSalon-see-all-btn" id="detailSalon_openAllSamplesBtn">نمایش همه</button>
+  </div>
+</section>
+<hr class="detailSalon-divider" />
+
+<!-- خدمات -->
+<section id="detailSalon_services" class="detailSalon-content-section">
+  <h2>خدمات</h2>
+
+  <div class="detailSalon-service-groups" id="detailSalon_serviceGroups">
+    {% for group in service_groups %}
+      <button class="detailSalon-service-group-btn {% if forloop.first %}active{% endif %}"
+              data-group="group-{{ group.id }}">
+        {{ group.group_title }}
+      </button>
+    {% endfor %}
+  </div>
+
+  {% for service in services %}
+    {% for group in service.service_group.all %}
+      <div class="detailSalon-service-item group-{{ group.id }}"
+           data-service-id="{{ service.id }}"
+           data-service-name="{{ service.service_name }}"
+           data-service-duration="{{ service.duration_minutes }}"
+           data-service-price="{{ service.min_price|intcomma }}"
+           data-service-description="{{ service.description }}"
+           data-service-score="{{ service.avg_score }}">
+        <div class="detailSalon-service-info">
+          <h3>{{ service.service_name }}</h3>
+          <p>{{ service.duration_minutes }} دقیقه</p>
+          {% if service.min_price is not None %}
+            <p>از {{ service.min_price|intcomma }} تومان</p>
+          {% else %}
+            <p>قیمت ثبت نشده است</p>
+          {% endif %}
+        </div>
+        <button class="detailSalon-btn-book" aria-label="افزودن به رزرو">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    {% endfor %}
+  {% empty %}
+    <p>برای این سالن خدمتی ثبت نشده است.</p>
+  {% endfor %}
+
+  <div class="detailSalon-see-all-container">
+    <button class="detailSalon-see-all-btn">نمایش همه</button>
+  </div>
+</section>
+
+<hr class="detailSalon-divider" />
+
+<!-- تیم -->
+<section id="detailSalon_team" class="detailSalon-content-section">
+  <h2>آرایشگران</h2>
+  <div class="detailSalon-scroll-container">
+    <div class="detailSalon-team-members">
+      {% for stylist in stylists|slice:3 %}
+        <div class="detailSalon-team-member">
+          <div class="detailSalon-profile-image-container">
+            <img src="{{ media_url }}{{ stylist.profile_image }}" alt="{{ stylist.get_fullName }}" />
+            <div class="detailSalon-rating-badge">
+              <span class="detailSalon-rating-value">{{ stylist.avg_score|floatformat:1|default_if_none:'—' }}</span>
+              <span class="detailSalon-rating-star"><i class="fa-solid fa-star"></i></span>
+            </div>
+          </div>
+          <div class="detailSalon-name">{{ stylist.get_fullName }}</div>
+          <div class="detailSalon-role">{{ stylist.expert }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="detailSalon-see-all-container">
+    <button class="detailSalon-see-all-btn" id="detailSalon_openAllStylistsModal">نمایش همه</button>
+  </div>
+</section>
+<hr class="detailSalon-divider" />
+
+<!-- دیدگاه‌ها -->
+<div id="detailSalon_reviews" class="detailSalon-reviews">
+  <div class="detailSalon-review-header">
+    <h3>دیدگاه‌ها</h3>
+    <button id="addCommentBtn" class="detailSalon-add-comment-btn" aria-label="افزودن دیدگاه">
+      <i class="fas fa-plus-circle"></i>
+    </button>
+  </div>
+
+  <!-- فرم ثبت دیدگاه (مخفی) -->
+  <div id="commentFormContainer" class="detailSalon-comment-form-container" style="display:none">
+    <h4>ثبت دیدگاه جدید</h4>
+
+    {% if user.is_authenticated %}
+      <form method="post"
+            action="{% url 'csf:salon_comment_score' %}?salon_id={{ salon.id }}"
+            class="detailSalon-comment-form">
+        {% csrf_token %}
+
+        <div class="detailSalon-rating-section">
+          <label class="detailSalon-rating-label">{{ form.score.label }}</label>
+          <div class="detailSalon-rating-stars">{{ form.score }}</div>
+        </div>
+
+        <div class="detailSalon-dropdown-section">
+          <label class="detailSalon-dropdown-label">{{ form.stylist.label }}</label>
+          <div class="detailSalon-select-wrapper">
+            <i class="fas fa-cut select-icon"></i>
+            {{ form.stylist }}
+          </div>
+        </div>
+
+        <div class="detailSalon-dropdown-section">
+          <label class="detailSalon-dropdown-label">{{ form.service.label }}</label>
+          <div class="detailSalon-select-wrapper">
+            <i class="fas fa-list-alt select-icon"></i>
+            {{ form.service }}
+          </div>
+        </div>
+
+        <div class="detailSalon-comment-section">
+          <label class="detailSalon-comment-label">{{ form.comment_text.label }}</label>
+          {{ form.comment_text }}
+          <div class="character-counter">0/500</div>
+        </div>
+
+        <div class="detailSalon-form-actions">
+          <button type="button" class="detailSalon-cancel-btn" id="cancelCommentBtn">انصراف</button>
+          <button type="submit" class="detailSalon-submit-btn">
+            <i class="fas fa-paper-plane"></i>
+            ثبت دیدگاه
+          </button>
+        </div>
+      </form>
+    {% else %}
+      <div class="detailSalon-login-required">
+        <i class="fas fa-user-lock login-icon"></i>
+        <p>برای ثبت دیدگاه ابتدا وارد شوید.</p>
+        <a href="#" class="detailSalon-login-btn">
+          <i class="fas fa-sign-in-alt"></i>
+          ورود / ثبت نام
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- لیست دیدگاه‌ها -->
+  <div class="detailSalon-reviews-list">
+    {% for c in comments_list|slice:'0:4' %}
+      <div class="detailSalon-review-item">
+        <div class="detailSalon-review-user">
+          {% if c.avatar_url %}
+            <img src="{{ c.avatar_url }}" alt="{{ c.user_full_name }}" />
+          {% else %}
+            <img src="/static/images/default-avatar.png" alt="کاربر" />
+          {% endif %}
+          <span class="detailSalon-username">{{ c.user_full_name }}</span>
+          {% if c.is_pending %}<span class="pending-badge">در انتظار تأیید</span>{% endif %}
+        </div>
+
+        <div class="detailSalon-review-date">{{ c.date }}</div>
+
+        <div class="detailSalon-review-stars">
+          {% if c.score %}
+            {% for i in 5|make_range %}
+              {% if i <= c.score %}
+                <i class="fas fa-star" style="color:#ffb700"></i>
+              {% else %}
+                <i class="far fa-star" style="color:#ddd"></i>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <span>بدون امتیاز</span>
+          {% endif %}
+        </div>
+
+        <div class="detailSalon-review-text">{{ c.comment_text }}</div>
+        <div class="detailSalon-review-details">
+          {% if c.stylist_name %}<strong>آرایشگر:</strong> {{ c.stylist_name }}{% endif %}
+          {% if c.service_name %} | <strong>خدمت:</strong> {{ c.service_name }}{% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p>هنوز دیدگاهی ثبت نشده است.</p>
+    {% endfor %}
+  </div>
+
+  <div style="text-align:center;margin:1rem 0">
+    <button class="detailSalon-see-all-btn" id="detailSalon_review_btn">نمایش همه</button>
+  </div>
+</div>
+
+<!-- خرید -->
+<section id="detailSalon_buy" class="detailSalon-content-section">
+  <h2>خرید</h2>
+  <p>محصولات یا پکیج‌های قابل خرید...</p>
+  <div class="detailSalon-buy-section">
+    <strong>پکیج VIP:</strong> جلسات کاشت ناخن + ترمیم<br>
+    <strong>قیمت:</strong> 300,000 تومان
+  </div>
+</section>
+<hr class="detailSalon-divider" />
+
+<!-- درباره سالن -->
+<section id="detailSalon_about" class="detailSalon-content-section">
+  <h2>درباره {{ salon.salon_name }}</h2>
+  <p class="detailSalon-description" id="detailSalon_description">{{ salon.description }}</p>
+  <button id="detailSalon_toggleDescriptionBtn" style="display:none">نمایش بیشتر</button>
+
+  <div class="detailSalon-opening-hours-container">
+    <h3>ساعات کاری</h3>
+    <ul class="detailSalon-opening-hours-list">
+      {% for oh in salon.ordered_opening_hours %}
+        <li class="detailSalon-opening-hours-item {% if oh.is_closed %}closed{% else %}open{% endif %}">
+          <span class="detailSalon-dot"></span>
+          <span class="detailSalon-day-of-week">{{ oh.get_day_of_week_display }}:</span>
+          {% if oh.is_closed %}
+            <span class="detailSalon-time">تعطیل</span>
+          {% else %}
+            {% if oh.open_time or oh.close_time %}
+              <span class="detailSalon-time">{{ oh.open_time|time:'H:i' }} - {{ oh.close_time|time:'H:i' }}</span>
+            {% else %}
+              <span class="detailSalon-time">نامشخص</span>
+            {% endif %}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+<hr class="detailSalon-divider" />
+
+<!-- اطلاعات تکمیلی -->
+<section id="detailSalon_salon_info" class="detailSalon-content-section">
+  <h2>اطلاعات تکمیلی</h2>
+  {% for info in supplementary_info %}
+    <div class="info-item">
+      <div class="info-main">
+        <span class="info-icon"><i class="{{ info.icon_class }}"></i></span>
+        <span class="info-title">{{ info.title }}</span>
+        {% if info.description %}
+          <span class="info-help">
+            <i class="fa-solid fa-circle-question fa-flip-horizontal"></i>
+            <span class="info-tooltip">{{ info.description }}</span>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <p>اطلاعات تکمیلی ثبت نشده است.</p>
+  {% endfor %}
+</section>
+
+<hr class="detailSalon-divider" />
+
+<!-- موقعیت -->
+<section id="detailSalon_location" class="detailSalon-content-section detailSalon-last-content">
+  <h2>موقعیت</h2>
+  {% if salon.location %}
+    <div id="detailSalon_mapid" class="detailSalon-salon-map"></div>
+    <div class="detailSalon-map-link-container">
+      <button id="detailSalon_navigateBtn" class="detailSalon-map-link">
+        مسیریابی به موقعیت سالن &nbsp;&nbsp;<i class="fa-solid fa-location-arrow"></i>
+      </button>
+    </div>
+  {% else %}
+    <p>موقعیت جغرافیایی این سالن ثبت نشده است.</p>
+  {% endif %}
+</section>
+<hr class="detailSalon-divider" />
+
+<!-- نوار رزرو پایین صفحه -->
+<div class="detailSalon-fixed-booking-bar">
+  <div class="detailSalon-service-count">
+    <div id="serviceInfo" data-total-services="{{ services.count }}"></div>
+    <p id="detailSalon_selectedServicesCount">0 خدمت</p>
+    <p id="detailSalon_selectedServicesPrice">0 تومان</p>
+    <p id="detailSalon_selectedServicesDuration">0 دقیقه</p>
+  </div>
+  <button id="detailSalon_bookAppointmentBtn"
+          data-salon-id="{{ salon.id }}"
+          data-booking-url="{% url 'orders:select_stylists' %}">
+    رزرو نوبت
+  </button>
+</div>
+
+<!-- مودال‌ها -->
+<div class="detailSalon-bottom-sheet" id="detailSalon_allSamplesModal" style="display:none;height:0">
+  <div class="detailSalon-bottom-sheet-content">
+    <div class="detailSalon-bottom-sheet-header">
+      <button class="detailSalon-close-modal-btn" id="detailSalon_closeAllSamplesModal"><i class="fa-solid fa-xmark"></i></button>
+      <h2 class="detailSalon-sheet-title">همه نمونه‌کارها</h2>
+    </div>
+
+    <div class="detailSalon-modal-samples-grid">
+      {% for stylist in stylists %}
+        {% for sample in stylist.work_samples_of_stylist.all %}
+          <div class="detailSalon-sample-card" data-image-url="{{ sample.sample_image.url }}">
+            <img src="{{ sample.sample_image.url }}" alt="Sample Image" />
+            <div class="detailSalon-photo-slide-info">
+              <p class="detailSalon-stylist-name">{{ stylist.get_fullName }}</p>
+              <p class="detailSalon-service-name">
+                {% if sample.service %}{{ sample.service.service_name }}{% else %}نامشخص{% endif %}
+              </p>
+            </div>
+          </div>
+        {% endfor %}
+      {% empty %}
+        <p>نمونه‌کاری برای نمایش وجود ندارد.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="detailSalon-fullscreen-sample" id="detailSalon_fullscreenSample" style="display:none">
+</div>
+
+<div class="detailSalon-service-modal" id="detailSalon_serviceModal" style="display:none;height:0">
+  <div class="detailSalon-service-modal-content">
+    <button class="detailSalon-close-modal-btn" id="detailSalon_closeServiceModal"><i class="fa-solid fa-xmark"></i></button>
+    <h3 id="detailSalon_modalServiceName"></h3>
+    <img id="detailSalon_modalServiceImage" class="detailSalon-service-modal-image" src="#" alt="Service" />
+    <p id="detailSalon_modalServiceTime"></p>
+    <p id="detailSalon_modalServicePrice"></p>
+    <div class="detailSalon-service-stars" id="detailSalon_modalServiceStars"></div>
+    <p id="detailSalon_modalServiceDescription"></p>
+  </div>
+</div>
+
+<div class="detailSalon-stylist-modal" id="detailSalon_allStylistsModal" style="display:none;height:0">
+  <div class="detailSalon-stylist-modal-content">
+    <button class="detailSalon-close-modal-btn" id="detailSalon_closeAllStylistsModal"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="detailSalon-modal-title">انتخاب آرایشگر</h2>
+    <div class="detailSalon-team-members detailSalon-modal-team-members">
+      {% for stylist in stylists %}
+        <div class="detailSalon-team-member-box">
+          <div class="detailSalon-team-member">
+            <div class="detailSalon-profile-image-container">
+              <img src="{{ media_url }}{{ stylist.profile_image }}" alt="{{ stylist.get_fullName }}" />
+              <div class="detailSalon-rating-badge">
+                <span class="detailSalon-rating-value">{{ stylist.avg_score|floatformat:1|default_if_none:'—' }}</span>
+                <span class="detailSalon-rating-star"><i class="fa-solid fa-star"></i></span>
+              </div>
+            </div>
+            <div class="detailSalon-name">{{ stylist.get_fullName }}</div>
+            <div class="detailSalon-role">{{ stylist.expert }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="detailSalon-bottom-sheet" id="detailSalon_reviewModal" style="display:none;height:0">
+  <div class="detailSalon-bottom-sheet-content">
+    <div class="detailSalon-bottom-sheet-header">
+      <button class="detailSalon-close-modal-btn" id="detailSalon_closeReviewModal"><i class="fa-solid fa-xmark"></i></button>
+      <h2 class="detailSalon-sheet-title">دیدگاه‌ها</h2>
+    </div>
+
+    <div class="detailSalon-modal-reviews-summary">
+      {% if average_score %}
+        <div class="detailSalon-average-stars">
+          {% for i in 5|make_range %}
+            {% if average_score >= i %}<i class="fa-solid fa-star"></i>
+            {% elif average_score >= i|subtract:0.5 %}<i class="fa-solid fa-star-half-stroke fa-flip-horizontal"></i>
+            {% else %}<i class="fa-regular fa-star"></i>{% endif %}
+          {% endfor %}
+        </div>
+        <span class="detailSalon-avg-score">{{ average_score|round_value }}</span>
+        <span class="detailSalon-total-reviews">{{ total_reviews }} دیدگاه</span>
+      {% else %}
+        <p>بدون امتیاز</p>
+      {% endif %}
+    </div>
+
+    <div class="detailSalon-reviews-filter-section">
+      <h3 class="detailSalon-filter-title">فیلتر شده با</h3>
+      {% for star in '54321'|make_list %}{% with star_int=star|add:'0' %}
+        <div class="detailSalon-rating-filter">
+          <input type="checkbox" class="detailSalon-star-filter-checkbox" id="detailSalon_star{{ star_int }}" checked />
+          <label for="detailSalon_star{{ star_int }}">{{ star_int }}</label>
+          <div class="detailSalon-progress-bar">
+            <div class="detailSalon-progress-bar-fill"
+                 style="width:{% if total_reviews > 0 %}{{ star_counts|dict_lookup:star_int|to_percent:total_reviews|floatformat:0 }}%{% else %}0%{% endif %}"></div>
+          </div>
+          <span class="detailSalon-star-count">{{ star_counts|dict_lookup:star_int }}</span>
+        </div>
+      {% endwith %}{% endfor %}
+    </div>
+
+    <div class="detailSalon-reviews-filter-result">
+      <span id="detailSalon_reviewsVisibleCount">0</span> دیدگاه
+    </div>
+
+    <div class="detailSalon-modal-reviews-list" id="detailSalon_modalReviewsList"></div>
+  </div>
+</div>
+
+<div class="detailSalon-fullscreen-sample" id="detailSalon_fullscreenSample" style="display:none">
+  <span class="close-btn" id="detailSalon_closeFullscreenSample"><i class="fa-solid fa-xmark"></i></span>
+  <img id="detailSalon_fullscreenSampleImage" src="" alt="Fullscreen Sample" />
+  <div class="sample-detail-text" id="detailSalon_fullscreenSampleText"></div>
+</div>
+{% endblock %}
+
+{# =========================================
+   جاوااسکریپت‌ها (Vendor + متغیرهای سراسری)
+   نکته: app.js در layout بعد از این بلوک لود می‌شود.
+   ========================================= #}
+{% block js %}
+  <!-- Vendor JS (فقط همین صفحه) -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- متغیرهای سراسری که detail_salon.js استفاده می‌کند -->
+  <script>
+    {% if salon.location %}
+      window.salonLat = '{{ salon.location.y }}';
+      window.salonLng = '{{ salon.location.x }}';
+    {% endif %}
+    window.salonName = "{{ salon.salon_name|escapejs }}";
+
+    window.allReviews = [
+      {% for c in comments_list %}
+        {
+          "score": {{ c.score|default:0 }},
+          "comment_text": "{{ c.comment_text|escapejs }}",
+          "date": "{{ c.date|escapejs }}",
+          "user_full_name": "{{ c.user_full_name|escapejs }}",
+          "avatar_url": "{{ c.avatar_url|default_if_none:'#'|escapejs }}",
+          "stylist_name": "{{ c.stylist_name|default_if_none:''|escapejs }}",
+          "service_name": "{{ c.service_name|default_if_none:''|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ] || [];
+
+    window.addFavoriteUrl = "{% url 'csf:add_favorite' %}";
+  </script>
+{% endblock %}

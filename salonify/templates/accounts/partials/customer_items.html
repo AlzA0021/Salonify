@@ -1,0 +1,141 @@
+
+<!-- مودال آیتم‌ها -->
+<div class="modal-overlay" id="items-modal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">آیتم‌ها</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-content">
+            <!-- بخش تب‌ها -->
+            <div class="items-tabs">
+                <button class="tab-pill" data-tab="products">محصولات</button>
+                <button class="tab-pill" data-tab="memberships">عضویت‌ها</button>
+                <button class="tab-pill active" data-tab="services">
+                    خدمات 
+                    <span class="counter">{{ order_details.count }}</span>
+                </button>
+            </div>
+           
+            <!-- بخش خدمات -->
+            <div id="services-content" class="tab-content active">
+                {% for detail in order_details %}
+                <div class="items-card">
+                    <div class="item-content">
+                        <div class="item-indicator" style="background-color: {% if detail.order.is_finally %}green{% else %}orange{% endif %};"></div>
+                        <div class="item-info">
+                            <h3 class="item-title">{{ detail.service.service_name }}</h3>
+                            <p class="item-meta">
+                                {{ detail.date|date:"l d F" }} • با {{ detail.stylist.user.name }} {{ detail.stylist.user.family }}
+                            </p>
+                        </div>
+                        <div class="item-price">
+                            <p class="price-value">{{ detail.price|floatformat:0 }} تومان</p>
+                        </div>
+                    </div>
+                    
+                    <div class="item-actions">
+                        <button class="action-button view-sale" data-order-id="{{ detail.order.id }}">مشاهده فروش</button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-items">
+                    <p>هیچ خدمتی برای این مشتری ثبت نشده است.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- بخش محصولات -->
+            <div id="products-content" class="tab-content">
+                <div class="no-items">
+                    <p>هیچ محصولی برای این مشتری ثبت نشده است.</p>
+                </div>
+            </div>
+
+            <!-- بخش عضویت‌ها -->
+            <div id="memberships-content" class="tab-content">
+                <div class="no-items">
+                    <p>هیچ عضویتی برای این مشتری ثبت نشده است.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // مدیریت تب‌ها
+        const tabs = document.querySelectorAll('.tab-pill');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // غیرفعال کردن همه تب‌ها
+                tabs.forEach(t => t.classList.remove('active'));
+                // فعال کردن تب کلیک شده
+                this.classList.add('active');
+                
+                // مخفی کردن همه محتواهای تب
+                const tabContents = document.querySelectorAll('.tab-content');
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // نمایش محتوای تب انتخاب شده
+                const tabName = this.getAttribute('data-tab');
+                document.getElementById(tabName + '-content').classList.add('active');
+            });
+        });
+        
+        // بستن مودال
+        document.querySelector('#items-modal .modal-close').addEventListener('click', function() {
+            document.getElementById('items-modal').style.display = 'none';
+        });
+        
+        // مشاهده فروش
+        const viewSaleButtons = document.querySelectorAll('.view-sale');
+        viewSaleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const orderId = this.getAttribute('data-order-id');
+                // مخفی کردن مودال آیتم‌ها
+                document.getElementById('items-modal').style.display = 'none';
+                // نمایش مودال فروش
+                const salesModal = document.getElementById('sales-modal');
+                if (salesModal) {
+                    salesModal.style.display = 'flex';
+                }
+                // می‌توانید کد اضافی برای فیلتر کردن فروش براساس شناسه سفارش اضافه کنید
+            });
+        });
+    });
+</script>
+
+{% comment %} <style>
+    /* استایل‌های مربوط به مودال آیتم‌ها */
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    .item-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-left: 10px;
+    }
+    .items-card {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    .item-content {
+        display: flex;
+        padding: 15px;
+        align-items: center;
+    }
+    .item-info {
+        flex-grow: 1;
+    }
+    .no-items {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+</style> {% endcomment %}

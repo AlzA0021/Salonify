@@ -1,0 +1,40 @@
+<div class="filter-modal" id="filter-modal">
+    <div class="filter-header">
+        <h2>فیلترها</h2>
+        <button class="filter-close" id="filter-close">&times;</button>
+    </div>
+    <div class="filter-content">
+        <form id="filter-form" method="post" action="{% url 'search:filter_customers' %}">
+            {% csrf_token %}
+            
+            <div class="filter-group">
+                <h3>مرتب سازی بر اساس</h3>
+                <div class="select-wrapper">
+                    <select name="sort_by" class="filter-select">
+                        <option value="newest" selected> جدیدترین</option>
+                        <option value="oldest">  قدیمی ترین </option>
+                        <option value="name_asc">نام (الف تا ی)</option>
+                        <option value="name_desc">نام (ی تا الف)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <h3>گروه مشتری</h3>
+                <div class="select-wrapper">
+                    <select name="client_group" class="filter-select">
+                        <option value="all" selected>All types</option>
+                        <option value="vip">مشتریان VIP</option>
+                        <option value="regular">مشتریان عادی</option>
+                        <option value="new">مشتریان جدید</option>
+                    </select>
+                </div>
+            </div>
+                   
+            <div class="filter-actions">
+                <button type="button" class="clear-filters" id="clear-filters">پاک کردن  </button>
+                <button type="submit" class="apply-filters">اعمال</button>
+            </div>
+        </form>
+    </div>
+</div>

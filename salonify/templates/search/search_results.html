@@ -1,0 +1,75 @@
+{% extends 'main_template.html' %}
+
+{% block content %}
+  {% if services or stylists or salons %}
+    {% if services %}
+      <div>
+        <h2>نتایج جستجوی خدمات</h2>
+        <!-- اسلایدر خدمات -->
+        <div class="swiper topService-swiper-container">
+          <div class="swiper-wrapper">
+            {% for service in services %}
+              <div class="swiper-slide">
+                {% include 'services/partials/service_card.html' %}
+              </div>
+            {% empty %}
+              <p class="top-section-no-section">هیچ سرویسی برای نمایش وجود ندارد.</p>
+            {% endfor %}
+          </div>
+
+          {% comment %} <!-- دکمه‌های ناوبری -->
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div> {% endcomment %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if stylists %}
+      <div>
+        <h2>نتایج جستجوی آرایشگران</h2>
+        <!-- اسلایدر آرایشگران -->
+        <div class="swiper topStylist-swiper-container">
+          <div class="swiper-wrapper">
+            {% for stylist in stylists %}
+              <div class="swiper-slide">
+                {% include 'stylists/partials/stylist_card.html' %}
+              </div>
+            {% empty %}
+              <p class="top-section-no-section">هیچ آرایشگری برای نمایش وجود ندارد.</p>
+            {% endfor %}
+          </div>
+
+          {% comment %} <!-- دکمه‌های ناوبری -->
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div> {% endcomment %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if salons %}
+      <div>
+        <h2>نتایج جستجوی سالن ها</h2>
+        <!-- اسلایدر سالن‌ها -->
+        <div class="swiper topSalon-swiper-container">
+          <div class="swiper-wrapper">
+            {% for salon in salons %}
+              <div class="swiper-slide">
+                {% include 'salons/partials/salon_card.html' %}
+              </div>
+            {% empty %}
+              <p class="top-section-no-section">هیچ سالنی برای نمایش وجود ندارد.</p>
+            {% endfor %}
+          </div>
+          {% comment %}
+          <!-- دکمه‌های ناوبری -->
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div> {% endcomment %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="no-content-wrapper">
+      <p class="no-content">هیچ نتیجه‌ای برای نمایش وجود ندارد.</p>
+    </div>
+  {% endif %}
+{% endblock %}

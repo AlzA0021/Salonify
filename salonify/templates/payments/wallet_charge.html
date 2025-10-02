@@ -1,0 +1,640 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}شارژ کیف پول{% endblock %}
+
+{% block head %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .container {
+        max-width: 400px;
+        margin: 0 auto;
+        background: transparent;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .page-wrapper {
+        background: linear-gradient(90deg, #6b5bff 0%, #ff59c7 100%);
+        min-height: 100vh;
+        padding: 0;
+    }
+
+    .header {
+        background: transparent;
+        padding: 20px;
+        position: relative;
+        color: white;
+    }
+
+
+    .wallet-info {
+        text-align: center;
+        padding: 60px 20px 40px;
+    }
+
+    .balance-amount {
+        font-size: 3.5rem;
+        font-weight: 300;
+        color: white;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .balance-label {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 10px;
+    }
+
+    .user-name {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 30px;
+    }
+
+    .gift-card-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        color: white;
+        padding: 12px 24px;
+        font-size: 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .gift-card-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .content-section {
+        background: white;
+        border-radius: 20px 20px 0 0;
+        margin-top: 40px;
+        padding: 30px 20px;
+        min-height: calc(100vh - 300px);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 30px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .amount-input {
+        width: 100%;
+        padding: 18px;
+        border: 2px solid #f0f0f0;
+        border-radius: 15px;
+        font-size: 1.2rem;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+        margin-bottom: 8px;
+    }
+
+    .amount-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+    }
+
+    .form-text {
+        font-size: 0.9rem;
+        color: #666;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .quick-amounts-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .quick-amounts {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .quick-amount-btn {
+        background: #f8f9fa;
+        border: 2px solid #f0f0f0;
+        border-radius: 15px;
+        padding: 15px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    .quick-amount-btn:hover {
+        background: #e9ecef;
+        border-color: #667eea;
+    }
+
+    .quick-amount-btn:active {
+        transform: scale(0.95);
+    }
+
+    .quick-amount-btn.active {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .charge-summary {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+        display: none;
+    }
+
+    .summary-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-row:last-child {
+        border-bottom: none;
+        font-weight: 600;
+        color: #28a745;
+        padding-top: 15px;
+        border-top: 2px solid #eee;
+    }
+
+    .amount-display {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .charge-btn {
+        width: 100%;
+        background: linear-gradient(90deg, #6b5bff 0%, #ff59c7 100%);
+        border: none;
+        border-radius: 15px;
+        color: white;
+        padding: 18px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .charge-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+
+    .charge-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .security-info {
+        text-align: center;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 10px;
+    }
+
+    .security-info small {
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .back-link a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #667eea;
+        text-decoration: none;
+        padding: 10px 20px;
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .back-link a:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .loading {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    .alert-dismissible .btn-close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 1rem;
+        color: inherit;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+        .balance-amount {
+            font-size: 3rem;
+        }
+        
+        .quick-amounts {
+            grid-template-columns: 1fr;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 0 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="container">
+        <!-- Header with wallet balance -->
+        <div class="header">
+            <a href="{% url 'payments:detail' %}" class="back-btn">
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            
+            <div class="wallet-info">
+                <div class="balance-label">موجودی فعلی</div>
+                <div class="balance-amount">{{ wallet.balance|floatformat:0|intcomma }} تومان</div>
+                <div class="user-name">کیف پول {{ user.get_fullName|default:user.name }}</div>
+                
+                <button class="gift-card-btn" type="button">
+                    <i class="fas fa-plus"></i>
+                    افزودن گیفت کارت
+                </button>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="content-section">
+            <!-- Alerts -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">&times;</button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Charge section -->
+            <div class="section-title">
+                <i class="fas fa-plus-circle"></i>
+                شارژ کیف پول
+            </div>
+
+            <form method="post" id="chargeForm">
+                {% csrf_token %}
+                
+                <!-- Amount input -->
+                <div class="mb-3">
+                    <label for="amount" class="form-label">مبلغ شارژ (تومان)</label>
+                    <input type="text" 
+                           class="amount-input" 
+                           id="amount" 
+                           name="amount" 
+                           placeholder="مبلغ مورد نظر را وارد کنید"
+                           inputmode="numeric"
+                           pattern="[0-9,]*"
+                           autocomplete="off"
+                           required>
+                    <div class="form-text">حداقل: 10,000 تومان | حداکثر: 50,000,000 تومان</div>
+                </div>
+
+                <!-- Quick amount buttons -->
+                <div class="mb-4">
+                    <label class="quick-amounts-label">مبالغ پیشنهادی</label>
+                    <div class="quick-amounts">
+                        <div class="quick-amount-btn" data-amount="50000">
+                            50 هزار
+                        </div>
+                        <div class="quick-amount-btn" data-amount="100000">
+                            100 هزار
+                        </div>
+                        <div class="quick-amount-btn" data-amount="200000">
+                            200 هزار
+                        </div>
+                        <div class="quick-amount-btn" data-amount="500000">
+                            500 هزار
+                        </div>
+                        <div class="quick-amount-btn" data-amount="1000000">
+                            1 میلیون
+                        </div>
+                        <div class="quick-amount-btn" data-amount="2000000">
+                            2 میلیون
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charge summary -->
+                <div class="charge-summary" id="chargeInfo">
+                    <div class="summary-title">
+                        <i class="fas fa-info-circle"></i>
+                        خلاصه تراکنش
+                    </div>
+                    <div class="summary-row">
+                        <span>موجودی فعلی:</span>
+                        <span>{{ wallet.balance|floatformat:0|intcomma }} تومان</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>مبلغ شارژ:</span>
+                        <span id="chargeAmount" class="amount-display">0 تومان</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>موجودی پس از شارژ:</span>
+                        <span id="totalBalance" class="amount-display">{{ wallet.balance|floatformat:0|intcomma }} تومان</span>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" class="charge-btn" id="submitBtn" disabled>
+                    <i class="fas fa-credit-card"></i>
+                    پرداخت و شارژ کیف پول
+                </button>
+            </form>
+
+            <!-- Security info -->
+            <div class="security-info">
+                <small>
+                    <i class="fas fa-shield-alt"></i>
+                    پرداخت از طریق درگاه امن زرین‌پال انجام می‌شود
+                </small>
+            </div>
+
+            <!-- Back link -->
+            <div class="back-link">
+                <a href="{% url 'payments:detail' %}">
+                    <i class="fas fa-arrow-right"></i>
+                    بازگشت به کیف پول
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.getElementById('amount');
+    const quickAmountBtns = document.querySelectorAll('.quick-amount-btn');
+    const chargeInfo = document.getElementById('chargeInfo');
+    const chargeAmount = document.getElementById('chargeAmount');
+    const totalBalance = document.getElementById('totalBalance');
+    const submitBtn = document.getElementById('submitBtn');
+    const currentBalance = {{ wallet.balance }};
+
+    // فرمت کردن عدد با کاما
+    function formatNumber(num) {
+        if (!num) return '';
+        // تبدیل عدد به رشته و اضافه کردن کاما
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // حذف کاما و تبدیل به عدد
+    function parseNumber(str) {
+        if (!str) return 0;
+        // حذف کاما و تبدیل به عدد
+        const cleanStr = str.replace(/,/g, '');
+        return parseInt(cleanStr) || 0;
+    }
+
+    // اعتبارسنجی مبلغ
+    function validateAmount(amount) {
+        const numAmount = typeof amount === 'string' ? parseNumber(amount) : amount;
+        console.log('Validating amount:', numAmount); // برای دیباگ
+        
+        if (isNaN(numAmount) || numAmount <= 0) {
+            console.log('Invalid number or zero');
+            return false;
+        }
+        if (numAmount < 10000) {
+            console.log('Less than minimum');
+            return false;
+        }
+        if (numAmount > 50000000) {
+            console.log('More than maximum');
+            return false;
+        }
+        console.log('Amount is valid');
+        return true;
+    }
+
+    // به‌روزرسانی نمایش اطلاعات
+    function updateChargeInfo(amount) {
+        const numAmount = typeof amount === 'string' ? parseNumber(amount) : amount;
+        console.log('Updating charge info with amount:', numAmount); // برای دیباگ
+        
+        if (validateAmount(numAmount)) {
+            chargeAmount.textContent = formatNumber(numAmount) + ' تومان';
+            totalBalance.textContent = formatNumber(currentBalance + numAmount) + ' تومان';
+            chargeInfo.style.display = 'block';
+            submitBtn.disabled = false;
+            console.log('Button enabled'); // برای دیباگ
+        } else {
+            chargeInfo.style.display = 'none';
+            submitBtn.disabled = true;
+            console.log('Button disabled'); // برای دیباگ
+        }
+    }
+
+    // مدیریت ورودی مبلغ
+    amountInput.addEventListener('Keyup', function(e) {
+        console.log('Keyup event triggered with value:', e.target.value); // برای دیباگ
+        
+        // حذف کاراکترهای غیرعددی و کاما
+        let value = e.target.value.replace(/[^0-9]/g, '');
+        console.log('Cleaned value:', value); // برای دیباگ
+        
+        // فرمت کردن با کاما
+        if (value) {
+            const formattedValue = formatNumber(value);
+            e.target.value = formattedValue;
+            console.log('Formatted value:', formattedValue); // برای دیباگ
+            updateChargeInfo(parseInt(value));
+        } else {
+            e.target.value = '';
+            chargeInfo.style.display = 'none';
+            submitBtn.disabled = true;
+            console.log('Input cleared'); // برای دیباگ
+        }
+
+        // حذف active از دکمه‌های سریع
+        quickAmountBtns.forEach(btn => btn.classList.remove('active'));
+    });
+
+    amountInput.addEventListener('paste', function(e) {
+    // صبر تا بعد از paste (چون value بلافاصله بروز نمی‌شود)
+    setTimeout(() => {
+        let value = e.target.value.replace(/[^0-9]/g, '');
+        if (value) {
+            const formattedValue = formatNumber(value);
+            e.target.value = formattedValue;
+            updateChargeInfo(parseInt(value));
+        } else {
+            e.target.value = '';
+            chargeInfo.style.display = 'none';
+            submitBtn.disabled = true;
+        }
+        quickAmountBtns.forEach(btn => btn.classList.remove('active'));
+    }, 0);
+    });
+    // مدیریت دکمه‌های مبلغ سریع
+    quickAmountBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const amount = parseInt(this.dataset.amount);
+            console.log('Quick button clicked with amount:', amount); // برای دیباگ
+            
+            // حذف active از همه دکمه‌ها
+            quickAmountBtns.forEach(b => b.classList.remove('active'));
+            
+            // اضافه کردن active به دکمه انتخاب شده
+            this.classList.add('active');
+            
+            // تنظیم مقدار در input
+            amountInput.value = formatNumber(amount);
+            console.log('Input value set to:', amountInput.value); // برای دیباگ
+            updateChargeInfo(amount);
+        });
+    });
+
+    // مدیریت ارسال فرم
+    document.getElementById('chargeForm').addEventListener('submit', function(e) {
+        const inputValue = amountInput.value;
+        const amount = parseNumber(inputValue);
+        console.log('Form submitted with amount:', amount); // برای دیباگ
+        
+        if (!validateAmount(amount)) {
+            e.preventDefault();
+            alert('لطفاً مبلغ معتبر وارد کنید (حداقل 10,000 و حداکثر 50,000,000 تومان)');
+            return false;
+        }
+        
+        // تأیید از کاربر
+        const confirmMessage = `آیا از شارژ کیف پول با مبلغ ${formatNumber(amount)} تومان اطمینان دارید؟`;
+        if (!confirm(confirmMessage)) {
+            e.preventDefault();
+            return false;
+        }
+
+        // تنظیم مقدار خام برای ارسال به سرور
+        amountInput.value = amount.toString();
+
+        // غیرفعال کردن دکمه تا جلوی ارسال مکرر گرفته شود
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner loading"></i>در حال انتقال به درگاه پرداخت...';
+    });
+
+    // Gift card button functionality
+    document.querySelector('.gift-card-btn').addEventListener('click', function() {
+        alert('قابلیت افزودن گیفت کارت به زودی اضافه خواهد شد');
+    });
+
+    // Alert close functionality
+    document.querySelectorAll('.btn-close').forEach(function(closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            this.closest('.alert').style.display = 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

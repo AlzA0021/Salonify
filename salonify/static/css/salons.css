@@ -1,0 +1,149 @@
+/* ================= (Salons) صفحه سالن ها ============================== */
+
+.salons-user-dashboard {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.salons-profile-greeting {
+  margin-right: 2rem;
+}
+.salons-slider-section {
+  direction: rtl;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.salons-slider-section h3 {
+  display: flex;
+  justify-content: start;
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+  margin-right: 1rem;
+}
+
+.salons-recent-swiper,
+.salons-top-swiper {
+  padding: 20px 0 40px 0;
+}
+
+.salons-swiper-slide {
+  width: 300px;
+  transition: transform 0.3s;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.salons-swiper-slide:hover {
+  transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+  .salons-swiper-slide {
+    width: 250px;
+  }
+}
+
+/* ============================================== */
+/* Salons Card */
+
+.salons-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-top: 10px;
+  transition: transform 0.3s ease;
+}
+
+.salons-card:hover {
+  transform: translateY(-5px);
+}
+
+.salons-card-image img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.salons-card-details {
+  padding: 15px;
+  direction: rtl;
+}
+
+.salons-card-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.salons-card-discount {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-right: 55%;
+}
+
+.salons-card-address {
+  font-size: 14px;
+  color: #666;
+  margin: 8px 0;
+}
+
+.salons-card-body p {
+  margin: 5px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.salons-card-body p i {
+  font-size: 24px;
+}
+
+.salons-card-body p i.fa-location-dot {
+  color: #007bff;
+}
+
+.salons-card-body p i.fa-star {
+  color: #ffc107;
+}
+
+.salons-card-body p i.fa-location-dot {
+  font-size: 20px;
+  color: #8c091b;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.like-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: #ffffffcc;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.like-button i {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+.like-button i.liked {
+  color: red;
+}

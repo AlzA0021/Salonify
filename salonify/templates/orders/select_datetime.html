@@ -1,0 +1,120 @@
+{% extends "main_template.html" %}
+{% load static %}
+
+{% block title %}انتخاب تاریخ و زمان{% endblock title %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/select_datetime.css' %}">
+
+  {# jQuery و تقویم فارسی (Babakhani) #}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+  <script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
+  <script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
+  <style>
+    .datepicker-plot-area{font-family:'IRANSans','Tahoma',sans-serif!important;direction:rtl}
+    #inlineCalendarContainer{width:100%;margin:0 auto}
+    .calendar-modal.show{display:block!important}
+  </style>
+
+  <script>
+    // متغیرهای سراسری موردنیاز JS
+    window.CSRF_TOKEN = '{{ csrf_token }}';
+    window.STATIC_URL = '{{ STATIC_URL }}';
+    window.INITIAL_MONTH = '{{ month_name }}';
+    window.INITIAL_YEAR  = '{{ current_year }}';
+  </script>
+{% endblock head %}
+
+{# برای اتصال app.js به این صفحه #}
+{% block body_attrs %}data-page="select_datetime"{% endblock %}
+
+{% block content %}
+  <!-- هدر ثابت -->
+  <header class="fixed-header">
+    <button class="back-button" onclick="window.history.back();">
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+    <div class="header-title">انتخاب تاریخ و زمان</div>
+  </header>
+
+  <!-- شناسه سالن -->
+  <input type="hidden" id="current_salon_id" value="{{ salon_id }}">
+
+  <!-- مودال تقویم -->
+  <div class="calendar-modal" id="calendarModal" style="display:none">
+    <h3 class="modal-title">انتخاب تاریخ</h3>
+    <input type="hidden" id="modalDatePicker" readonly>
+    <div id="inlineCalendarContainer" class="inline-calendar"></div>
+    <div class="modal-close-container">
+      <button id="modalCloseBtn" class="close-modal">بستن</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- دراپ‌داون آرایشگر -->
+    <div class="stylist-dropdown-container">
+      <div class="stylist-dropdown">
+        <div class="dropdown-header" id="stylistDropdownHeader">
+          {% with first_stylist=stylists_data.0 %}
+            {% if first_stylist.stylist.profile_image %}
+              <img src="{{ first_stylist.stylist.profile_image.url }}" alt="{{ first_stylist.stylist.get_fullName }}">
+            {% else %}
+              <img src="{% static 'css/images/default-avatar.png' %}" alt="{{ first_stylist.stylist.get_fullName }}">
+            {% endif %}
+            <span>{{ first_stylist.stylist.get_fullName }}</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          {% endwith %}
+        </div>
+        <div class="dropdown-content" id="stylistDropdownContent">
+          {% for item in stylists_data %}
+            <div class="stylist-option" data-stylist-id="{{ item.stylist.user.id }}">
+              {% if item.stylist.profile_image %}
+                <img src="{{ item.stylist.profile_image.url }}" alt="{{ item.stylist.get_fullName }}">
+              {% else %}
+                <img src="{% static 'css/images/default-avatar.png' %}" alt="{{ item.stylist.get_fullName }}">
+              {% endif %}
+              <span>{{ item.stylist.get_fullName }}</span>
+              <span class="slot-count">({{ item.available_slots_count }} سانس)</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="calendar-icon-container">
+        <i class="fa-solid fa-calendar calendar-icon" id="calendarIcon"></i>
+      </div>
+    </div>
+
+    <!-- تب‌های محتوا -->
+    <div class="tabs-contents">
+      {% for item in stylists_data %}
+        <div class="tab-content {% if forloop.first %}active{% endif %}"
+             id="tab-{{ item.stylist.user.id }}"
+             data-stylist-id="{{ item.stylist.user.id }}">
+          <div class="month-header" id="monthYearDisplay">{{ month_name }} {{ current_year }}</div>
+
+          <div class="days-container" id="daysContainer-{{ item.stylist.user.id }}">
+            {% for day in days %}
+              <div class="day-wrapper">
+                <div class="day-circle" data-date="{{ day.date_str }}">
+                  <div>{{ day.jalali_day }}</div>
+                  <small>{{ day.day_name }}</small>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="day-content" id="dayContent-{{ item.stylist.user.id }}"></div>
+
+          <script id="schedule-{{ item.stylist.user.id }}" type="application/json">
+            {{ item.schedule_json|safe }}
+          </script>
+        </div>
+      {% endfor %}
+    </div>
+
+    <button class="finalize-button" onclick="window.finalizeSelection()">نهایی کردن انتخاب</button>
+  </div>
+{% endblock content %}

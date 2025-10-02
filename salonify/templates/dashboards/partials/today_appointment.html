@@ -1,0 +1,45 @@
+{% load jalali_extras %}
+<div class="today-appointments-container">
+    <h3 class="appointments-title">نوبت های بعدی امروز</h3>
+    
+    {% if today_appointments %}
+      {% for appointment in today_appointments %}
+        <div class="appointment-card">
+          <div class="appointment-date">
+            {% with date_obj=appointment.date|date:"d" %}
+              {{ date_obj }}
+              <div class="month">{{ appointment.date|jalali_date:"%B" }}</div>
+
+            {% endwith %}
+          </div>
+          
+          <div class="appointment-details">
+            <div class="time-status">
+              <span class="time">{{ appointment.time|date:"H:i" }}</span>
+              <span class="status-booked">رزرو شده </span>
+            </div>
+            
+            <div class="service-name">{{ appointment.service.service_name }}</div>
+            
+            <div class="client-info">
+              {{ appointment.order.customer.user.name }} {{ appointment.order.customer.user.family }}, {{ appointment.service.duration_minutes|floatformat:"0" }}min
+              <div class="stylist">با {{ appointment.stylist.user.name }}  {{ appointment.stylist.user.family }}</div>
+            </div>
+          </div>
+          
+          <div class="price-info">
+            <span class="price"> {{ appointment.price }} تومان</span>
+            <span class="arrow"><i class="fa-solid fa-angle-right"></i></span>
+          </div>
+        </div>
+        {% if not forloop.last %}
+          <hr class="appointment-divider">
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <div class="no-appointments">
+        <p>هیچ نوبتی برای امروز وجود ندارد </p>
+      </div>
+    {% endif %}
+  </div>
+  

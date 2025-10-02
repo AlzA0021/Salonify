@@ -1,0 +1,79 @@
+{% extends "main_template.html" %}
+{% load static %}
+
+{% block title %}
+  ویرایش پروفایل
+{% endblock title %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/customer_update_profile.css' %}">
+{% endblock head %}
+
+{% block content %}
+  <div class="container">
+    <!-- دکمه بازگشت -->
+    <a href="javascript:history.back()" class="back-btn">
+      <i class="fa-solid fa-xmark"></i>
+    </a>
+
+    <!-- نمایش تصویر پروفایل کاربر -->
+    <img src="{{ image_url.url }}" alt="تصویر پروفایل" class="profile-img"
+         onerror="this.src='{% static 'images/default-profile.png' %}'">
+
+    <!-- عنوان صفحه -->
+    <div class="title">ویرایش پروفایل</div>
+
+    <!-- فرم ویرایش پروفایل -->
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <!-- فیلد نام -->
+      <div class="form-group">
+        {{ form.name.label_tag }}
+        {{ form.name }}
+        {% if form.name.errors %}
+          <div class="error">{{ form.name.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- فیلد نام خانوادگی -->
+      <div class="form-group">
+        {{ form.family.label_tag }}
+        {{ form.family }}
+        {% if form.family.errors %}
+          <div class="error">{{ form.family.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- فیلد ایمیل -->
+      <div class="form-group">
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div class="error">{{ form.email.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- فیلد شماره موبایل -->
+      <div class="form-group">
+        {{ form.mobile_number.label_tag }}
+        {{ form.mobile_number }}
+        {% if form.mobile_number.errors %}
+          <div class="error">{{ form.mobile_number.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- فیلد آدرس -->
+      <div class="form-group">
+        {{ form.address.label_tag }}
+        {{ form.address }}
+        {% if form.address.errors %}
+          <div class="error">{{ form.address.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- دکمه ارسال فرم -->
+      <button type="submit" class="btn">ذخیره تغییرات</button>
+    </form>
+  </div>
+{% endblock content %}

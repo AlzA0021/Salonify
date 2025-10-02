@@ -1,0 +1,39 @@
+/*! salonify: components/button.css */
+.btn,
+.primary-button,
+.primary-btn,
+.save-btn,
+.submit-btn{
+  --_bg: var(--primary-500);
+  --_fg: #fff;
+  --_bd: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--_bd);
+  background: var(--_bg);
+  color: var(--_fg);
+  cursor: pointer;
+  transition: transform .06s ease, background .2s ease, box-shadow .2s ease;
+  box-shadow: var(--shadow-sm);
+  justify-content: center;
+}
+.btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn:active{ transform: translateY(0); box-shadow: var(--shadow-sm); }
+
+/* Variants */
+.btn--primary{ --_bg: var(--primary-500); --_fg:#fff; }
+.btn--outline,
+.secondary-button{
+  --_bg: #fff;
+  --_fg: var(--primary-600);
+  --_bd: var(--primary-300);
+}
+.btn--danger{ --_bg: var(--danger-500); }
+.btn--success{ --_bg: var(--success-500); }
+
+/* Sizes */
+.btn--sm{ padding: .4rem .75rem; font-size: var(--font-size-200); }
+.btn--lg{ padding: .8rem 1.25rem; font-size: var(--font-size-400); }

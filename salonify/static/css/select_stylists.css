@@ -1,0 +1,224 @@
+/* تنظیمات عمومی */
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  direction: rtl;
+}
+/* هدر ثابت */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem 2rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+.fixed-header .back-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+}
+.fixed-header .header-title {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 1.5rem;
+}
+/* آکاردئون خدمات */
+.accordion {
+  margin-top: 80px;
+  margin-bottom: 120px;
+}
+.accordion-item {
+  border-bottom: 1px solid #ddd;
+}
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  background: #fff6f6;
+}
+.accordion-header .toggle-icon {
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+.accordion-header.active .toggle-icon {
+  transform: rotate(180deg);
+}
+.accordion-header .service-title {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 1.2rem;
+  margin-right: -2rem;
+}
+.accordion-content {
+  display: none;
+  padding: 1rem 2rem;
+  background: #fff;
+}
+.accordion-content.active {
+  display: block;
+}
+/* نوار پایین ثابت */
+.fixed-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+}
+.fixed-bottom-bar .selected-stylists-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1rem;
+}
+.fixed-bottom-bar .selected-stylists-info div {
+  margin-bottom: 0.5rem;
+}
+.fixed-bottom-bar img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+}
+.fixed-bottom-bar button {
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.fixed-bottom-bar button:hover {
+  background-color: #fff;
+  color: #333;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+}
+
+/* --- مودال آرایشگران (allStylistsModal) --- */
+.detailSalon-stylist-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 16px 16px 0 0;
+  transition: height 0.2s ease-out;
+  z-index: 9999;
+  overflow: hidden;
+}
+.detailSalon-stylist-modal-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+.detailSalon-stylist-modal-content .detailSalon-close-modal-btn {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  font-size: 2rem;
+  color: #000;
+}
+/* تیتر داخل مودال آرایشگران */
+.detailSalon-modal-title {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* بخش تیم در مودال چندستونه شود */
+.detailSalon-team-members {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 2rem;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.detailSalon-team-member-box {
+  border: 1px solid #cb28e0;
+  border-radius: 8px;
+  padding: 1rem;
+  width: calc(45% - 1rem);
+  margin: 0.5rem;
+  box-shadow: 0 2px 4px rgba(255, 23, 240, 0.1);
+  background-color: #fff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.detailSalon-team-member-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.detailSalon-team-member-box.selected {
+  background-color: #fff6f6;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+}
+
+.detailSalon-team-member-box img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.detailSalon-profile-image-container {
+  position: relative;
+  display: inline-block;
+}
+.detailSalon-rating-badge {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  background-color: #fff;
+  color: #000;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+.detailSalon-rating-star {
+  font-size: 1rem;
+  color: #ffd700;
+}
+.detailSalon-team-member .detailSalon-name {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 1.2rem;
+}
+.detailSalon-team-member .detailSalon-role {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+}

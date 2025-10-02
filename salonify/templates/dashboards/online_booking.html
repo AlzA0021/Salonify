@@ -1,0 +1,61 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block title %}رزرو آنلاین{% endblock title %}
+
+{# اجرای ماژول صفحه #}
+{% block body_attrs %}data-page="dashboard_online_booking"{% endblock %}
+
+{% block head %}
+
+{% comment %} <link rel="stylesheet" href="{% static 'css/dashboard/online_booking.css' %}"> {% endcomment %}
+
+{% endblock head %}
+
+{% block content %}
+<div class="container online-booking-page">
+  <div class="header">
+    <button class="back-button"
+            type="button"
+            aria-label="بازگشت"
+            data-action="go-back"
+            data-fallback-url="{% url 'dashboards:salon_manager_dashboard' %}">
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+    <h1 class="page-title">رزرو آنلاین</h1>
+  </div>
+
+  <div class="card">
+    <a href="{% url 'dashboards:salon_profile_creator' %}" class="option">
+      <div class="icon"><i class="fa-solid fa-house-user"></i></div>
+      <div class="option-text">پروفایل سالن</div>
+      <div class="arrow"><i class="fa-solid fa-angle-left"></i></div>
+    </a>
+
+    <a href="javascript:void(0)" class="option" data-disabled="true" title="به‌زودی">
+      <div class="icon"><i class="fa-brands fa-google"></i></div>
+      <div class="option-text">رزرو با گوگل</div>
+      <div class="arrow"><i class="fa-solid fa-angle-left"></i></div>
+    </a>
+
+    <a href="javascript:void(0)" class="option" data-disabled="true" title="به‌زودی">
+      <div class="icon"><i class="fa-brands fa-instagram"></i></div>
+      <div class="option-text">اینستاگرام</div>
+      <div class="arrow"><i class="fa-solid fa-angle-left"></i></div>
+    </a>
+
+    <a href="javascript:void(0)" class="option" data-disabled="true" title="به‌زودی">
+      <div class="icon"><i class="fa-solid fa-link"></i></div>
+      <div class="option-text">لینک‌ساز</div>
+      <div class="arrow"><i class="fa-solid fa-angle-left"></i></div>
+    </a>
+  </div>
+
+  <h2 class="section-title">فروشگاه اینترنتی</h2>
+  <div class="empty-section">
+    {# می‌توانید یک empty-state حرفه‌ای اینجا قرار دهید #}
+  </div>
+</div>
+
+{# هیچ اسکریپت inlineی لازم نیست؛ app.js ماژول را بارگذاری می‌کند. #}
+{% endblock content %}

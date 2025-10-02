@@ -1,0 +1,97 @@
+{% extends "main_template.html" %}
+{% load static %}
+{% block title %}ثبت‌نام {% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock head %}
+{% block content %}
+<div class="login-page">
+  <div class="login-container">
+    <h2>ثبت‌نام در سایت</h2>
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+    
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <div class="form-group">
+        {{ form.mobile_number.label_tag }}
+        <div class="input-field">
+          <i class="fas fa-mobile-alt"></i>
+          {{ form.mobile_number }}
+        </div>
+        {% if form.mobile_number.errors %}
+          <div class="error">
+            {% for error in form.mobile_number.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        {{ form.password1.label_tag }}
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          {{ form.password1 }}
+        </div>
+        {% if form.password1.errors %}
+          <div class="error">
+            {% for error in form.password1.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        {{ form.password2.label_tag }}
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          {{ form.password2 }}
+        </div>
+        {% if form.password2.errors %}
+          <div class="error">
+            {% for error in form.password2.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="form-group checkbox-group">
+        {{ form.agree_to_terms }}
+        {{ form.agree_to_terms.label_tag }}
+        {% if form.agree_to_terms.errors %}
+          <div class="error">
+            {% for error in form.agree_to_terms.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <button type="submit" class="btn btn-primary">ثبت‌نام</button>
+    </form>
+    
+    <div class="alt-login">
+      <p>یا ثبت‌نام با</p>
+      <div class="social-login">
+        <a href="#" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="social-btn google"><i class="fab fa-google"></i></a>
+      </div>
+    </div>
+    
+    <div class="login-link">
+      <p>قبلاً ثبت‌نام کرده‌اید؟ <a href="{% url 'accounts:login' %}">وارد شوید</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+[tool.black]
+line-length = 99
+target-version = ['py313'] # نسخه پایتون خود را اینجا وارد کنید
+
+[tool.isort]
+profile = "black"
+line_length = 99
+src_paths = ["salonify", "apps"]
+
+[tool.flake8]
+max-line-length = 99
+exclude = [
+    ".venv",
+    "__pycache__",
+    "migrations",
+    "manage.py",
+    "settings.py", # معمولا فایل تنظیمات را برای شروع نادیده می‌گیریم
+]
+# W503: line break before binary operator (توسط black مدیریت می‌شود)
+# E203: whitespace before ':' (توسط black مدیریت می‌شود)
+# B950: line too long (توسط black مدیریت می‌شود)
+ignore = ["W503", "E203", "B950"]
+
+[tool.djlint]
+profile = "django"
+line_length = 120
+indent_size = 4

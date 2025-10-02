@@ -1,0 +1,629 @@
+/* استایل نوار جستجو در بالای صفحه (روی نقشه، شفاف) */
+.search-container {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 500px;
+  z-index: 10;
+  background: none;
+  box-shadow: none;
+}
+.search-container input {
+  width: 30vh;
+  padding: 12px 75px 12px 50px;
+  border: none;
+  outline: none;
+  border-radius: 25px;
+  font-size: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  height: 4vh;
+  margin-top: 1.5rem;
+}
+/* دکمه منوی جستجو (آیکون منو) در سمت چپ */
+.search-container button:first-child {
+  position: absolute;
+  left: auto;
+  right: 0;
+  top: 60%;
+  transform: translateY(-50%);
+  background: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #555;
+  margin-top: 0.8rem;
+}
+/* دکمه جستجو (آیکون ذره‌بین) در سمت چپ */
+.search-container button {
+  position: absolute;
+  left: 0;
+  right: auto;
+  top: 60%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  font-size: 24px;
+  color: #555;
+  margin-top: 0.6rem;
+}
+.search-container button i {
+  width: 40px;
+  height: 40px;
+}
+/* استایل نقشه در پس‌زمینه */
+#map {
+  height: 100vh;
+  width: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+/* پنل کشویی (شامل دکمه‌های فیلتر و نتایج) */
+.filters-container {
+  position: fixed;
+  bottom: 45px;
+  left: 0;
+  width: 100%;
+  height: 90px; 
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  transition: height 0.3s ease-in-out;
+  z-index: 3;
+}
+/* زمانی که پنل کشویی باز است */
+.filters-container.open {
+  height: 92%;
+  z-index: 11;
+}
+/* دسته (handle) برای کشیدن پنل */
+.handle {
+  width: 50px;
+  height: 5px;
+  background: #ccc;
+  border-radius: 5px;
+  margin: 10px auto;
+  cursor: pointer;
+}
+/* استایل بخش دکمه‌های فیلتر */
+.closed-filters-buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 10px;
+  position: relative;
+}
+.closed-filters-buttons button {
+  background: none;
+  border: none;
+  font-size: 20px;
+}
+.filter-icon {
+  color: #000;
+}
+/* استایل منوی کشویی (dropdown) */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  flex: 1;
+  margin: 0 5px;
+  text-align: center;
+}
+.dropdown > button {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 16px;
+  background-color: #fff;
+  border: 2px solid #999;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dropdown > button i {
+  margin-left: 5px;
+  font-size: 14px;
+}
+/* استایل دکمه انتخاب شده */
+.dropdown > button.selected {
+  border-color: rgb(174, 0, 255);
+  background: rgba(239, 219, 249, 0.6);
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  z-index: 10;
+  left: 0;
+  top: 110%;
+}
+/* زمانی که بخش فیلترینگ بسته است، منوی کشویی به سمت بالا باز شود */
+.filters-container:not(.open) .dropdown-content {
+  top: auto;
+  bottom: 110%;
+}
+/* نمایش منوی کشویی زمانی که کلاس active اضافه شود */
+.dropdown.active .dropdown-content {
+  display: block;
+}
+.dropdown-content a {
+  color: #333;
+  padding: 8px 12px;
+  text-decoration: none;
+  display: block;
+}
+.dropdown-content a:hover {
+  background: rgba(239, 219, 249, 0.6);
+}
+/* بخش نتایج (کارت‌های سالن) */
+.results-content {
+  padding: 10px;
+  background: #fff;
+  border-radius: 5px;
+  margin: 10px;
+  overflow-y: auto;
+  height: calc(90vh - 80px - 20px);
+  margin-top: 1rem;
+}
+.salon-item {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
+.salon-item h3 {
+  margin: 0 0 5px 0;
+}
+/* استایل‌های مدال */
+.search-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: modalFadeIn 0.3s ease;
+}
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  margin: 20px auto;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #666;
+}
+.modal-section {
+  margin: 20px 0;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+.modal-section h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+.filter-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  overflow-x: hidden;
+}
+.filter-item {
+  flex: 1;
+  min-width: 100px;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.filter-item i {
+  margin-left: 8px;
+}
+.filter-item.selected {
+  border-color: rgb(174, 0, 255);
+  background: rgb(255, 255, 255);
+}
+.filter-item:hover {
+  border-color: rgb(174, 0, 255);
+}
+.filter-item:first-child {
+  flex: 1;
+  min-width: 250px;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.category-item {
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.category-item:hover {
+  border-color: rgb(174, 0, 255);
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  border: 2px solid #ddd;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+.clear-btn {
+  background: #ffffff;
+  color: #666;
+}
+.primary-btn {
+  background: rgb(0, 0, 0);
+  color: white;
+}
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* استایل مودال جستجوی موقعیت */
+.location-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: modalFadeIn 0.3s ease;
+}
+.location-content {
+  background: #fff;
+  width: 90%;
+  max-width: 500px;
+  margin: 20px auto;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.location-modal .modal-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.location-modal .modal-header h3 {
+  flex-grow: 1;
+  text-align: center;
+  margin: 0;
+  font-size: 1.5rem;
+}
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #666;
+}
+.location-modal .modal-body input {
+  width: 90%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+.location-modal .modal-body .current-location button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+  color: #333;
+}
+.location-modal .modal-body .current-location button i {
+  margin-right: 8px;
+}
+.location-modal .modal-body h4 {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  color: #333;
+}
+.location-modal .modal-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+.location-modal .modal-body ul li {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+.location-modal .modal-body .address-options {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.location-modal .modal-body .address-options button {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+.location-modal .modal-body .address-options button i {
+  margin-right: 8px;
+}
+/* استایل پیشنهادات موقعیت */
+.suggestions {
+  background: #fff;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  width: 100%;
+  top: 58px;
+  left: 0;
+  z-index: 11;
+}
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+}
+.suggestion-item:hover {
+  background: #f0f0f0;
+}
+/* استایل مدال انتخاب تاریخ */
+.date-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: modalFadeIn 0.3s ease;
+}
+.date-modal .modal-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  margin: 20px auto;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.date-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.date-modal .modal-header h3 {
+  margin: 0 auto;
+  font-size: 1.5rem;
+}
+.date-quick-options button {
+  padding: 12px 18px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #fff;
+  color: #333;
+}
+.date-quick-options button.selected {
+  background: rgb(177, 99, 214);
+  color: white;
+}
+.date-picker input {
+  font-size: 1.2rem;
+  padding: 10px;
+}
+/* استایل مدال انتخاب زمان */
+.time-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: modalFadeIn 0.3s ease;
+}
+.time-modal .modal-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  margin: 20px auto;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.time-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.time-modal .modal-header h3 {
+  margin: 0 auto;
+  font-size: 1.5rem;
+}
+.time-quick-options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.time-quick-options button {
+  padding: 10px 15px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #fff;
+  margin: 0 5px;
+  color: #333;
+}
+.time-quick-options button.selected {
+  background: rgb(174, 0, 255);
+  color: white;
+}
+.time-range-selection select {
+  padding: 10px;
+  font-size: 16px;
+  margin: 0 5px;
+  background-color: #fff;
+  border: 2px solid #ddd;
+  color: #333;
+}
+
+#initialLocationModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+#initialLocationModal .modal-content {
+  background: white;
+  width: 90%;
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#initialLocationModal button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#allowLocation {
+  background: #007bff;
+  color: white;
+}
+
+#denyLocation {
+  background: #6c757d;
+  color: white;
+}
+
+/* استایل ساده برای مدال */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  border-radius: 8px;
+}
+.modal-actions {
+  margin-top: 20px;
+}
+.modal-actions button {
+  margin: 0 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+}

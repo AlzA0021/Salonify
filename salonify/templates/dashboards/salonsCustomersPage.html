@@ -1,0 +1,65 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% load render_partial %}
+
+{% block body_attrs %}data-page="salons_customers"{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salons_customers.css' %}">
+{% endblock head %}
+
+{% block title %}مدیریت مشتریان سالن{% endblock title %}
+
+{% block content %}
+    <!-- Clients List Header (Fixed) -->
+    <div class="clients-header">
+        <div class="header-left">
+            <button class="back-button"><i class="fa-solid fa-arrow-right"></i></button>
+            <div class="clients-title">لیست مشتریان</div>
+        </div>
+        <div class="header-actions">
+            <button class="add-customer-button"><i class="fa-solid fa-plus"></i></button>
+        </div>
+    </div>
+   
+    <div class="content-wrapper">
+        <!-- Promotion Card -->
+        <div class="promo-card">
+            <div class="promo-content">
+                <h3>افزایش دید آنلاین</h3>
+                <button class="promo-button">اطلاعات بیشتر</button>
+            </div>
+            <div class="promo-image">
+                <img src="#" alt="تصویر پروموشن">
+                <div class="rating">
+                    <span class="star">★</span>
+                    <span>5.0 عالی (1050+)</span>
+                </div>
+            </div>
+        </div>
+       
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-box">
+                <div class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <input type="text" class="search-input" placeholder="جستجو با نام، ایمیل یا موبایل">
+                <div class="search-clear" style="display: none;"><i class="fa-solid fa-times"></i></div>
+            </div>
+            <button class="filter-button"><i class="fa-solid fa-sliders fa-flip-vertical"></i></button>
+        </div>
+       
+        <div id="clients-list-container" class="clients-list">
+            {% include "dashboards/partials/salons_customers.html" %}
+        </div>
+    </div>
+    
+    <!-- Filter Modal -->
+    {% include "dashboards/partials/filter_modal.html" %}
+    <!-- Add Customer Modal -->
+    {% include "accounts/partials/add_customer_modal.html" %}
+    
+    <!-- CSRF برای درخواست‌های AJAX -->
+    {% csrf_token %}
+
+    {# توجه: اسکریپت قدیمی حذف شد؛ لود توسط app.js انجام می‌شود #}
+{% endblock content %}

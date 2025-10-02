@@ -1,0 +1,97 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block head %}
+
+
+
+{% endblock head %}
+
+
+{% block title %}انبار داری  {% endblock title %}
+
+{% block content %}
+
+
+</head>
+<body>
+    <div class="container">
+       
+        <div class="header">
+            <div class="back-button">
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+            <div class="header-title">مدیریت انبار با...</div>
+            <div class="free-badge"> به زودی  </div>
+        </div>
+        
+        
+        
+        <h1 class="main-title">مدیریت انبار با لیست محصولات سالنی فای </h1>
+        
+        <p class="description">مدیریت موجودی و سطح انبار برای سفارش آسان، پیگیری و فروش:</p>
+        
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div class="feature-text">شروع با یک محصول یا <span class="purple-link">وارد کردن چندین محصول همزمان</span></div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div class="feature-text">سازماندهی لیست با افزودن برندها و دسته‌بندی‌ها</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div class="feature-text">حفظ مقدار در سطح مناسب با یادآوری موجودی کم</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-check">✓</div>
+                <div class="feature-text">فروش محصولات آنلاین و در هنگام تسویه حساب در نقطه فروش</div>
+            </div>
+        </div>
+        
+        <div class="banner-section">
+            <img class="banner-image" src="{% static "images/banners/banner5.jpg" %}" alt="بنر محصولات سالنی فای" style="width: 100%; border-radius: 12px; margin: 0 auto 24px; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+        
+        <div class="bottom-padding"></div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-outline">اطلاعات بیشتر</button>
+            <button class="btn btn-primary">شروع</button>
+        </div>
+        
+    </div>
+
+    <script>
+        // Simple JavaScript to make the buttons interactive
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('عملیات تکمیل شد: ' + this.textContent);
+                });
+            });
+            
+            const backButton = document.querySelector('.back-button');
+            backButton.addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            const searchIcon = document.querySelector('.search-icon');
+            searchIcon.addEventListener('click', function() {
+                alert('جستجوی محصولات');
+            });
+            
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const productName = this.querySelector('.product-name').textContent;
+                    const productPrice = this.querySelector('.product-price').textContent;
+                    alert(`محصول انتخاب شده: ${productName}\nقیمت: ${productPrice}`);
+                });
+            });
+        });
+    </script>
+
+{% endblock content %}

@@ -1,0 +1,131 @@
+{% extends 'main_template.html' %}
+{% load static %}
+
+{% block title %}
+  پروفایل
+{% endblock title %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/customer_profile.css' %}">
+{% endblock head %}
+
+{% block content %}
+<div class="profile-container">
+  <!-- Profile Header -->
+  <header class="profile-header fixed-header">
+    <a href="javascript:history.back()" class="back-btn">
+      <i class="fas fa-arrow-right"></i>
+    </a>
+    <h1>پروفایل من</h1>
+  </header>
+
+  <!-- Placeholder to offset fixed header -->
+  <div class="header-placeholder"></div>
+
+  <!-- Profile Card -->
+  <section class="profile-card">
+    <a href="#" class="edit-btn">ویرایش</a>
+
+    <!-- Profile Image Section -->
+    <div class="profile-image-section">
+      <img src="{{ media_url }}{{ customer.profile_image }}" alt="Profile Image" class="profile-image">
+      <!-- Edit Icon Button -->
+      <button type="button" class="edit-profile-btn">
+        <i class="fa-solid fa-pen"></i>
+      </button>
+      <!-- Hidden File Input for Image Upload -->
+      <input type="file" id="profile-image-input" name="image" accept="image/*" style="display: none;">
+    </div>
+
+    <!-- User Name -->
+    <h2 class="user-name">{{ customer.user.name }} {{ customer.user.family }}</h2>
+    <hr class="divider">
+
+    <!-- User Information -->
+    <div class="user-info">
+      <div class="info-item">
+        <label>نام : </label>
+        <p>{{ customer.user.name }}</p>
+      </div>
+      <div class="info-item">
+        <label>نام خانوادگی :</label>
+        <p>{{ customer.user.family }}</p>
+      </div>
+      <div class="info-item">
+        <label>شماره موبایل :</label>
+        <p>{{ customer.user.mobile_number }}</p>
+      </div>
+      <div class="info-item">
+        <label>ایمیل :</label>
+        <p>{{ customer.user.email }}</p>
+      </div>
+    </div>
+    <hr class="divider">
+  </section>
+</div>
+
+<!-- JavaScript Section -->
+<script>
+  // Helper function to get CSRF token from cookies
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  // Event: Click on edit profile image button
+  document.querySelector('.edit-profile-btn').addEventListener('click', function() {
+    document.getElementById('profile-image-input').click();
+  });
+
+  // Event: On file input change, upload new profile image
+  document.getElementById('profile-image-input').addEventListener('change', function(e) {
+    const fileInput = e.target;
+    if (fileInput.files.length === 0) return;
+    
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const csrfToken = getCookie('csrftoken');
+
+    fetch("{% url 'accounts:customer_update_profile_image' %}", {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrfToken },
+      body: formData,
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('مشکلی در برقراری ارتباط با سرور وجود دارد.');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.status === 'success' && data.image_url) {
+        // Update profile image on success
+        document.querySelector('.profile-image').src = data.image_url;
+      } else {
+        alert("خطا در تغییر تصویر.");
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("خطا در تغییر تصویر.");
+    });
+  });
+
+  // Event: Click on edit button to navigate to profile edit page
+  document.querySelector('.edit-btn').addEventListener('click', function() {
+    window.location.href = "{% url 'accounts:customer_update_profile' %}";
+  });
+</script>
+{% endblock content %}

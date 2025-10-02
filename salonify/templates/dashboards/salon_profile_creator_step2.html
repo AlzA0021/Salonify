@@ -1,0 +1,60 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/dashboard/salon_profile_creator.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+
+{% endblock head %}
+{% block title %}ساخت پروفایل سالن{% endblock title %}
+{% block body_attrs %}data-page="salon_profile_creator"{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="header">
+    <a href="{% url 'dashboards:salon_profile_creator_step1' %}" class="back-btn"><i class="fa-solid fa-arrow-right"></i></a>
+    <a href="{% url 'dashboards:online_booking' %}" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+  </div>
+  <div class="content">
+    <div class="step">مرحله ۲</div>
+    <h1>موقعیت کسب و کار شما کجاست؟</h1>
+    <p>پین را در موقعیت صحیح روی نقشه تنظیم کنید.</p>
+
+    <form method="post" action="{% url 'dashboards:salon_profile_creator_step2' %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.zone.id_for_label }}">{{ form.zone.label }}</label>
+        {{ form.zone }}
+        {% if form.zone.errors %}<div class="form-errors">{{ form.zone.errors }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.neighborhood.id_for_label }}">{{ form.neighborhood.label }}</label>
+        {{ form.neighborhood }}
+        {% if form.neighborhood.errors %}<div class="form-errors">{{ form.neighborhood.errors }}</div>{% endif %}
+      </div>
+
+      <div id="map-container"
+           data-lat-input="#{{ form.latitude.id_for_label }}"
+           data-lng-input="#{{ form.longitude.id_for_label }}"
+           data-address-input="#{{ form.address.id_for_label }}"
+           data-zone-select="#{{ form.zone.id_for_label }}"
+           data-neighborhood-select="#{{ form.neighborhood.id_for_label }}"></div>
+      <div class="map-marker-label">موقعیت انتخاب شده</div>
+
+      <div class="form-group">
+        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+        <div class="address-input-container">
+          <i class="loading-spinner fa-solid fa-spinner"></i>
+          {{ form.address }}
+        </div>
+        {% if form.address.errors %}<div class="form-errors">{{ form.address.errors }}</div>{% endif %}
+      </div>
+
+      {{ form.latitude }} {{ form.longitude }}
+
+      <button type="submit" class="continue-btn">ادامه</button>
+    </form>
+  </div>
+</div>
+{% endblock content %}

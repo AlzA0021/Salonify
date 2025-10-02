@@ -1,0 +1,30 @@
+<!-- لیست مشتریان -->
+<div id="clients-list-container" class="clients-list">
+    {% if customers %}
+        {% for customer in customers %}
+            <div class="client-card" data-customer-id="{{ customer.user.pk }}" data-url="{% url 'accounts:detail_customer' customer.user.pk %}">
+                <div class="client-avatar">
+                  <div class="client-avatar">
+                    {% if customer.profile_image %}
+                      <img src="{{ customer.profile_image.url }}" alt="{{ customer.get_fullName }}" class="profile-image">
+                    {% else %}
+                      <div class="profile-placeholder">
+                        {{ customer.get_fullName|make_list|first|upper }}
+                      </div>
+                    {% endif %}
+                </div>
+                    </div>
+                <div class="client-info">
+                    <div class="client-name">{{ customer.get_fullName }}</div>
+                    <div class="client-details">
+                        <div class="client-phone">{{ customer.user.mobile_number }}</div>
+                        <div class="client-email">{{ customer.user.email|default:"بدون ایمیل" }}</div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="no-results" style="display: none;">هیچ مشتری یافت نشد</div>
+    {% else %}
+        <div class="no-results">هیچ مشتری یافت نشد</div>
+    {% endif %}
+</div>

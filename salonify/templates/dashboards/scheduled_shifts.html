@@ -1,0 +1,224 @@
+{% extends "dashboard_template.html" %}
+{% load static %}
+
+{% block title %}شیفت‌های برنامه‌ریزی شده{% endblock %}
+
+{% block body_attrs %}data-page="scheduled_shifts"{% endblock %}
+
+{% block head %}
+  {# برای دسترسی مسیر آواتار پیش‌فرض در JS #}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/pages/scheduled_shifts.css' %}">
+  <meta name="default-avatar" content="{% static 'default-avatar.png' %}">
+{% endblock head %}
+
+{% block content %}
+  {% csrf_token %}
+  <div class="container" data-salon-id="{{ salon.id|default:'1' }}">
+    <div class="header">
+      <button class="icon-button" onclick="history.back()" title="بازگشت">
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <div class="page-title-section">
+      <h2>شیفت‌های برنامه‌ریزی شده</h2>
+      {% if date_range_display %}
+        <div class="date-navigator">
+          <a href="?start_date={{ next_week_start_iso }}"
+             class="nav-arrow"
+             title="هفته بعد"><i class="fa-solid fa-chevron-right"></i></a>
+          <p class="date-display">{{ date_range_display }}</p>
+          <a href="?start_date={{ prev_week_start_iso }}"
+             class="nav-arrow"
+             title="هفته قبل"><i class="fa-solid fa-chevron-left"></i></a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="tabs">
+      <button id="team-tab" class="tab-button active">تیم</button>
+      <button id="week-tab" class="tab-button">هفته</button>
+    </div>
+
+    {% if error %}
+      <p class="error-message">{{ error }}</p>
+    {% else %}
+
+      <div id="team-view-content">
+        {% if stylists_with_hours %}
+          <ul class="list-container">
+            {% for stylist_data in stylists_with_hours %}
+              <li class="list-item stylist-item"
+                  data-stylist-id="{{ stylist_data.id }}">
+                <div class="list-item-summary stylist-summary">
+                  <div class="stylist-main-info">
+                    {% if stylist_data.profile_image_url %}
+                      <img src="{{ stylist_data.profile_image_url }}"
+                           alt="{{ stylist_data.full_name }}"
+                           class="profile-pic" />
+                    {% else %}
+                      <div class="placeholder-pic">{{ stylist_data.full_name|slice:":1" }}</div>
+                    {% endif %}
+                    <div class="stylist-info">
+                      <h3>{{ stylist_data.full_name }}</h3>
+                      <p class="hours">{{ stylist_data.total_hours }} ساعت</p>
+                    </div>
+                  </div>
+                  <span class="expand-icon"><i class="fa-solid fa-chevron-down"></i></span>
+                </div>
+
+                <ul class="details-list daily-schedule-list">
+                  {% for schedule_day in stylist_data.daily_schedules %}
+                    <li class="daily-schedule-item"
+                        data-date-iso="{{ schedule_day.raw_date_iso }}"
+                        data-date-formatted="{{ schedule_day.formatted_date }}"
+                        data-stylist-id="{{ stylist_data.id }}"
+                        data-stylist-name="{{ stylist_data.full_name }}"
+                        data-stylist-logo="{{ stylist_data.profile_image_url }}">
+                      <span class="schedule-day-date">{{ schedule_day.formatted_date }}</span>
+                      <div class="events-container">
+                        {% for event in schedule_day.events %}
+                          <div class="shift-item {{ event.type }}">{{ event.display }}</div>
+                        {% empty %}
+                          <div class="shift-item unscheduled">بدون برنامه</div>
+                        {% endfor %}
+                      </div>
+                    </li>
+                  {% empty %}
+                    <li class="no-content-message" style="padding: 10px 0">برنامه‌ای برای این بازه یافت نشد.</li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-content-message">آرایشگری برای نمایش در این بازه زمانی یافت نشد.</p>
+        {% endif %}
+      </div>
+
+      <div id="week-view-content" style="display: none">
+        {% if schedule_by_day %}
+          <ul class="list-container">
+            {% for day_data in schedule_by_day %}
+              <li class="list-item day-item">
+                <div class="list-item-summary day-summary">
+                  <div class="day-main-info">
+                    <h3>{{ day_data.formatted_date }}</h3>
+                  </div>
+
+                  {% if day_data.has_schedule %}
+                    <div class="working-stylists-preview">
+                      {% for stylist in day_data.stylists_working %}
+                        {% if stylist.profile_image_url %}
+                          <img src="{{ stylist.profile_image_url }}"
+                               alt="{{ stylist.full_name }}"
+                               class="profile-pic-small" />
+                        {% else %}
+                          <div class="placeholder-pic-small">{{ stylist.full_name|slice:":1" }}</div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="no-team-available-msg">عضوی در دسترس نیست</div>
+                  {% endif %}
+                </div>
+
+                {% if day_data.has_schedule %}
+                  <ul class="details-list week-view-stylist-list">
+                    {% for stylist in day_data.stylists_working %}
+                      <li class="week-view-stylist-item"
+                          data-date-iso="{{ day_data.raw_date_iso }}"
+                          data-date-formatted="{{ day_data.formatted_date }}"
+                          data-stylist-id="{{ stylist.id }}"
+                          data-stylist-name="{{ stylist.full_name }}"
+                          data-stylist-logo="{{ stylist.profile_image_url }}">
+                        <div class="stylist-details">
+                          {% if stylist.profile_image_url %}
+                            <img src="{{ stylist.profile_image_url }}"
+                                 alt="{{ stylist.full_name }}"
+                                 class="profile-pic" />
+                          {% else %}
+                            <div class="placeholder-pic">{{ stylist.full_name|slice:":1" }}</div>
+                          {% endif %}
+                          <span class="name">{{ stylist.full_name }}</span>
+                        </div>
+                        <div class="events-container">
+                          {% for event in stylist.events %}
+                            <div class="shift-item {{ event.type }}">{{ event.display }}</div>
+                          {% endfor %}
+                        </div>
+                        <span class="stylist-shift-arrow"><i class="fa-solid fa-chevron-left"></i></span>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-content-message">برنامه هفتگی برای نمایش یافت نشد.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="cant-see-member">
+      عضو تیم را نمی‌بینید؟
+      <a href="{% url 'dashboards:add_stylist' %}">تخصیص اعضا</a>
+    </div>
+
+    <div class="info-box">
+      <p>
+        لیست تیم، در دسترس بودن شما برای رزروها را نشان می‌دهد و به ساعات کاری کسب
+        و کار شما مرتبط نیست. برای تنظیم ساعات کاری خود،
+        <a href="#">اینجا کلیک کنید</a>.
+      </p>
+    </div>
+
+    {# 
+    <div class="add-button-container">
+      <button class="add-button">افزودن +</button>
+    </div>
+    #}
+  </div>
+
+  <div id="dayActionModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img id="modalStylistLogo" src="" alt="لوگو" class="modal-stylist-logo" />
+        <h3 id="modalStylistName"></h3>
+        <p id="modalSelectedDate"></p>
+      </div>
+      <ul class="modal-actions">
+        <li>
+          <a href="#" data-action="edit_day">
+            <span class="action-text">ویرایش این روز</span>
+            <span class="icon"><i class="fa-regular fa-pen-to-square"></i></span>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-action="set_regular">
+            <span class="action-text">تنظیم شیفت‌های منظم</span>
+            <span class="icon"><i class="fa-regular fa-clock"></i></span>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-action="add_time_off">
+            <span class="action-text">افزودن مرخصی/تعطیلی</span>
+            <span class="icon"><i class="fa-regular fa-calendar"></i></span>
+          </a>
+        </li>
+        <li class="delete-action">
+          <a href="#" data-action="delete_day">
+            <span class="action-text">حذف این روز</span>
+            <span class="icon"><i class="fa-regular fa-trash-can"></i></span>
+          </a>
+        </li>
+      </ul>
+      <div class="modal-footer">
+        <button id="modalCloseButton">بستن</button>
+      </div>
+    </div>
+  </div>
+
+  {# توجه: اسکریپت اینلاین حذف شده؛ لود ماژول از طریق app.js انجام می‌شود #}
+{% endblock content %}

@@ -1,0 +1,151 @@
+{% extends 'main_template.html' %}
+{% load humanize %}
+
+{% block title %}تسویه حساب نهایی{% endblock %}
+
+{# کلید ماژول صفحه #}
+{% block body_attrs %}data-page="checkout"{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4 checkout-page">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 text-center">
+      <h1 class="text-2xl font-bold tracking-wider">تسویه حساب نهایی</h1>
+    </div>
+
+    <div class="p-6 space-y-6">
+
+      {# مشخصات سفارش‌دهنده #}
+      <section class="bg-gray-100 rounded-xl p-4 space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">مشتری</span>
+          <span class="font-semibold">
+            {{ order.customer.user.name }} {{ order.customer.user.family }}
+          </span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">تاریخ ثبت</span>
+          <span>{{ order.register_date|date:"Y/m/d" }}</span>
+        </div>
+      </section>
+
+      {# مجموع‌ها #}
+      <section class="bg-gray-100 rounded-xl p-4 space-y-3" data-totals>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">قیمت کل</span>
+          <span class="text-blue-600 font-bold" data-total-price>
+            {{ total_price|intcomma }} تومان
+          </span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">مالیات</span>
+          <span class="text-red-600 font-bold" data-tax>
+            {{ tax|intcomma }} تومان
+          </span>
+        </div>
+        <hr class="border-gray-200 my-2">
+        <div class="flex justify-between items-center font-bold text-lg">
+          <span>قیمت نهایی</span>
+          <span class="text-green-600" data-final-price>
+            {{ order_final_price|intcomma }} تومان
+          </span>
+        </div>
+      </section>
+
+      {# آیتم‌های سفارش #}
+      <section>
+        <h2 class="text-xl font-semibold mb-3 text-gray-700">جزئیات سفارش</h2>
+        <div class="space-y-2">
+          {% for detail in order.order_details1.all %}
+            <div class="flex justify-between bg-gray-100 p-3 rounded-lg">
+              <span class="text-gray-600">{{ detail.service.service_name }}</span>
+              <span class="font-bold text-gray-800">{{ detail.price|intcomma }} تومان</span>
+            </div>
+          {% empty %}
+            <div class="text-center text-gray-500 bg-gray-50 p-3 rounded-lg">
+              آیتمی ثبت نشده است.
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      {# انتخاب روش پرداخت #}
+      <form id="checkoutPayForm" method="post" action="{% url 'orders:check_out' order_id=order.id %}" class="space-y-6">
+        {% csrf_token %}
+        <div>
+          <h2 class="text-xl font-semibold mb-3 text-gray-700">روش پرداخت</h2>
+          <div class="space-y-3">
+            {% for radio in form.payment_type %}
+              <label class="flex items-center bg-gray-100 p-3 rounded-lg cursor-pointer hover:bg-gray-200 transition">
+                {{ radio.tag }}
+                <span class="mr-2">{{ radio.choice_label }}</span>
+              </label>
+            {% endfor %}
+            {% if form.payment_type.errors %}
+              <div class="text-red-600 text-sm form-error">{{ form.payment_type.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <button id="paySubmitBtn" type="submit"
+                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transition text-lg font-semibold is-disabled"
+                aria-disabled="true" disabled>
+          تأیید و پرداخت
+        </button>
+      </form>
+
+      {# کد تخفیف: AJAX-friendly + fallback #}
+      <div class="border-t pt-4">
+        <form id="couponForm" action="{% url 'orders:apply_coupon' order.id %}" method="post" class="flex items-stretch gap-2">
+          {% csrf_token %}
+          <div class="flex-grow">
+            {# اگر فیلد آماده دارید: #}
+            {{ form_coupon.coupon_code.as_widget|default:"" }}
+            {# در صورت تمایل، یک ورودی fallback سفارشی: #}
+            {% if not form_coupon.coupon_code %}
+              <input id="couponCodeInput" name="coupon_code" type="text"
+                     placeholder="کد تخفیف را وارد کنید"
+                     class="w-full bg-gray-100 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {% else %}
+              {# اطمینان از داشتن id جهت JS: #}
+              <script>
+                (function(){
+                  var el = document.querySelector('[name="coupon_code"]');
+                  if (el && !el.id) el.id = 'couponCodeInput';
+                })();
+              </script>
+            {% endif %}
+          </div>
+          <button type="submit"
+                  class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition whitespace-nowrap">
+            اعمال کد تخفیف
+          </button>
+        </form>
+        <div id="couponMessage" class="mt-2 text-sm hidden" tabindex="-1" aria-live="polite" style="display:none"></div>
+      </div>
+
+      {# نمایش پیام‌های سراسری (اگر پیامکانی دارید) #}
+      {% if messages %}
+        <div class="space-y-2">
+          {% for message in messages %}
+            <div class="alert px-3 py-2 rounded {{ message.tags|default:'info' }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<style>
+  /* دکمه پرداخت وقتی غیرفعال است */
+  #paySubmitBtn.is-disabled { filter: grayscale(0.2) brightness(0.9); cursor: not-allowed; }
+  /* پیام کوپن */
+  #couponForm.is-loading { opacity: .7; pointer-events: none; }
+  #couponMessage.ok { color: #16a34a; }
+  #couponMessage.err { color: #dc2626; }
+</style>
+{% endblock %}

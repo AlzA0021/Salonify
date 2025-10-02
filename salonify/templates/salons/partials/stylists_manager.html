@@ -1,0 +1,20 @@
+<form method="post" action="{% url "salons:stylist_manager" %}">
+    {% csrf_token %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>نام آرایشگر</th>
+                <th>فعال یا غیرفعال</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in formset %}
+                <tr>
+                    <td>{{ form.instance.user.name }}</td> <!-- نام آرایشگر -->
+                    <td>{{ form.is_active }}</td> <!-- چک‌باکس وضعیت فعال یا غیرفعال -->
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+</form>
