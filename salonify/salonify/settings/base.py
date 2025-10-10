@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     "leaflet",
     "debug_toolbar",
     "django_jalali",
-    "zarinpal",
+    # "zarinpal",
 ]
 
 MIDDLEWARE = [
