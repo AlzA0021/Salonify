@@ -48,6 +48,10 @@ from .views import (
     get_popular_stylists,
     calendar_view,
     get_calendar_data,
+    mark_appointment_paid,
+    create_appointment,
+    update_appointment,
+    cancel_appointment,
 )
 
 # ----------------------------------------------------------------
@@ -178,10 +182,35 @@ urlpatterns = [
         AddTimeOffView.as_view(),
         name="add_time_off",
     ),
-    path("calendar/salon/<int:salon_id>/", calendar_view, name="appointment_calendar"),
+    path("salon/<int:salon_id>/calendar/", calendar_view, name="appointment_calendar"),
+    # API برای دریافت اطلاعات تقویم
     path(
         "api/calendar-data/salon/<int:salon_id>/",
         get_calendar_data,
-        name="api_get_calendar_data",
+        name="get_calendar_data",
+    ),
+    # API برای ایجاد نوبت جدید
+    path(
+        "api/salon/<int:salon_id>/appointments/",
+        create_appointment,
+        name="create_appointment",
+    ),
+    # API برای به‌روزرسانی نوبت
+    path(
+        "api/salon/<int:salon_id>/appointments/<int:appointment_id>/",
+        update_appointment,
+        name="update_appointment",
+    ),
+    # API برای لغو نوبت
+    path(
+        "api/salon/<int:salon_id>/appointments/<int:appointment_id>/cancel/",
+        cancel_appointment,
+        name="cancel_appointment",
+    ),
+    # API برای علامت‌گذاری پرداخت
+    path(
+        "api/salon/<int:salon_id>/appointments/<int:appointment_id>/mark-paid/",
+        mark_appointment_paid,
+        name="mark_appointment_paid",
     ),
 ]

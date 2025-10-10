@@ -1,96 +1,423 @@
 {% extends "dashboard_template.html" %}
 
 {% block head %}
-    {# ---- Libraries ---- #}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
-    {# ---- Custom Styles ---- #}
     <style>
-        body { font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .menu-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
-        .date-display { font-size: 16px; font-weight: 500; display: flex; align-items: center; cursor: pointer; }
-        .logo { background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; }
-        .stylists-container { background: white; padding: 15px 0; border-bottom: 1px solid #e9ecef; }
-        .stylists-row { display: flex; gap: 20px; padding: 0 20px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .stylists-row::-webkit-scrollbar { display: none; }
-        .stylist-card { display: flex; flex-direction: column; align-items: center; min-width: 80px; text-align: center; cursor: pointer; transition: transform 0.2s ease; }
-        .stylist-card:hover { transform: translateY(-2px); }
-        .stylist-card.active { color: #667eea; }
-        .stylist-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #e9ecef; object-fit: cover; margin-bottom: 8px; transition: border-color 0.2s ease; }
-        .stylist-card.active .stylist-avatar { border-color: #667eea; }
-        .stylist-name { font-size: 12px; font-weight: 500; color: #333; white-space: nowrap; }
-        .calendar-container { background: white; margin: 0; min-height: calc(100vh - 200px); }
-        .time-slots { padding: 20px; position: relative; }
-        #timeSlots.loading::after { content: 'در حال بارگذاری...'; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; color: #6c757d; background: rgba(255, 255, 255, 0.8); padding: 20px 30px; border-radius: 10px; }
-        .time-slot { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
-        .time-label { font-size: 14px; font-weight: 500; color: #666; width: 60px; text-align: left; }
-        .time-content { flex: 1; margin-right: 20px; }
-        .stylist-slot { flex: 1; min-height: 50px; border: 1px dashed #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; position: relative; }
-        .stylist-slot.available { cursor: pointer; }
-        .stylist-slot.available:hover { background-color: #f8f9ff; border-color: #667eea; }
-        .stylist-slot.available::before { content: '+'; color: #ccc; font-size: 20px; font-weight: bold; }
-        .time-slot.unavailable .stylist-slot { cursor: not-allowed; border-style: solid; border-color: #e9ecef; background-color: #f8f9fa; }
-        .time-slot.time-off .stylist-slot { cursor: not-allowed; border-style: solid; border-color: #ffdbe5; background-color: #fff0f6; }
-        .time-slot.time-off::after { content: 'مرخصی'; position: absolute; right: 90px; font-size: 10px; color: #d6336c; font-weight: bold; }
-        .appointment { color: white; border: none; padding: 10px 12px; border-radius: 8px; font-size: 12px; text-align: right; width: 100%; height: 100%; min-height: 50px; display: flex; flex-direction: column; justify-content: center; cursor: pointer; transition: transform 0.2s ease; }
-        .appointment:hover { transform: scale(1.02); }
-        .appointment.paid { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .appointment.unpaid { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .appointment-customer { font-weight: bold; margin-bottom: 2px; }
-        .appointment-service { font-size: 10px; opacity: 0.9; }
-        .modal-content { border-radius: 15px; border: none; }
-        .modal-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0; }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
-        .btn-primary:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); transform: translateY(-1px); }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background-color: #f5f5f7; 
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .header { 
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .header-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 12px 16px;
+        }
+        .menu-btn { 
+            background: none; 
+            border: none; 
+            font-size: 24px; 
+            cursor: pointer;
+            padding: 8px;
+        }
+        .date-display { 
+            font-size: 17px; 
+            font-weight: 600; 
+            display: flex; 
+            align-items: center; 
+            cursor: pointer;
+            color: #1c1c1e;
+        }
+        .date-display i { margin-left: 6px; font-size: 14px; }
+        .logo { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-weight: 600; 
+            font-size: 14px;
+        }
+        
+        .stylists-header { 
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            position: sticky;
+            top: 57px;
+            z-index: 999;
+        }
+        .time-column-header {
+            width: 70px;
+            min-width: 70px;
+            background: white;
+            border-left: 1px solid #e5e5e5;
+        }
+        .stylists-columns {
+            display: flex;
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .stylists-columns::-webkit-scrollbar { display: none; }
+        .stylist-column-header {
+            flex: 1;
+            min-width: 200px;
+            padding: 16px 12px;
+            text-align: center;
+            border-left: 1px solid #e5e5e5;
+        }
+        .stylist-avatar { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            margin: 0 auto 8px;
+            border: 2px solid #e5e5e5;
+        }
+        .stylist-name { 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: #1c1c1e;
+        }
+        
+        .calendar-grid {
+            background: white;
+            display: flex;
+            min-height: calc(100vh - 160px);
+        }
+        .time-column {
+            width: 70px;
+            min-width: 70px;
+            background: #fafafa;
+            border-left: 1px solid #e5e5e5;
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+        .time-slot-label {
+            height: 80px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 4px;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .time-slot-label.hour {
+            font-weight: 600;
+            color: #1c1c1e;
+        }
+        
+        .appointments-grid {
+            display: flex;
+            flex: 1;
+            position: relative;
+            overflow-x: auto;
+        }
+        .stylist-day-column {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+            border-left: 1px solid #e5e5e5;
+        }
+        .time-grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            pointer-events: none;
+        }
+        .grid-line {
+            height: 80px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .grid-line.half-hour {
+            border-bottom: 1px dashed #f0f0f0;
+        }
+        
+        .appointment-block {
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            border-radius: 8px;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: white;
+            overflow: hidden;
+        }
+        .appointment-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .appointment-block.paid {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .appointment-block.unpaid {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .appointment-time {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            opacity: 0.95;
+        }
+        .appointment-customer {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .appointment-service {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .slot-click-area {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 40px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .slot-click-area:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .slot-click-area.unavailable {
+            cursor: not-allowed;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.02) 10px,
+                rgba(0,0,0,0.02) 20px
+            );
+        }
+        .slot-click-area.time-off {
+            cursor: not-allowed;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255,59,48,0.05),
+                rgba(255,59,48,0.05) 10px,
+                rgba(255,59,48,0.08) 10px,
+                rgba(255,59,48,0.08) 20px
+            );
+        }
+        
+        .fab-container {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+        }
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        .fab-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 24px;
+        }
+        .fab-secondary {
+            background: white;
+            color: #1c1c1e;
+            font-size: 20px;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f0f0f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .modal-content { border-radius: 16px; border: none; }
+        .modal-header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border-radius: 16px 16px 0 0;
+            padding: 20px 24px;
+        }
+        .modal-title { font-weight: 600; font-size: 18px; }
+        .modal-body { padding: 24px; }
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            width: 100px;
+        }
+        .info-value {
+            flex: 1;
+            color: #1c1c1e;
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-primary:hover { 
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); 
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #1c1c1e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-danger, .btn-success, .btn-warning {
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-danger { background: #ff3b30; }
+        .btn-success { background: #34c759; }
+        .btn-warning { background: #ff9500; color: white; }
     </style>
 {% endblock head %}
 
 {% block title %}تقویم نوبت‌ها{% endblock title %}
 
 {% block content %}
-    <div id="calendar-data-container" data-salon-id="{{ salon_id }}" data-prefix="{{ dashboard_prefix|safe }}"></div>
-
-    <div class="header">
-        <div class="header-top">
-            <button class="menu-btn"><i class="bi bi-list"></i></button>
-            <div class="date-display" id="dateDisplay"><span></span></div>
-            <div class="logo">آلیزا</div>
-        </div>
-        <div class="stylists-container">
-            <div class="stylists-row" id="stylistsRow"></div>
-        </div>
+    <div id="calendar-data-container" 
+         data-salon-id="{{ salon_id }}" 
+         data-prefix="{{ dashboard_prefix|safe }}">
     </div>
 
     <input type="text" id="hiddenDatePicker" class="d-none" />
 
-    <div class="calendar-container">
-        <div class="time-slots" id="timeSlots"></div>
+    <div class="header">
+        <div class="header-top">
+            <button class="menu-btn"><i class="bi bi-list"></i></button>
+            <div class="date-display" id="dateDisplay">
+                <span></span>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+            <div class="logo">آلیزا</div>
+        </div>
     </div>
 
-    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="stylists-header">
+        <div class="time-column-header"></div>
+        <div class="stylists-columns" id="stylistsHeader"></div>
+    </div>
+
+    <div class="calendar-grid">
+        <div class="time-column" id="timeLabels"></div>
+        <div class="appointments-grid" id="appointmentsGrid"></div>
+    </div>
+
+    <div class="fab-container">
+        <button class="fab fab-secondary" title="مدیریت تیم">
+            <i class="bi bi-people"></i>
+        </button>
+        <button class="fab fab-secondary" title="تنظیمات تقویم">
+            <i class="bi bi-calendar3"></i>
+        </button>
+        <button class="fab fab-primary" id="addAppointmentFab" title="نوبت جدید">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="bookingModalLabel">ثبت نوبت جدید</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">ثبت نوبت جدید</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3"><strong>آرایشگر:</strong> <span id="modalStylist"></span></div>
-                    <div class="mb-3"><strong>تاریخ:</strong> <span id="modalDate"></span></div>
-                    <div class="mb-3"><strong>ساعت:</strong> <span id="modalTime"></span></div>
+                    <div class="info-row">
+                        <div class="info-label">آرایشگر:</div>
+                        <div class="info-value" id="modalStylist"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">تاریخ:</div>
+                        <div class="info-value" id="modalDate"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">ساعت:</div>
+                        <div class="info-value" id="modalTime"></div>
+                    </div>
                     <hr>
                     <form id="bookingForm">
-                        <div class="mb-3"><label for="customerName" class="form-label">نام مشتری</label><input type="text" class="form-control" id="customerName" required></div>
-                        <div class="mb-3"><label for="serviceType" class="form-label">نوع خدمت</label><select class="form-select" id="serviceType" required><option value="">انتخاب کنید...</option></select></div>
-                        <div class="mb-3"><label for="description" class="form-label">توضیحات (اختیاری)</label><textarea class="form-control" id="description" rows="3"></textarea></div>
+                        <div class="mb-3">
+                            <label class="form-label">نام مشتری</label>
+                            <input type="text" class="form-control" id="customerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">نوع خدمت</label>
+                            <select class="form-select" id="serviceType" required>
+                                <option value="">انتخاب کنید...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">توضیحات (اختیاری)</label>
+                            <textarea class="form-control" id="description" rows="3"></textarea>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -101,12 +428,12 @@
         </div>
     </div>
 
-    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+    <div class="modal fade" id="appointmentModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="appointmentModalLabel">جزئیات نوبت</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">جزئیات نوبت</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="appointmentDetails"></div>
                 <div class="modal-footer">
@@ -126,15 +453,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const stylists = JSON.parse('{{ stylists_json|safe }}');
     
     let currentDate = new Date();
-    let currentStylistId = stylists.length > 0 ? stylists[0].id : null;
     let dailyData = {};
 
     initializeDatePicker();
     renderStylists();
+    renderTimeLabels();
     fetchAndRenderDay(currentDate);
 
     function initializeDatePicker() {
-        const datePicker = flatpickr("#hiddenDatePicker", {
+        const picker = flatpickr("#hiddenDatePicker", {
             defaultDate: currentDate,
             dateFormat: "Y-m-d",
             onChange: function(selectedDates) {
@@ -144,119 +471,277 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        document.getElementById('dateDisplay').addEventListener('click', () => datePicker.open());
+        document.getElementById('dateDisplay').addEventListener('click', () => picker.open());
     }
 
     async function fetchAndRenderDay(date) {
         updateDateDisplay();
-        const timeSlotsContainer = document.getElementById('timeSlots');
-        timeSlotsContainer.innerHTML = '';
-        timeSlotsContainer.classList.add('loading');
+        showLoading();
         
         const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         const url = `${dashboardPrefix}/api/calendar-data/salon/${salonId}/?date=${dateString}`;
 
         try {
             const response = await fetch(url);
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Network error');
             dailyData = await response.json();
-            renderTimeSlots();
+            renderCalendarGrid();
         } catch (error) {
-            console.error('Failed to fetch calendar data:', error);
-            timeSlotsContainer.innerHTML = `<div class="alert alert-danger text-center m-3">خطا در بارگذاری اطلاعات.</div>`;
+            console.error('Failed to fetch:', error);
+            document.getElementById('appointmentsGrid').innerHTML = 
+                '<div class="alert alert-danger m-3">خطا در بارگذاری اطلاعات</div>';
         } finally {
-            timeSlotsContainer.classList.remove('loading');
+            hideLoading();
         }
     }
     
     function updateDateDisplay() {
-        const formatter = new Intl.DateTimeFormat('fa-IR', { weekday: 'long', day: 'numeric', month: 'long' });
+        const formatter = new Intl.DateTimeFormat('fa-IR', { 
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long' 
+        });
         document.querySelector('#dateDisplay span').textContent = formatter.format(currentDate);
     }
 
     function renderStylists() {
-        const container = document.getElementById('stylistsRow');
-        container.innerHTML = '';
-        stylists.forEach(stylist => {
-            const card = document.createElement('div');
-            card.className = `stylist-card ${stylist.id === currentStylistId ? 'active' : ''}`;
-            card.dataset.stylistId = stylist.id;
-            card.innerHTML = `<img src="${stylist.avatar}" alt="${stylist.name}" class="stylist-avatar"><div class="stylist-name">${stylist.name}</div>`;
-            card.addEventListener('click', function() {
-                document.querySelectorAll('.stylist-card').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                currentStylistId = this.dataset.stylistId;
-                renderTimeSlots();
-            });
-            container.appendChild(card);
-        });
+        const container = document.getElementById('stylistsHeader');
+        container.innerHTML = stylists.map(s => `
+            <div class="stylist-column-header" data-stylist-id="${s.id}">
+                <img src="${s.avatar}" alt="${s.name}" class="stylist-avatar">
+                <div class="stylist-name">${s.name}</div>
+            </div>
+        `).join('');
     }
 
-    function renderTimeSlots() {
-        const container = document.getElementById('timeSlots');
-        container.innerHTML = '';
-
-        if (!dailyData.salonIsOpen) {
-            container.innerHTML = `<div class="alert alert-warning text-center m-3">${dailyData.message}</div>`;
+    function renderTimeLabels() {
+        if (!dailyData.salonIsOpen || !dailyData.openTime) {
+            // Default times for initial render
+            const times = [];
+            for (let hour = 9; hour <= 18; hour++) {
+                times.push(`${String(hour).padStart(2, '0')}:00`);
+                if (hour < 18) times.push(`${String(hour).padStart(2, '0')}:30`);
+            }
+            renderTimeLabelsFromArray(times);
             return;
         }
 
-        const slotInterval = 30;
-        const dateStr = currentDate.toISOString().split('T')[0];
-        const startTime = new Date(`${dateStr}T${dailyData.openTime}`);
-        const endTime = new Date(`${dateStr}T${dailyData.closeTime}`);
+        const [openHour] = dailyData.openTime.split(':').map(Number);
+        const [closeHour] = dailyData.closeTime.split(':').map(Number);
+        const times = [];
         
-        for (let dt = new Date(startTime); dt < endTime; dt.setMinutes(dt.getMinutes() + slotInterval)) {
-            const timeString = dt.toTimeString().substring(0, 5);
-            const slotDiv = document.createElement('div');
-            
-            const appointment = dailyData.appointments.find(app => app.stylistId === currentStylistId && app.time === timeString);
-            const { isAvailable, reason } = checkStylistAvailability(timeString);
-
-            let slotStateClass = '', slotContent = '';
-
-            if (appointment) {
-                slotContent = `<div class="appointment ${appointment.paid ? 'paid' : 'unpaid'}" data-appointment-id="${appointment.id}"><div class="appointment-customer">${appointment.customer}</div><div class="appointment-service">${appointment.service}</div></div>`;
-            } else if (isAvailable) {
-                slotStateClass = 'available';
-            } else {
-                slotStateClass = reason === 'time-off' ? 'time-off' : 'unavailable';
-            }
-
-            slotDiv.className = `time-slot ${slotStateClass}`;
-            slotDiv.innerHTML = `<div class="time-label">${timeString}</div><div class="time-content"><div class="stylist-slot ${slotStateClass}" data-time="${timeString}" data-stylist-id="${currentStylistId}">${slotContent}</div></div>`;
-            container.appendChild(slotDiv);
+        for (let hour = openHour; hour <= closeHour; hour++) {
+            times.push(`${String(hour).padStart(2, '0')}:00`);
+            if (hour < closeHour) times.push(`${String(hour).padStart(2, '0')}:30`);
         }
-        addEventListenersToSlots();
+        
+        renderTimeLabelsFromArray(times);
     }
 
-    function checkStylistAvailability(time) {
-        const stylistSchedules = dailyData.schedules[currentStylistId] || [];
-        const stylistTimeOffs = dailyData.timeOffs[currentStylistId] || [];
-        if (stylistTimeOffs.some(off => time >= off.start && time < off.end)) return { isAvailable: false, reason: 'time-off' };
-        if (stylistSchedules.some(schedule => time >= schedule.start && time < schedule.end)) return { isAvailable: true, reason: 'in-schedule' };
-        return { isAvailable: false, reason: 'not-scheduled' };
+    function renderTimeLabelsFromArray(times) {
+        const container = document.getElementById('timeLabels');
+        container.innerHTML = times.map((time, i) => `
+            <div class="time-slot-label ${i % 2 === 0 ? 'hour' : ''}">
+                ${i % 2 === 0 ? time : ''}
+            </div>
+        `).join('');
     }
 
-    function addEventListenersToSlots() {
-        document.querySelectorAll('.stylist-slot.available').forEach(slot => {
+    function renderCalendarGrid() {
+        const grid = document.getElementById('appointmentsGrid');
+        
+        if (!dailyData.salonIsOpen) {
+            grid.innerHTML = `<div class="alert alert-warning m-3">${dailyData.message || 'سالن تعطیل است'}</div>`;
+            return;
+        }
+
+        renderTimeLabels(); // Update time labels based on salon hours
+        
+        grid.innerHTML = stylists.map(stylist => {
+            const stylistAppts = (dailyData.appointments || []).filter(a => a.stylistId === stylist.id);
+            
+            return `
+                <div class="stylist-day-column" data-stylist-id="${stylist.id}">
+                    ${renderGridLines()}
+                    ${renderAppointments(stylistAppts)}
+                    ${renderClickAreas(stylist.id)}
+                </div>
+            `;
+        }).join('');
+        
+        attachEventListeners();
+    }
+
+    function renderGridLines() {
+        const [openHour] = (dailyData.openTime || '09:00').split(':').map(Number);
+        const [closeHour] = (dailyData.closeTime || '18:00').split(':').map(Number);
+        const slots = (closeHour - openHour) * 2 + 1;
+        
+        let html = '<div class="time-grid-lines">';
+        for (let i = 0; i < slots; i++) {
+            html += `<div class="grid-line ${i % 2 === 1 ? 'half-hour' : ''}"></div>`;
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function renderAppointments(appts) {
+        const [openHour] = (dailyData.openTime || '09:00').split(':').map(Number);
+        const startMinutes = openHour * 60;
+        
+        return appts.map(appt => {
+            const apptStartMinutes = timeToMinutes(appt.time);
+            const apptEndMinutes = timeToMinutes(appt.endTime);
+            const duration = apptEndMinutes - apptStartMinutes;
+            
+            const top = ((apptStartMinutes - startMinutes) / 30) * 80;
+            const height = (duration / 30) * 80;
+            
+            return `
+                <div class="appointment-block ${appt.paid ? 'paid' : 'unpaid'}" 
+                     style="top: ${top}px; height: ${height}px;"
+                     data-appointment-id="${appt.id}">
+                    <div class="appointment-time">${appt.time} - ${appt.endTime}</div>
+                    <div class="appointment-customer">${appt.customer}</div>
+                    <div class="appointment-service">${appt.service}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderClickAreas(stylistId) {
+        const [openHour] = (dailyData.openTime || '09:00').split(':').map(Number);
+        const [closeHour] = (dailyData.closeTime || '18:00').split(':').map(Number);
+        const startMinutes = openHour * 60;
+        
+        let html = '';
+        for (let hour = openHour; hour <= closeHour; hour++) {
+            for (let minutes of [0, 30]) {
+                if (hour === closeHour && minutes === 30) break;
+                
+                const time = `${String(hour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                const top = ((timeToMinutes(time) - startMinutes) / 30) * 80;
+                
+                const { isAvailable, reason } = checkAvailability(time, stylistId);
+                const availClass = isAvailable ? '' : reason;
+                
+                html += `
+                    <div class="slot-click-area ${availClass}" 
+                         style="top: ${top}px;"
+                         data-time="${time}"
+                         data-stylist-id="${stylistId}"
+                         data-available="${isAvailable}">
+                    </div>
+                `;
+            }
+        }
+        return html;
+    }
+
+    function checkAvailability(time, stylistId) {
+        const schedules = dailyData.schedules?.[stylistId] || [];
+        const timeOffs = dailyData.timeOffs?.[stylistId] || [];
+        
+        // Check time off
+        if (timeOffs.some(off => time >= off.start && time < off.end)) {
+            return { isAvailable: false, reason: 'time-off' };
+        }
+        
+        // Check schedule
+        if (schedules.some(sch => time >= sch.start && time < sch.end)) {
+            return { isAvailable: true, reason: '' };
+        }
+        
+        return { isAvailable: false, reason: 'unavailable' };
+    }
+
+    function timeToMinutes(time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+    }
+
+    function attachEventListeners() {
+        document.querySelectorAll('.slot-click-area').forEach(slot => {
             slot.addEventListener('click', function() {
-                const time = this.dataset.time, stylist = stylists.find(s => s.id === currentStylistId);
+                if (this.dataset.available === 'false') return;
+                
+                const time = this.dataset.time;
+                const stylistId = this.dataset.stylistId;
+                const stylist = stylists.find(s => s.id === stylistId);
+                
                 document.getElementById('modalStylist').textContent = stylist.name;
-                document.getElementById('modalDate').textContent = new Intl.DateTimeFormat('fa-IR', { dateStyle: 'full' }).format(currentDate);
+                document.getElementById('modalDate').textContent = 
+                    new Intl.DateTimeFormat('fa-IR', { dateStyle: 'full' }).format(currentDate);
                 document.getElementById('modalTime').textContent = time;
+                
                 new bootstrap.Modal(document.getElementById('bookingModal')).show();
             });
         });
-        document.querySelectorAll('.appointment').forEach(appEl => {
-            appEl.addEventListener('click', function(e) {
+        
+        document.querySelectorAll('.appointment-block').forEach(block => {
+            block.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const appointmentId = parseInt(this.dataset.appointmentId), appData = dailyData.appointments.find(app => app.id === appointmentId), stylist = stylists.find(s => s.id === appData.stylistId);
-                document.getElementById('appointmentDetails').innerHTML = `<p><strong>مشتری:</strong> ${appData.customer}</p><p><strong>آرایشگر:</strong> ${stylist.name}</p><p><strong>ساعت:</strong> ${appData.time}</p><p><strong>خدمت:</strong> ${appData.service}</p><p><strong>وضعیت پرداخت:</strong><span class="badge bg-${appData.paid ? 'success' : 'warning'}">${appData.paid ? 'پرداخت شده' : 'پرداخت نشده'}</span></p>${appData.description ? `<p><strong>توضیحات:</strong> ${appData.description}</p>` : ''}`;
-                document.getElementById('appointmentModal').dataset.appointmentId = appointmentId;
+                const apptId = parseInt(this.dataset.appointmentId);
+                const appt = dailyData.appointments.find(a => a.id === apptId);
+                const stylist = stylists.find(s => s.id === appt.stylistId);
+                
+                document.getElementById('appointmentDetails').innerHTML = `
+                    <div class="info-row">
+                        <div class="info-label">مشتری:</div>
+                        <div class="info-value">${appt.customer}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">آرایشگر:</div>
+                        <div class="info-value">${stylist.name}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">زمان:</div>
+                        <div class="info-value">${appt.time} - ${appt.endTime}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">خدمت:</div>
+                        <div class="info-value">${appt.service}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">وضعیت:</div>
+                        <div class="info-value">
+                            <span class="badge bg-${appt.paid ? 'success' : 'warning'}">
+                                ${appt.paid ? 'پرداخت شده' : 'پرداخت نشده'}
+                            </span>
+                        </div>
+                    </div>
+                    ${appt.description ? `
+                    <div class="info-row">
+                        <div class="info-label">توضیحات:</div>
+                        <div class="info-value">${appt.description}</div>
+                    </div>
+                    ` : ''}
+                `;
+                
                 new bootstrap.Modal(document.getElementById('appointmentModal')).show();
             });
         });
+    }
+
+    document.getElementById('addAppointmentFab').addEventListener('click', function() {
+        if (stylists.length > 0) {
+            document.getElementById('modalStylist').textContent = stylists[0].name;
+            document.getElementById('modalDate').textContent = 
+                new Intl.DateTimeFormat('fa-IR', { dateStyle: 'full' }).format(currentDate);
+            document.getElementById('modalTime').textContent = dailyData.openTime || '10:00';
+            
+            new bootstrap.Modal(document.getElementById('bookingModal')).show();
+        }
+    });
+
+    function showLoading() {
+        const grid = document.getElementById('appointmentsGrid');
+        grid.innerHTML = '<div class="loading-overlay"><div class="spinner"></div></div>';
+    }
+
+    function hideLoading() {
+        const overlay = document.querySelector('.loading-overlay');
+        if (overlay) overlay.remove();
     }
 });
 </script>

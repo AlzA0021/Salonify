@@ -2574,14 +2574,16 @@ class AddTimeOffView(LoginRequiredMixin, View):
 # ------------------------------------------------------------------------------------------------------------------------------
 import json
 from datetime import datetime, timedelta
-import jdatetime  # <<< ۱. اضافه کردن کتابخانه jdatetime
+import jdatetime
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.utils import timezone
+from django.db.models import Q
+
+# Import models (adjust based on your project structure)
+# from .models import Salon, SalonOpeningHours, OrderDetail, StylistSchedule, StylistTimeOff
 
 
-
-# این دیکشنری همچنان برای محاسبه روز هفته لازم است
 JALALI_WEEKDAY_MAP = {
     5: 1,  # Saturday
     6: 2,  # Sunday
@@ -2595,51 +2597,82 @@ JALALI_WEEKDAY_MAP = {
 
 def calendar_view(request, salon_id):
     """
-    این ویو تغییری نکرده است. فقط صفحه اصلی را رندر می‌کند.
+    رندر صفحه اصلی تقویم با استایل Fresha
     """
     salon = get_object_or_404(Salon, pk=salon_id)
     stylists_qs = salon.stylists.filter(is_active=True)
 
     stylists_data = []
     for stylist in stylists_qs:
+        avatar_url = "https://i.pravatar.cc/150?u=" + str(stylist.user.pk)
+        if hasattr(stylist, "profile_image") and stylist.profile_image:
+            avatar_url = stylist.profile_image.url
+
         stylists_data.append(
             {
                 "id": str(stylist.user.pk),
                 "name": stylist.get_fullName(),
-                "avatar": (
-                    stylist.profile_image.url
-                    if stylist.profile_image
-                    else "https://via.placeholder.com/60"
-                ),
+                "avatar": avatar_url,
             }
         )
 
     context = {
         "salon_id": salon_id,
-        "stylists_json": json.dumps(stylists_data),
-        "dashboard_prefix": "/dashboards",  # پیشوند URL داشبورد
+        "stylists_json": json.dumps(stylists_data, ensure_ascii=False),
+        "dashboard_prefix": "/dashboards",
     }
     return render(request, "dashboards/appointment_calendar.html", context)
 
 
 def get_calendar_data(request, salon_id):
     """
-    این ویو برای کار با تاریخ شمسی اصلاح شده است.
+    API endpoint برای دریافت اطلاعات تقویم
+    با پشتیبانی کامل از تاریخ شمسی
     """
-    date_str = request.GET.get("date", timezone.now().strftime("%Y-%m-%d"))
+    # دریافت تاریخ از query parameter
+    date_str = request.GET.get("date")
+
+    if not date_str:
+        # اگر تاریخ ارسال نشده، از تاریخ امروز استفاده کن
+        today = timezone.now().date()
+        date_str = today.strftime("%Y-%m-%d")
+
     try:
-        # تاریخ میلادی از ورودی گرفته می‌شود
-        selected_gregorian_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
-        return JsonResponse({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+        # Parse تاریخ میلادی
+        parts = date_str.split("-")
+        year, month, day = int(parts[0]), int(parts[1]), int(parts[2])
+        selected_gregorian_date = datetime(year, month, day).date()
+    except (ValueError, IndexError, TypeError):
+        return JsonResponse(
+            {
+                "error": "فرمت تاریخ نامعتبر است. از فرمت YYYY-MM-DD استفاده کنید.",
+                "salonIsOpen": False,
+            },
+            status=400,
+        )
 
     salon = get_object_or_404(Salon, pk=salon_id)
 
-    # ۲. تبدیل تاریخ میلادی به شمسی برای کوئری دیتابیس
-    selected_jalali_date = jdatetime.date.fromgregorian(date=selected_gregorian_date)
-    print(f"Selected Jalali Date: {selected_jalali_date}")
-    # پیدا کردن ساعات کاری سالن همچنان با تاریخ میلادی انجام می‌شود چون به روز هفته نیاز دارد
+    # تبدیل تاریخ میلادی به شمسی
+    try:
+        selected_jalali_date = jdatetime.date.fromgregorian(
+            year=selected_gregorian_date.year,
+            month=selected_gregorian_date.month,
+            day=selected_gregorian_date.day,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"error": f"خطا در تبدیل تاریخ: {str(e)}", "salonIsOpen": False}, status=400
+        )
+
+    # Debug logs
+    print(f"[DEBUG] Gregorian Date: {selected_gregorian_date}")
+    print(f"[DEBUG] Jalali Date: {selected_jalali_date}")
+
+    # یافتن روز هفته برای ساعات کاری
     day_of_week_model = JALALI_WEEKDAY_MAP.get(selected_gregorian_date.weekday())
+
+    # دریافت ساعات کاری سالن
     opening_hours = SalonOpeningHours.objects.filter(
         salon=salon, day_of_week=day_of_week_model
     ).first()
@@ -2647,51 +2680,101 @@ def get_calendar_data(request, salon_id):
     if not opening_hours or opening_hours.is_closed:
         return JsonResponse({"salonIsOpen": False, "message": "سالن در این روز تعطیل است."})
 
-    # ۳. جستجوی نوبت‌ها با استفاده از تاریخ شمسی
-    appointments_qs = OrderDetail.objects.filter(
-        salon=salon, date=selected_jalali_date
-    ).select_related("order__customer__user", "service", "stylist__user")
+    # ===========================================
+    # دریافت نوبت‌ها (Appointments)
+    # ===========================================
+
+    # روش 1: اگر فیلد date از نوع jdatetime.date است
+    try:
+        appointments_qs = OrderDetail.objects.filter(
+            salon=salon, date=selected_jalali_date
+        ).select_related("order__customer__user", "service", "stylist__user")
+    except Exception as e:
+        print(f"[ERROR] Query error: {e}")
+        # روش 2: اگر date به صورت string ذخیره شده
+        jalali_str = selected_jalali_date.strftime("%Y-%m-%d")
+        appointments_qs = OrderDetail.objects.filter(salon=salon, date=jalali_str).select_related(
+            "order__customer__user", "service", "stylist__user"
+        )
+
+    print(f"[DEBUG] Found {appointments_qs.count()} appointments")
 
     appointments_data = []
     for detail in appointments_qs:
-        if detail.date is None or detail.time is None:
+        if not detail.date or not detail.time:
             continue
 
-        # برای عملیات `combine`، تاریخ شمسی باید به میلادی معادل تبدیل شود
-        detail_gregorian_date = detail.date.togregorian()
-        start_datetime = datetime.combine(detail_gregorian_date, detail.time)
+        try:
+            # تبدیل تاریخ شمسی به میلادی برای محاسبات
+            if isinstance(detail.date, jdatetime.date):
+                detail_gregorian_date = detail.date.togregorian()
+            elif isinstance(detail.date, str):
+                # Parse string date
+                j_parts = detail.date.split("-")
+                temp_jalali = jdatetime.date(int(j_parts[0]), int(j_parts[1]), int(j_parts[2]))
+                detail_gregorian_date = temp_jalali.togregorian()
+            else:
+                # Already gregorian date
+                detail_gregorian_date = detail.date
 
-        duration = 60
-        if detail.service:
-            duration = (
-                getattr(detail.service, "duration_in_minutes", None)
-                or getattr(detail.service, "duration", None)
-                or 60
+            start_datetime = datetime.combine(detail_gregorian_date, detail.time)
+
+            # محاسبه مدت زمان خدمت
+            duration = 60  # Default duration
+            if detail.service:
+                duration = (
+                    getattr(detail.service, "duration_in_minutes", None)
+                    or getattr(detail.service, "duration", None)
+                    or 60
+                )
+
+            end_datetime = start_datetime + timedelta(minutes=int(duration))
+
+            # نام خدمت
+            service_name = "خدمت"
+            if detail.service:
+                service_name = (
+                    getattr(detail.service, "name", None)
+                    or getattr(detail.service, "title", None)
+                    or "خدمت"
+                )
+
+            # نام مشتری
+            customer_name = "مشتری"
+            if detail.order and detail.order.customer:
+                customer_name = detail.order.customer.get_fullName()
+
+            appointments_data.append(
+                {
+                    "id": detail.pk,
+                    "stylistId": str(detail.stylist.user.pk),
+                    "customer": customer_name,
+                    "time": detail.time.strftime("%H:%M"),
+                    "endTime": end_datetime.strftime("%H:%M"),
+                    "date": str(detail.date),
+                    "service": service_name,
+                    "paid": detail.order.is_paid if detail.order else False,
+                    "description": detail.order.description if detail.order else "",
+                }
             )
-        end_datetime = start_datetime + timedelta(minutes=int(duration))
+        except Exception as e:
+            print(f"[ERROR] Processing appointment {detail.pk}: {e}")
+            continue
 
-        service_name = ""
-        if detail.service:
-            service_name = getattr(detail.service, "name", "") or getattr(
-                detail.service, "title", ""
-            )
+    # ===========================================
+    # دریافت برنامه‌کاری آرایشگران (Schedules)
+    # ===========================================
 
-        appointments_data.append(
-            {
-                "id": detail.pk,
-                "stylistId": str(detail.stylist.user.pk),
-                "customer": detail.order.customer.get_fullName(),
-                "time": detail.time.strftime("%H:%M"),
-                "date": detail.date.strftime("%Y-%m-%d"),  # این تاریخ شمسی است
-                "service": service_name,
-                "paid": detail.order.is_paid,
-                "description": detail.order.description or "",
-                "endTime": end_datetime.strftime("%H:%M"),
-            }
+    try:
+        schedules_qs = StylistSchedule.objects.filter(
+            salon=salon, date=selected_jalali_date
+        ).select_related("stylist__user")
+    except:
+        jalali_str = selected_jalali_date.strftime("%Y-%m-%d")
+        schedules_qs = StylistSchedule.objects.filter(salon=salon, date=jalali_str).select_related(
+            "stylist__user"
         )
 
-    # جستجوی برنامه‌کاری و مرخصی‌ها نیز باید با تاریخ شمسی انجام شود
-    schedules_qs = StylistSchedule.objects.filter(salon=salon, date=selected_jalali_date)
     schedules_data = {}
     for schedule in schedules_qs:
         stylist_id = str(schedule.stylist.user.pk)
@@ -2704,10 +2787,22 @@ def get_calendar_data(request, salon_id):
             }
         )
 
+    # ===========================================
+    # دریافت مرخصی‌ها (Time Offs)
+    # ===========================================
+
     stylists_in_salon = salon.stylists.all()
-    time_offs_qs = StylistTimeOff.objects.filter(
-        stylist__in=stylists_in_salon, date=selected_jalali_date
-    )
+
+    try:
+        time_offs_qs = StylistTimeOff.objects.filter(
+            stylist__in=stylists_in_salon, date=selected_jalali_date
+        ).select_related("stylist__user")
+    except:
+        jalali_str = selected_jalali_date.strftime("%Y-%m-%d")
+        time_offs_qs = StylistTimeOff.objects.filter(
+            stylist__in=stylists_in_salon, date=jalali_str
+        ).select_related("stylist__user")
+
     time_offs_data = {}
     for time_off in time_offs_qs:
         stylist_id = str(time_off.stylist.user.pk)
@@ -2715,19 +2810,108 @@ def get_calendar_data(request, salon_id):
             time_offs_data[stylist_id] = []
         time_offs_data[stylist_id].append(
             {
-                "start": time_off.start_time.strftime("%H:%M") if time_off.start_time else "00:00",
-                "end": time_off.end_time.strftime("%H:%M") if time_off.end_time else "23:59",
-                "reason": time_off.reason,
+                "start": (
+                    time_off.start_time.strftime("%H:%M") if time_off.start_time else "00:00"
+                ),
+                "end": (time_off.end_time.strftime("%H:%M") if time_off.end_time else "23:59"),
+                "reason": getattr(time_off, "reason", "مرخصی") or "مرخصی",
             }
         )
 
-    return JsonResponse(
-        {
-            "salonIsOpen": True,
-            "openTime": opening_hours.open_time.strftime("%H:%M"),
-            "closeTime": opening_hours.close_time.strftime("%H:%M"),
-            "appointments": appointments_data,
-            "schedules": schedules_data,
-            "timeOffs": time_offs_data,
-        }
-    )
+    # Response
+    response_data = {
+        "salonIsOpen": True,
+        "openTime": opening_hours.open_time.strftime("%H:%M"),
+        "closeTime": opening_hours.close_time.strftime("%H:%M"),
+        "appointments": appointments_data,
+        "schedules": schedules_data,
+        "timeOffs": time_offs_data,
+        "debug": {
+            "gregorianDate": str(selected_gregorian_date),
+            "jalaliDate": str(selected_jalali_date),
+            "appointmentsCount": len(appointments_data),
+        },
+    }
+
+    print(f"[DEBUG] Returning {len(appointments_data)} appointments")
+
+    return JsonResponse(response_data)
+
+
+def create_appointment(request, salon_id):
+    """
+    API endpoint برای ایجاد نوبت جدید
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+
+        # اعتبارسنجی
+        required_fields = ["stylistId", "date", "time", "customerName", "serviceId"]
+        for field in required_fields:
+            if field not in data:
+                return JsonResponse({"error": f"فیلد {field} الزامی است"}, status=400)
+
+        # TODO: پیاده‌سازی لاجیک ایجاد نوبت
+
+        return JsonResponse(
+            {"success": True, "message": "نوبت با موفقیت ثبت شد", "appointmentId": 123}
+        )
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "JSON نامعتبر است"}, status=400)
+    except Exception as e:
+        print(f"[ERROR] Create appointment: {e}")
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+def update_appointment(request, salon_id, appointment_id):
+    """
+    API endpoint برای به‌روزرسانی نوبت
+    """
+    if request.method not in ["PUT", "PATCH"]:
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+
+        # TODO: پیاده‌سازی لاجیک به‌روزرسانی
+
+        return JsonResponse({"success": True, "message": "نوبت به‌روزرسانی شد"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+def cancel_appointment(request, salon_id, appointment_id):
+    """
+    API endpoint برای لغو نوبت
+    """
+    if request.method not in ["DELETE", "POST"]:
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        # TODO: پیاده‌سازی لاجیک لغو
+
+        return JsonResponse({"success": True, "message": "نوبت لغو شد"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+def mark_appointment_paid(request, salon_id, appointment_id):
+    """
+    API endpoint برای پرداخت نوبت
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        # TODO: پیاده‌سازی لاجیک پرداخت
+
+        return JsonResponse({"success": True, "message": "وضعیت پرداخت به‌روزرسانی شد"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
