@@ -398,6 +398,125 @@
         .btn-danger { background: #ff3b30; }
         .btn-success { background: #34c759; }
         .btn-warning { background: #ff9500; color: white; }
+        
+        /* Stylist Menu Modal */
+        .stylist-menu-modal {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            z-index: 10000;
+            max-height: 70vh;
+            animation: slideUp 0.3s ease;
+        }
+        .stylist-menu-modal.show {
+            display: block;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        .stylist-menu-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+        }
+        .stylist-menu-backdrop.show {
+            display: block;
+        }
+        .stylist-menu-header {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stylist-menu-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1c1c1e;
+        }
+        .stylist-menu-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .stylist-menu-body {
+            padding: 10px 0;
+            max-height: calc(70vh - 80px);
+            overflow-y: auto;
+        }
+        .menu-section {
+            padding: 10px 0;
+        }
+        .menu-section-title {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .menu-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: none;
+            background: white;
+            width: 100%;
+            text-align: right;
+        }
+        .menu-item:hover {
+            background: #f9f9f9;
+        }
+        .menu-item:active {
+            background: #f0f0f0;
+        }
+        .menu-item i {
+            font-size: 20px;
+            color: #666;
+            width: 24px;
+            text-align: center;
+        }
+        .menu-item-text {
+            flex: 1;
+            font-size: 16px;
+            color: #1c1c1e;
+        }
+        .menu-divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 5px 20px;
+        }
+        .current-view-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+        }
     </style>
 {% endblock head %}
 
@@ -433,6 +552,9 @@
     </div>
 
     <div class="fab-container">
+        <button class="fab fab-secondary" title="تست منو" id="testMenuBtn">
+            <i class="bi bi-gear"></i>
+        </button>
         <button class="fab fab-secondary" title="مدیریت تیم">
             <i class="bi bi-people"></i>
         </button>
@@ -442,6 +564,68 @@
         <button class="fab fab-primary" id="addAppointmentFab" title="نوبت جدید">
             <i class="bi bi-plus-lg"></i>
         </button>
+    </div>
+
+    <!-- Stylist Menu Modal -->
+    <div class="stylist-menu-backdrop" id="stylistMenuBackdrop"></div>
+    <div class="stylist-menu-modal" id="stylistMenuModal">
+        <div class="stylist-menu-header">
+            <h3 class="stylist-menu-title" id="stylistMenuTitle">آرایشگر</h3>
+            <button class="stylist-menu-close" id="closeStylistMenu">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="stylist-menu-body">
+            <div class="menu-section">
+                <div class="menu-section-title">نمایش تقویم</div>
+                <button class="menu-item" data-view="day">
+                    <i class="bi bi-calendar-day"></i>
+                    <span class="menu-item-text">روز</span>
+                    <span class="current-view-indicator" id="dayViewIndicator"></span>
+                </button>
+                <button class="menu-item" data-view="3day">
+                    <i class="bi bi-calendar3"></i>
+                    <span class="menu-item-text">۳ روز</span>
+                    <span class="current-view-indicator" id="threeDayViewIndicator" style="display: none;"></span>
+                </button>
+                <button class="menu-item" data-view="week">
+                    <i class="bi bi-calendar-week"></i>
+                    <span class="menu-item-text">هفته</span>
+                    <span class="current-view-indicator" id="weekViewIndicator" style="display: none;"></span>
+                </button>
+                <button class="menu-item" data-view="month">
+                    <i class="bi bi-calendar-month"></i>
+                    <span class="menu-item-text">ماه</span>
+                    <span class="current-view-indicator" id="monthViewIndicator" style="display: none;"></span>
+                </button>
+            </div>
+            
+            <div class="menu-divider"></div>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">عملیات</div>
+                <button class="menu-item" id="menuAddAppointment">
+                    <i class="bi bi-plus-circle"></i>
+                    <span class="menu-item-text">افزودن نوبت</span>
+                </button>
+                <button class="menu-item" id="menuAddBlockedTime">
+                    <i class="bi bi-slash-circle"></i>
+                    <span class="menu-item-text">افزودن زمان مسدود</span>
+                </button>
+                <button class="menu-item" id="menuEditShift">
+                    <i class="bi bi-clock"></i>
+                    <span class="menu-item-text">ویرایش شیفت کاری</span>
+                </button>
+                <button class="menu-item" id="menuAddTimeOff">
+                    <i class="bi bi-calendar-x"></i>
+                    <span class="menu-item-text">افزودن مرخصی</span>
+                </button>
+                <button class="menu-item" id="menuViewTeamMember">
+                    <i class="bi bi-person"></i>
+                    <span class="menu-item-text">مشاهده اطلاعات</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="bookingModal" tabindex="-1">
@@ -518,11 +702,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let dailyData = {};
     let persianDatePickerInstance = null;
     const usePersianDate = typeof persianDate !== 'undefined' && typeof $.fn.persianDatepicker !== 'undefined';
+    let currentView = 'day';
+    let selectedStylistId = null;
 
     initializeDatePicker();
+    updateDateDisplay();
+    initializeStylistMenu();
     renderStylists();
     renderTimeLabels();
-    updateDateDisplay();
     fetchAndRenderDay(currentDate);
 
     function initializeDatePicker() {
@@ -691,12 +878,37 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        container.innerHTML = stylists.map(s => `
-            <div class="stylist-column-header" data-stylist-id="${s.id}">
+        container.innerHTML = stylists.map((s, index) => `
+            <div class="stylist-column-header ${index === 0 ? 'active' : ''}" data-stylist-id="${s.id}">
                 <img src="${s.avatar}" alt="${s.name}" class="stylist-avatar" onerror="this.src='https://via.placeholder.com/50'">
                 <div class="stylist-name">${s.name}</div>
             </div>
         `).join('');
+        
+        // Add click event to each stylist header - با تاخیر کوچک
+        setTimeout(() => {
+            document.querySelectorAll('.stylist-column-header').forEach(header => {
+                header.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Remove active class from all
+                    document.querySelectorAll('.stylist-column-header').forEach(h => {
+                        h.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked
+                    this.classList.add('active');
+                    
+                    selectedStylistId = this.dataset.stylistId;
+                    const stylist = stylists.find(s => s.id === selectedStylistId);
+                    
+                    if (stylist) {
+                        openStylistMenu(stylist);
+                    }
+                });
+            });
+        }, 100);
     }
 
     function renderTimeLabels() {
@@ -978,6 +1190,136 @@ document.addEventListener('DOMContentLoaded', function() {
     function hideLoading() {
         const overlay = document.querySelector('.loading-overlay');
         if (overlay) overlay.remove();
+    }
+
+    function initializeStylistMenu() {
+        const modal = document.getElementById('stylistMenuModal');
+        const backdrop = document.getElementById('stylistMenuBackdrop');
+        const closeBtn = document.getElementById('closeStylistMenu');
+        
+        // Close menu
+        closeBtn.addEventListener('click', closeStylistMenu);
+        backdrop.addEventListener('click', closeStylistMenu);
+        
+        // View change buttons
+        document.querySelectorAll('[data-view]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const view = this.dataset.view;
+                changeView(view);
+                closeStylistMenu();
+            });
+        });
+        
+        // Action buttons
+        document.getElementById('menuAddAppointment').addEventListener('click', function() {
+            closeStylistMenu();
+            if (selectedStylistId) {
+                const stylist = stylists.find(s => s.id === selectedStylistId);
+                const persianDateStr = getPersianDateString(currentDate);
+                
+                document.getElementById('modalStylist').textContent = stylist.name;
+                document.getElementById('modalDate').textContent = persianDateStr;
+                document.getElementById('modalTime').textContent = dailyData.openTime || '10:00';
+                
+                new bootstrap.Modal(document.getElementById('bookingModal')).show();
+            }
+        });
+        
+        document.getElementById('menuAddBlockedTime').addEventListener('click', function() {
+            closeStylistMenu();
+            alert('افزودن زمان مسدود به زودی فعال می‌شود');
+        });
+        
+        document.getElementById('menuEditShift').addEventListener('click', function() {
+            closeStylistMenu();
+            alert('ویرایش شیفت کاری به زودی فعال می‌شود');
+        });
+        
+        document.getElementById('menuAddTimeOff').addEventListener('click', function() {
+            closeStylistMenu();
+            alert('افزودن مرخصی به زودی فعال می‌شود');
+        });
+        
+        document.getElementById('menuViewTeamMember').addEventListener('click', function() {
+            closeStylistMenu();
+            if (selectedStylistId) {
+                const stylist = stylists.find(s => s.id === selectedStylistId);
+                alert(`اطلاعات ${stylist.name}\n\nاین قسمت به زودی تکمیل می‌شود`);
+            }
+        });
+    }
+
+    function openStylistMenu(stylist) {
+        if (!stylist) return;
+        
+        const modal = document.getElementById('stylistMenuModal');
+        const backdrop = document.getElementById('stylistMenuBackdrop');
+        const title = document.getElementById('stylistMenuTitle');
+        
+        if (!modal || !backdrop || !title) {
+            alert('خطا در باز کردن منو');
+            return;
+        }
+        
+        title.textContent = stylist.name;
+        
+        // Update view indicators
+        updateViewIndicators();
+        
+        // Show modal with animation
+        requestAnimationFrame(() => {
+            backdrop.classList.add('show');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    function closeStylistMenu() {
+        const modal = document.getElementById('stylistMenuModal');
+        const backdrop = document.getElementById('stylistMenuBackdrop');
+        
+        backdrop.classList.remove('show');
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function updateViewIndicators() {
+        const indicators = {
+            'day': document.getElementById('dayViewIndicator'),
+            '3day': document.getElementById('threeDayViewIndicator'),
+            'week': document.getElementById('weekViewIndicator'),
+            'month': document.getElementById('monthViewIndicator')
+        };
+        
+        Object.keys(indicators).forEach(view => {
+            if (indicators[view]) {
+                indicators[view].style.display = view === currentView ? 'block' : 'none';
+            }
+        });
+    }
+
+    function changeView(view) {
+        currentView = view;
+        updateViewIndicators();
+        
+        switch(view) {
+            case 'day':
+                alert('نمایش روزانه فعال است');
+                // TODO: Implement day view
+                break;
+            case '3day':
+                alert('نمایش ۳ روزه به زودی فعال می‌شود');
+                // TODO: Implement 3-day view
+                break;
+            case 'week':
+                alert('نمایش هفتگی به زودی فعال می‌شود');
+                // TODO: Implement week view
+                break;
+            case 'month':
+                alert('نمایش ماهانه به زودی فعال می‌شود');
+                // TODO: Implement month view
+                break;
+        }
     }
 });
 </script>
