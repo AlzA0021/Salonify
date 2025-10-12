@@ -3,19 +3,25 @@
 {% block head %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@latest/dist/persian-date.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
     <style>
         * { box-sizing: border-box; }
+        html, body {
+            overflow-x: hidden !important;
+            max-width: 100vw !important;
+            position: relative;
+        }
         body { 
             font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background-color: #f5f5f7; 
             margin: 0; 
             padding: 0;
-            overflow-x: hidden;
         }
         
         .header { 
@@ -57,6 +63,54 @@
             font-size: 14px;
         }
         
+        #hiddenDatePicker {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 9999 !important;
+            opacity: 0;
+            pointer-events: none;
+            width: 1px;
+            height: 1px;
+        }
+        
+        #hiddenDatePicker.picker-opened {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .pwt-backdrop {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            z-index: 9998 !important;
+        }
+        
+        .datepicker-container {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 9999 !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+            border-radius: 12px !important;
+        }
+        
+        /* جلوگیری از shift کل صفحه */
+        body.datepicker-open {
+            overflow: hidden !important;
+            position: fixed !important;
+            width: 100% !important;
+        }
+        
+        .datepicker-plot-area {
+            position: fixed !important;
+        }
+        
         .stylists-header { 
             background: white;
             border-bottom: 1px solid #e5e5e5;
@@ -84,6 +138,15 @@
             padding: 16px 12px;
             text-align: center;
             border-left: 1px solid #e5e5e5;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .stylist-column-header:hover { 
+            background: #f9f9f9; 
+        }
+        .stylist-column-header.active {
+            background: #f0f0ff;
         }
         .stylist-avatar { 
             width: 50px; 
@@ -346,13 +409,13 @@
          data-prefix="{{ dashboard_prefix|safe }}">
     </div>
 
-    <input type="text" id="hiddenDatePicker" class="d-none" />
+    <input type="text" id="hiddenDatePicker" />
 
     <div class="header">
         <div class="header-top">
             <button class="menu-btn"><i class="bi bi-list"></i></button>
             <div class="date-display" id="dateDisplay">
-                <span></span>
+                <span>در حال بارگذاری...</span>
                 <i class="bi bi-chevron-down"></i>
             </div>
             <div class="logo">آلیزا</div>
@@ -381,7 +444,6 @@
         </button>
     </div>
 
-    <!-- Modals -->
     <div class="modal fade" id="bookingModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -454,24 +516,125 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentDate = new Date();
     let dailyData = {};
+    let persianDatePickerInstance = null;
+    const usePersianDate = typeof persianDate !== 'undefined' && typeof $.fn.persianDatepicker !== 'undefined';
 
     initializeDatePicker();
     renderStylists();
     renderTimeLabels();
+    updateDateDisplay();
     fetchAndRenderDay(currentDate);
 
     function initializeDatePicker() {
-        const picker = flatpickr("#hiddenDatePicker", {
-            defaultDate: currentDate,
-            dateFormat: "Y-m-d",
-            onChange: function(selectedDates) {
-                if (selectedDates.length > 0) {
-                    currentDate = selectedDates[0];
-                    fetchAndRenderDay(currentDate);
-                }
+        if (usePersianDate) {
+            try {
+                persianDatePickerInstance = $("#hiddenDatePicker").persianDatepicker({
+                    inline: false,
+                    format: 'YYYY-MM-DD',
+                    viewMode: 'day',
+                    initialValue: true,
+                    initialValueType: 'persian',
+                    autoClose: true,
+                    persianDigit: true,
+                    position: 'auto',
+                    altField: '#hiddenDatePicker',
+                    calendar: {
+                        persian: {
+                            locale: 'fa'
+                        }
+                    },
+                    observer: true,
+                    navigator: {
+                        enabled: true
+                    },
+                    toolbox: {
+                        enabled: true,
+                        todayButton: {
+                            enabled: true,
+                            text: {
+                                fa: 'امروز'
+                            }
+                        },
+                        submitButton: {
+                            enabled: true,
+                            text: {
+                                fa: 'تایید'
+                            }
+                        }
+                    },
+                    onShow: function() {
+                        document.body.classList.add('datepicker-open');
+                        
+                        if (!document.querySelector('.pwt-backdrop')) {
+                            const backdrop = document.createElement('div');
+                            backdrop.className = 'pwt-backdrop';
+                            backdrop.onclick = function() {
+                                persianDatePickerInstance.hide();
+                            };
+                            document.body.appendChild(backdrop);
+                        }
+                        
+                        setTimeout(() => {
+                            const container = document.querySelector('.datepicker-container');
+                            if (container) {
+                                container.style.position = 'fixed';
+                                container.style.top = '50%';
+                                container.style.left = '50%';
+                                container.style.transform = 'translate(-50%, -50%)';
+                                container.style.zIndex = '9999';
+                            }
+                        }, 10);
+                    },
+                    onHide: function() {
+                        document.body.classList.remove('datepicker-open');
+                        const backdrop = document.querySelector('.pwt-backdrop');
+                        if (backdrop) backdrop.remove();
+                    },
+                    onSelect: function(unix) {
+                        try {
+                            const pDate = new persianDate(unix);
+                            currentDate = pDate.toDate();
+                            updateDateDisplay();
+                            fetchAndRenderDay(currentDate);
+                            
+                            document.body.classList.remove('datepicker-open');
+                            const backdrop = document.querySelector('.pwt-backdrop');
+                            if (backdrop) backdrop.remove();
+                        } catch(e) {
+                            alert('خطا در انتخاب تاریخ');
+                        }
+                    }
+                });
+            } catch(e) {
+                initializeFallbackDatePicker();
+            }
+        } else {
+            initializeFallbackDatePicker();
+        }
+        
+        document.getElementById('dateDisplay').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (persianDatePickerInstance) {
+                persianDatePickerInstance.show();
+            } else {
+                $("#hiddenDatePicker").focus();
             }
         });
-        document.getElementById('dateDisplay').addEventListener('click', () => picker.open());
+    }
+
+    function initializeFallbackDatePicker() {
+        const input = document.getElementById('hiddenDatePicker');
+        input.type = 'date';
+        input.style.cssText = 'position: relative; opacity: 1; left: 0; width: auto;';
+        input.value = currentDate.toISOString().split('T')[0];
+        
+        input.addEventListener('change', function() {
+            currentDate = new Date(this.value);
+            updateDateDisplay();
+            fetchAndRenderDay(currentDate);
+        });
     }
 
     async function fetchAndRenderDay(date) {
@@ -483,32 +646,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const response = await fetch(url);
-            if (!response.ok) throw new Error('Network error');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             dailyData = await response.json();
             renderCalendarGrid();
         } catch (error) {
-            console.error('Failed to fetch:', error);
             document.getElementById('appointmentsGrid').innerHTML = 
-                '<div class="alert alert-danger m-3">خطا در بارگذاری اطلاعات</div>';
+                '<div class="alert alert-danger m-3">خطا در بارگذاری اطلاعات. لطفاً صفحه را رفرش کنید.</div>';
         } finally {
             hideLoading();
         }
     }
     
     function updateDateDisplay() {
-        const formatter = new Intl.DateTimeFormat('fa-IR', { 
-            weekday: 'long', 
-            day: 'numeric', 
-            month: 'long' 
-        });
-        document.querySelector('#dateDisplay span').textContent = formatter.format(currentDate);
+        try {
+            let displayText = '';
+            
+            if (usePersianDate) {
+                const pDate = new persianDate(currentDate);
+                const dayName = pDate.format('dddd');
+                const day = pDate.format('D');
+                const monthName = pDate.format('MMMM');
+                displayText = `${dayName} ${day} ${monthName}`;
+            } else {
+                const formatter = new Intl.DateTimeFormat('fa-IR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long' 
+                });
+                displayText = formatter.format(currentDate);
+            }
+            
+            document.querySelector('#dateDisplay span').textContent = displayText;
+        } catch (e) {
+            document.querySelector('#dateDisplay span').textContent = currentDate.toLocaleDateString('fa-IR');
+        }
     }
 
     function renderStylists() {
         const container = document.getElementById('stylistsHeader');
+        if (!stylists || stylists.length === 0) {
+            container.innerHTML = '<div class="alert alert-warning m-3">هیچ آرایشگری یافت نشد</div>';
+            return;
+        }
+        
         container.innerHTML = stylists.map(s => `
             <div class="stylist-column-header" data-stylist-id="${s.id}">
-                <img src="${s.avatar}" alt="${s.name}" class="stylist-avatar">
+                <img src="${s.avatar}" alt="${s.name}" class="stylist-avatar" onerror="this.src='https://via.placeholder.com/50'">
                 <div class="stylist-name">${s.name}</div>
             </div>
         `).join('');
@@ -516,7 +701,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderTimeLabels() {
         if (!dailyData.salonIsOpen || !dailyData.openTime) {
-            // Default times for initial render
             const times = [];
             for (let hour = 9; hour <= 18; hour++) {
                 times.push(`${String(hour).padStart(2, '0')}:00`);
@@ -555,7 +739,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        renderTimeLabels(); // Update time labels based on salon hours
+        renderTimeLabels();
+        
+        if (!stylists || stylists.length === 0) {
+            grid.innerHTML = '<div class="alert alert-warning m-3">هیچ آرایشگری برای نمایش وجود ندارد</div>';
+            return;
+        }
         
         grid.innerHTML = stylists.map(stylist => {
             const stylistAppts = (dailyData.appointments || []).filter(a => a.stylistId === stylist.id);
@@ -595,7 +784,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const duration = apptEndMinutes - apptStartMinutes;
             
             const top = ((apptStartMinutes - startMinutes) / 30) * 80;
-            const height = (duration / 30) * 80;
+            const height = Math.max((duration / 30) * 80, 50);
             
             return `
                 <div class="appointment-block ${appt.paid ? 'paid' : 'unpaid'}" 
@@ -642,12 +831,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const schedules = dailyData.schedules?.[stylistId] || [];
         const timeOffs = dailyData.timeOffs?.[stylistId] || [];
         
-        // Check time off
         if (timeOffs.some(off => time >= off.start && time < off.end)) {
             return { isAvailable: false, reason: 'time-off' };
         }
         
-        // Check schedule
         if (schedules.some(sch => time >= sch.start && time < sch.end)) {
             return { isAvailable: true, reason: '' };
         }
@@ -660,6 +847,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return hours * 60 + minutes;
     }
 
+    function getPersianDateString(date) {
+        if (usePersianDate) {
+            const pDate = new persianDate(date);
+            return pDate.format('dddd D MMMM YYYY');
+        } else {
+            return date.toLocaleDateString('fa-IR', { dateStyle: 'full' });
+        }
+    }
+
     function attachEventListeners() {
         document.querySelectorAll('.slot-click-area').forEach(slot => {
             slot.addEventListener('click', function() {
@@ -669,9 +865,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const stylistId = this.dataset.stylistId;
                 const stylist = stylists.find(s => s.id === stylistId);
                 
+                if (!stylist) return;
+                
+                const persianDateStr = getPersianDateString(currentDate);
+                
                 document.getElementById('modalStylist').textContent = stylist.name;
-                document.getElementById('modalDate').textContent = 
-                    new Intl.DateTimeFormat('fa-IR', { dateStyle: 'full' }).format(currentDate);
+                document.getElementById('modalDate').textContent = persianDateStr;
                 document.getElementById('modalTime').textContent = time;
                 
                 new bootstrap.Modal(document.getElementById('bookingModal')).show();
@@ -683,7 +882,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.stopPropagation();
                 const apptId = parseInt(this.dataset.appointmentId);
                 const appt = dailyData.appointments.find(a => a.id === apptId);
+                
+                if (!appt) return;
+                
                 const stylist = stylists.find(s => s.id === appt.stylistId);
+                
+                if (!stylist) return;
                 
                 document.getElementById('appointmentDetails').innerHTML = `
                     <div class="info-row">
@@ -724,13 +928,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('addAppointmentFab').addEventListener('click', function() {
-        if (stylists.length > 0) {
-            document.getElementById('modalStylist').textContent = stylists[0].name;
-            document.getElementById('modalDate').textContent = 
-                new Intl.DateTimeFormat('fa-IR', { dateStyle: 'full' }).format(currentDate);
-            document.getElementById('modalTime').textContent = dailyData.openTime || '10:00';
-            
-            new bootstrap.Modal(document.getElementById('bookingModal')).show();
+        if (!stylists || stylists.length === 0) {
+            alert('هیچ آرایشگری موجود نیست');
+            return;
+        }
+        
+        const persianDateStr = getPersianDateString(currentDate);
+        
+        document.getElementById('modalStylist').textContent = stylists[0].name;
+        document.getElementById('modalDate').textContent = persianDateStr;
+        document.getElementById('modalTime').textContent = dailyData.openTime || '10:00';
+        
+        new bootstrap.Modal(document.getElementById('bookingModal')).show();
+    });
+
+    document.getElementById('confirmBooking').addEventListener('click', function() {
+        const customerName = document.getElementById('customerName').value;
+        const serviceType = document.getElementById('serviceType').value;
+        
+        if (!customerName || !serviceType) {
+            alert('لطفاً تمام فیلدهای الزامی را پر کنید');
+            return;
+        }
+        
+        alert('قابلیت ثبت نوبت به زودی فعال می‌شود');
+    });
+
+    document.getElementById('cancelAppointment').addEventListener('click', function() {
+        if (confirm('آیا از لغو این نوبت اطمینان دارید؟')) {
+            alert('قابلیت لغو نوبت به زودی فعال می‌شود');
+        }
+    });
+
+    document.getElementById('editAppointment').addEventListener('click', function() {
+        alert('قابلیت ویرایش نوبت به زودی فعال می‌شود');
+    });
+
+    document.getElementById('markPaid').addEventListener('click', function() {
+        if (confirm('آیا می‌خواهید این نوبت را به عنوان پرداخت شده علامت بزنید؟')) {
+            alert('قابلیت ثبت پرداخت به زودی فعال می‌شود');
         }
     });
 
