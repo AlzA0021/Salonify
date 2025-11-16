@@ -704,6 +704,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const usePersianDate = typeof persianDate !== 'undefined' && typeof $.fn.persianDatepicker !== 'undefined';
     let currentView = 'day';
     let selectedStylistId = null;
+    let filteredStylistId = null; // برای فیلتر کردن نمایش
 
     initializeDatePicker();
     updateDateDisplay();
@@ -878,26 +879,30 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        container.innerHTML = stylists.map((s, index) => `
-            <div class="stylist-column-header ${index === 0 ? 'active' : ''}" data-stylist-id="${s.id}">
+        // اگر فیلتر فعال است، فقط آرایشگر انتخاب شده را نمایش بده
+        let displayStylists = stylists;
+        if (filteredStylistId) {
+            displayStylists = stylists.filter(s => s.id === filteredStylistId);
+        }
+        
+        container.innerHTML = displayStylists.map((s, index) => `
+            <div class="stylist-column-header ${s.id === selectedStylistId ? 'active' : ''}" data-stylist-id="${s.id}">
                 <img src="${s.avatar}" alt="${s.name}" class="stylist-avatar" onerror="this.src='https://via.placeholder.com/50'">
                 <div class="stylist-name">${s.name}</div>
             </div>
         `).join('');
         
-        // Add click event to each stylist header - با تاخیر کوچک
+        // Add click event to each stylist header
         setTimeout(() => {
             document.querySelectorAll('.stylist-column-header').forEach(header => {
                 header.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    // Remove active class from all
                     document.querySelectorAll('.stylist-column-header').forEach(h => {
                         h.classList.remove('active');
                     });
                     
-                    // Add active class to clicked
                     this.classList.add('active');
                     
                     selectedStylistId = this.dataset.stylistId;
@@ -958,7 +963,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        grid.innerHTML = stylists.map(stylist => {
+        // فیلتر کردن آرایشگران بر اساس view
+        let displayStylists = stylists;
+        if (filteredStylistId) {
+            displayStylists = stylists.filter(s => s.id === filteredStylistId);
+        }
+        
+        grid.innerHTML = displayStylists.map(stylist => {
             const stylistAppts = (dailyData.appointments || []).filter(a => a.stylistId === stylist.id);
             
             return `
@@ -1197,6 +1208,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const backdrop = document.getElementById('stylistMenuBackdrop');
         const closeBtn = document.getElementById('closeStylistMenu');
         
+        if (!modal || !backdrop || !closeBtn) {
+            alert('المان‌های منو پیدا نشدند!');
+            return;
+        }
+        
+        // Test button
+        const testBtn = document.getElementById('testMenuBtn');
+        if (testBtn) {
+            testBtn.addEventListener('click', function() {
+                if (stylists.length > 0) {
+                    openStylistMenu(stylists[0]);
+                } else {
+                    alert('هیچ آرایشگری وجود ندارد');
+                }
+            });
+        }
+        
         // Close menu
         closeBtn.addEventListener('click', closeStylistMenu);
         backdrop.addEventListener('click', closeStylistMenu);
@@ -1304,22 +1332,276 @@ document.addEventListener('DOMContentLoaded', function() {
         
         switch(view) {
             case 'day':
-                alert('نمایش روزانه فعال است');
-                // TODO: Implement day view
+                // نمایش روزانه - همه آرایشگران
+                filteredStylistId = null;
+                renderStylists();
+                fetchAndRenderDay(currentDate);
                 break;
+                
             case '3day':
-                alert('نمایش ۳ روزه به زودی فعال می‌شود');
-                // TODO: Implement 3-day view
+                // نمایش ۳ روزه - فقط آرایشگر انتخاب شده
+                if (selectedStylistId) {
+                    filteredStylistId = selectedStylistId;
+                    render3DayView();
+                } else {
+                    alert('لطفاً ابتدا یک آرایشگر انتخاب کنید');
+                }
                 break;
+                
             case 'week':
-                alert('نمایش هفتگی به زودی فعال می‌شود');
-                // TODO: Implement week view
+                // نمایش هفتگی - فقط آرایشگر انتخاب شده
+                if (selectedStylistId) {
+                    filteredStylistId = selectedStylistId;
+                    renderWeekView();
+                } else {
+                    alert('لطفاً ابتدا یک آرایشگر انتخاب کنید');
+                }
                 break;
+                
             case 'month':
-                alert('نمایش ماهانه به زودی فعال می‌شود');
-                // TODO: Implement month view
+                // نمایش ماهانه - فقط آرایشگر انتخاب شده
+                if (selectedStylistId) {
+                    filteredStylistId = selectedStylistId;
+                    renderMonthView();
+                } else {
+                    alert('لطفاً ابتدا یک آرایشگر انتخاب کنید');
+                }
                 break;
         }
+    }
+
+    async function render3DayView() {
+        showLoading();
+        renderStylists();
+        
+        // محاسبه ۳ روز: دیروز، امروز، فردا
+        const dates = [];
+        for (let i = -1; i <= 1; i++) {
+            const d = new Date(currentDate);
+            d.setDate(d.getDate() + i);
+            dates.push(d);
+        }
+        
+        try {
+            // fetch data for 3 days
+            const promises = dates.map(date => {
+                const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                return fetch(`${dashboardPrefix}/api/calendar-data/salon/${salonId}/?date=${dateString}`)
+                    .then(res => res.json())
+                    .then(data => ({ date, data }));
+            });
+            
+            const results = await Promise.all(promises);
+            render3DayGrid(results);
+        } catch (error) {
+            alert('خطا در بارگذاری اطلاعات ۳ روزه');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    function render3DayGrid(daysData) {
+        const grid = document.getElementById('appointmentsGrid');
+        const timeLabels = document.getElementById('timeLabels');
+        
+        // Update header to show 3 days
+        const headerContainer = document.getElementById('stylistsHeader');
+        const stylist = stylists.find(s => s.id === filteredStylistId);
+        
+        headerContainer.innerHTML = daysData.map(({ date }) => {
+            const dayName = date.toLocaleDateString('fa-IR', { weekday: 'short' });
+            const dayNum = date.toLocaleDateString('fa-IR', { day: 'numeric' });
+            const isToday = date.toDateString() === new Date().toDateString();
+            
+            return `
+                <div class="stylist-column-header ${isToday ? 'active' : ''}" style="min-width: 150px;">
+                    <div class="stylist-name">${dayName}</div>
+                    <div style="font-size: 18px; font-weight: 700; margin-top: 5px;">${dayNum}</div>
+                </div>
+            `;
+        }).join('');
+        
+        // Render time labels
+        renderTimeLabels();
+        
+        // Render grid columns for each day
+        grid.innerHTML = daysData.map(({ date, data }) => {
+            const stylistAppts = (data.appointments || []).filter(a => a.stylistId === filteredStylistId);
+            
+            return `
+                <div class="stylist-day-column" data-date="${date.toISOString()}">
+                    ${renderGridLines()}
+                    ${renderAppointments(stylistAppts)}
+                </div>
+            `;
+        }).join('');
+        
+        attachEventListeners();
+    }
+
+    async function renderWeekView() {
+        showLoading();
+        renderStylists();
+        
+        // محاسبه ۷ روز هفته
+        const startOfWeek = new Date(currentDate);
+        const day = startOfWeek.getDay();
+        const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // شروع از دوشنبه
+        startOfWeek.setDate(diff);
+        
+        const dates = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(startOfWeek);
+            d.setDate(d.getDate() + i);
+            dates.push(d);
+        }
+        
+        try {
+            const promises = dates.map(date => {
+                const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                return fetch(`${dashboardPrefix}/api/calendar-data/salon/${salonId}/?date=${dateString}`)
+                    .then(res => res.json())
+                    .then(data => ({ date, data }));
+            });
+            
+            const results = await Promise.all(promises);
+            renderWeekGrid(results);
+        } catch (error) {
+            alert('خطا در بارگذاری اطلاعات هفتگی');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    function renderWeekGrid(daysData) {
+        const grid = document.getElementById('appointmentsGrid');
+        const headerContainer = document.getElementById('stylistsHeader');
+        
+        headerContainer.innerHTML = daysData.map(({ date }) => {
+            const dayName = date.toLocaleDateString('fa-IR', { weekday: 'short' });
+            const dayNum = date.toLocaleDateString('fa-IR', { day: 'numeric' });
+            const isToday = date.toDateString() === new Date().toDateString();
+            
+            return `
+                <div class="stylist-column-header ${isToday ? 'active' : ''}" style="min-width: 120px;">
+                    <div class="stylist-name">${dayName}</div>
+                    <div style="font-size: 16px; font-weight: 700; margin-top: 5px;">${dayNum}</div>
+                </div>
+            `;
+        }).join('');
+        
+        renderTimeLabels();
+        
+        grid.innerHTML = daysData.map(({ date, data }) => {
+            const stylistAppts = (data.appointments || []).filter(a => a.stylistId === filteredStylistId);
+            
+            return `
+                <div class="stylist-day-column" data-date="${date.toISOString()}" style="min-width: 120px;">
+                    ${renderGridLines()}
+                    ${data.salonIsOpen ? renderAppointments(stylistAppts) : '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; font-size: 12px;">تعطیل</div>'}
+                </div>
+            `;
+        }).join('');
+        
+        attachEventListeners();
+    }
+
+    async function renderMonthView() {
+        showLoading();
+        renderStylists();
+        
+        // محاسبه روزهای ماه
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        const dates = [];
+        for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
+            dates.push(new Date(d));
+        }
+        
+        try {
+            const promises = dates.map(date => {
+                const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                return fetch(`${dashboardPrefix}/api/calendar-data/salon/${salonId}/?date=${dateString}`)
+                    .then(res => res.json())
+                    .then(data => ({ date, data }));
+            });
+            
+            const results = await Promise.all(promises);
+            renderMonthGrid(results);
+        } catch (error) {
+            alert('خطا در بارگذاری اطلاعات ماهانه');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    function renderMonthGrid(daysData) {
+        const grid = document.getElementById('appointmentsGrid');
+        const headerContainer = document.getElementById('stylistsHeader');
+        const stylist = stylists.find(s => s.id === filteredStylistId);
+        
+        // نمایش نام ماه در header
+        const monthName = currentDate.toLocaleDateString('fa-IR', { month: 'long', year: 'numeric' });
+        headerContainer.innerHTML = `
+            <div class="stylist-column-header active" style="width: 100%;">
+                <div class="stylist-name" style="font-size: 18px;">${stylist.name}</div>
+                <div style="font-size: 14px; margin-top: 5px; color: #666;">${monthName}</div>
+            </div>
+        `;
+        
+        // حذف time labels
+        document.getElementById('timeLabels').innerHTML = '';
+        
+        // ایجاد نمایش ماهانه (Grid Calendar)
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // دوشنبه = 0
+        
+        let html = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e5e5e5; padding: 20px;">';
+        
+        // Header روزهای هفته
+        const weekDays = ['دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه', 'یکشنبه'];
+        weekDays.forEach(day => {
+            html += `<div style="background: white; padding: 10px; text-align: center; font-weight: 600; font-size: 12px;">${day}</div>`;
+        });
+        
+        // خانه‌های خالی قبل از اولین روز
+        for (let i = 0; i < startDay; i++) {
+            html += '<div style="background: #f5f5f5; min-height: 100px;"></div>';
+        }
+        
+        // روزهای ماه
+        daysData.forEach(({ date, data }) => {
+            const dayNum = date.getDate();
+            const isToday = date.toDateString() === new Date().toDateString();
+            const appointments = (data.appointments || []).filter(a => a.stylistId === filteredStylistId);
+            
+            html += `
+                <div style="background: white; min-height: 100px; padding: 8px; position: relative; border: ${isToday ? '2px solid #667eea' : 'none'};">
+                    <div style="font-weight: 600; margin-bottom: 5px;">${dayNum}</div>
+                    ${appointments.map(appt => `
+                        <div style="background: ${appt.paid ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'}; 
+                                    color: white; 
+                                    font-size: 10px; 
+                                    padding: 4px; 
+                                    margin-bottom: 2px; 
+                                    border-radius: 4px;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;">
+                            ${appt.time} ${appt.customer}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        grid.innerHTML = html;
     }
 });
 </script>
