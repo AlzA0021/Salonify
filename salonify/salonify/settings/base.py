@@ -74,7 +74,7 @@ MIDDLEWARE = [
     "django.middleware.locale.LocaleMiddleware",
 ]
 
-ROOT_URLCONF = "salonify.urls"
+ROOT_URLCONF = "Salonify.urls"
 
 TEMPLATES = [
     {
@@ -94,7 +94,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "salonify.wsgi.application"
+WSGI_APPLICATION = "Salonify.wsgi.application"
 
 # ==============================================================================
 # DATABASES
